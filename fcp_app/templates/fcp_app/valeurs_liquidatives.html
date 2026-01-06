@@ -300,7 +300,7 @@
                             <label class="evolution-filter-label">📋 FCP à afficher</label>
                             <select id="evolution-fcp-select" class="evolution-select">
                                 <option value="">-- Sélectionner un FCP --</option>
-                                {% for fcp in fcps %}
+                                {% for fcp in fcps_avec_vl %}
                                 <option value="{{ fcp.id }}">{{ fcp.nom }}</option>
                                 {% endfor %}
                             </select>
@@ -351,6 +351,28 @@
                     <div id="benchmark-info" class="benchmark-info" style="display: none;">
                         <span class="benchmark-tag">📊 Composition benchmark :</span>
                         <span id="benchmark-composition"></span>
+                    </div>
+                    
+                    <!-- Carte dernière VL -->
+                    <div id="derniere-vl-card" class="derniere-vl-card" style="display: none;">
+                        <div class="vl-card-header">
+                            <span class="vl-card-icon">📈</span>
+                            <span class="vl-card-title">Dernière Valeur Liquidative</span>
+                        </div>
+                        <div class="vl-card-content">
+                            <div class="vl-card-row">
+                                <span class="vl-card-label">Date</span>
+                                <span class="vl-card-value" id="derniere-vl-date">-</span>
+                            </div>
+                            <div class="vl-card-row">
+                                <span class="vl-card-label">Valeur</span>
+                                <span class="vl-card-value vl-value-main" id="derniere-vl-valeur">-</span>
+                            </div>
+                            <div class="vl-card-row">
+                                <span class="vl-card-label">Performance période</span>
+                                <span class="vl-card-value" id="derniere-vl-perf">-</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -958,6 +980,72 @@
 
     .benchmark-tag {
         font-weight: 600;
+    }
+
+    /* Carte dernière VL */
+    .derniere-vl-card {
+        margin-top: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        padding: 20px;
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .vl-card-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .vl-card-icon {
+        font-size: 1.5em;
+    }
+
+    .vl-card-title {
+        font-size: 1.1em;
+        font-weight: 600;
+    }
+
+    .vl-card-content {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .vl-card-row {
+        text-align: center;
+        min-width: 100px;
+    }
+
+    .vl-card-label {
+        display: block;
+        font-size: 0.8em;
+        opacity: 0.8;
+        margin-bottom: 5px;
+    }
+
+    .vl-card-value {
+        display: block;
+        font-size: 1.2em;
+        font-weight: 700;
+    }
+
+    .vl-value-main {
+        font-size: 1.5em;
+        color: #ffd700;
+    }
+
+    .perf-positive {
+        color: #2ecc71;
+    }
+
+    .perf-negative {
+        color: #ff6b6b;
     }
 </style>
 
@@ -1584,7 +1672,8 @@
             // Afficher placeholder si aucun FCP sélectionné
             document.getElementById('evolution-placeholder').style.display = 'flex';
             document.getElementById('evolution-vl-chart').style.display = 'none';
-            document.getElementById('evolution-benchmark-info').innerHTML = '';
+            document.getElementById('benchmark-info').style.display = 'none';
+            document.getElementById('derniere-vl-card').style.display = 'none';
             if (evolutionChart) {
                 evolutionChart.destroy();
                 evolutionChart = null;
@@ -1603,6 +1692,7 @@
             
             updateEvolutionChart(data);
             updateBenchmarkInfo(data.benchmark_info);
+            updateDerniereVL(data.derniere_vl);
             
         } catch (error) {
             console.error('Erreur lors du chargement des données d\'évolution:', error);
@@ -1733,6 +1823,36 @@
             <span>${actionsLabel} (${(info.poids_actions * 100).toFixed(0)}%)</span>
         `;
         container.style.display = 'block';
+    }
+
+    function updateDerniereVL(vlInfo) {
+        const card = document.getElementById('derniere-vl-card');
+        const dateEl = document.getElementById('derniere-vl-date');
+        const valeurEl = document.getElementById('derniere-vl-valeur');
+        const perfEl = document.getElementById('derniere-vl-perf');
+        
+        if (!vlInfo) {
+            card.style.display = 'none';
+            return;
+        }
+        
+        // Formater la date
+        const date = new Date(vlInfo.date);
+        const options = { day: '2-digit', month: 'short', year: 'numeric' };
+        dateEl.textContent = date.toLocaleDateString('fr-FR', options);
+        
+        // Formater la valeur
+        valeurEl.textContent = vlInfo.valeur.toLocaleString('fr-FR', { 
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 4 
+        }) + ' FCFA';
+        
+        // Formater la performance avec couleur
+        const perf = vlInfo.performance;
+        perfEl.textContent = (perf >= 0 ? '+' : '') + perf.toFixed(2) + '%';
+        perfEl.className = 'vl-card-value ' + (perf >= 0 ? 'perf-positive' : 'perf-negative');
+        
+        card.style.display = 'block';
     }
 
     // Event listeners pour l'évolution VL

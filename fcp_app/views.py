@@ -274,11 +274,22 @@ def api_evolution_vl(request):
                             'valeur': round(perf_bench, 2)
                         })
     
+    # Récupérer la dernière VL
+    derniere_vl = vl_list[-1] if vl_list else None
+    derniere_vl_info = None
+    if derniere_vl:
+        derniere_vl_info = {
+            'date': str(derniere_vl['date']),
+            'valeur': float(derniere_vl['valeur']),
+            'performance': evolution_fcp[-1]['valeur'] if evolution_fcp else 0
+        }
+    
     return JsonResponse({
         'fcp_nom': fcp.nom,
         'evolution_fcp': evolution_fcp,
         'evolution_benchmark': evolution_benchmark,
         'benchmark_info': benchmark_info,
+        'derniere_vl': derniere_vl_info,
         'periode': periode
     })
 
@@ -300,6 +311,9 @@ def valeurs_liquidatives(request):
     
     # Récupérer tous les FCP actifs avec leur fiche signalétique
     fcps = FCP.objects.filter(actif=True).select_related('fiche_signaletique').order_by('nom')
+    
+    # Filtrer les FCP qui ont des VL (pour le sélecteur du graphique évolution)
+    fcps_avec_vl = [fcp for fcp in fcps if ValeurLiquidative.objects.filter(fcp=fcp, valeur__isnull=False).exists()]
     
     # Récupérer les paramètres de filtrage
     periode = request.GET.get('periode', 'origine')
@@ -386,6 +400,7 @@ def valeurs_liquidatives(request):
     
     context = {
         'fcps': fcps,
+        'fcps_avec_vl': fcps_avec_vl,
         'classification_data': json.dumps(classification_data),
         'performance_data': json.dumps(performance_data),
         'periode': periode,
