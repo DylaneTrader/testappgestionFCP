@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestion FCP{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'fcp_app/css/style.css' %}">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="{% url 'fcp_app:home' %}" {% if request.resolver_match.url_name == 'home' %}class="active"{% endif %}>Accueil</a></li>
+            <li><a href="{% url 'fcp_app:valeurs_liquidatives' %}" {% if request.resolver_match.url_name == 'valeurs_liquidatives' %}class="active"{% endif %}>Valeurs liquidatives</a></li>
+            <li><a href="{% url 'fcp_app:composition_fcp' %}" {% if request.resolver_match.url_name == 'composition_fcp' %}class="active"{% endif %}>Composition FCP</a></li>
+            <li><a href="{% url 'fcp_app:fiche_signaletique' %}" {% if request.resolver_match.url_name == 'fiche_signaletique' %}class="active"{% endif %}>Fiche signalétique</a></li>
+            <li><a href="{% url 'fcp_app:souscriptions_rachats' %}" {% if request.resolver_match.url_name == 'souscriptions_rachats' %}class="active"{% endif %}>Souscriptions rachats & Actifs net</a></li>
+            <li><a href="{% url 'fcp_app:about' %}" {% if request.resolver_match.url_name == 'about' %}class="active"{% endif %}>À propos</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Gestion FCP. Tous droits réservés.</p>
+    </footer>
+</body>
+</html>
