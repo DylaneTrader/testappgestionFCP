@@ -45,12 +45,6 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'fcp_app:souscriptions_rachats' %}" {% if request.resolver_match.url_name == 'souscriptions_rachats' %}class="active"{% endif %}>
-                        <span class="icon">💰</span>
-                        <span class="text">Souscriptions & Rachats</span>
-                    </a>
-                </li>
-                <li>
                     <a href="{% url 'fcp_app:about' %}" {% if request.resolver_match.url_name == 'about' %}class="active"{% endif %}>
                         <span class="icon">ℹ️</span>
                         <span class="text">À propos</span>

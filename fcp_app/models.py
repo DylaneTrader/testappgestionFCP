@@ -355,3 +355,93 @@ class PoidsQuotidien(models.Model):
     
     def __str__(self):
         return f"{self.fcp.nom} - {self.date}"
+
+
+class FicheSignaletique(models.Model):
+    """Fiche signalétique des FCP avec informations générales"""
+    fcp = models.OneToOneField(
+        FCP, 
+        on_delete=models.CASCADE, 
+        related_name='fiche_signaletique',
+        verbose_name="FCP"
+    )
+    echelle_risque = models.IntegerField(
+        null=True, 
+        blank=True,
+        verbose_name="Échelle de risque"
+    )
+    type_fcp = models.CharField(
+        max_length=100, 
+        null=True, 
+        blank=True,
+        verbose_name="Type de FCP"
+    )
+    horizon_investissement = models.IntegerField(
+        null=True, 
+        blank=True,
+        verbose_name="Horizon d'investissement (années)"
+    )
+    benchmark_obligataire = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        null=True, 
+        blank=True,
+        verbose_name="Benchmark Obligataire"
+    )
+    benchmark_brvmc = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2, 
+        null=True, 
+        blank=True,
+        verbose_name="Benchmark BRVMC (Actions)"
+    )
+    date_creation = models.DateField(
+        null=True, 
+        blank=True,
+        verbose_name="Date de création"
+    )
+    depositaire = models.CharField(
+        max_length=200, 
+        null=True, 
+        blank=True,
+        verbose_name="Dépositaire"
+    )
+    frais_gestion = models.DecimalField(
+        max_digits=10, 
+        decimal_places=4, 
+        null=True, 
+        blank=True,
+        verbose_name="Frais de gestion (TTC de l'actif net / an)"
+    )
+    frais_entree = models.CharField(
+        max_length=50, 
+        null=True, 
+        blank=True,
+        verbose_name="Frais d'entrée TTC"
+    )
+    frais_sortie = models.CharField(
+        max_length=50, 
+        null=True, 
+        blank=True,
+        verbose_name="Frais de sortie TTC"
+    )
+    
+    @property
+    def profil_risque(self):
+        """Détermine le profil de risque en fonction de l'échelle"""
+        if self.echelle_risque is None:
+            return "Non défini"
+        elif self.echelle_risque <= 2:
+            return "Prudent"
+        elif self.echelle_risque <= 4:
+            return "Équilibré"
+        else:
+            return "Dynamique"
+    
+    class Meta:
+        verbose_name = "Fiche Signalétique"
+        verbose_name_plural = "Fiches Signalétiques"
+        ordering = ['fcp']
+    
+    def __str__(self):
+        return f"Fiche - {self.fcp.nom}"
