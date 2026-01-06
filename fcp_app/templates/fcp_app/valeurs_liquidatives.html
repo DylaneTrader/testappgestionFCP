@@ -3,13 +3,350 @@
 {% block title %}Valeurs liquidatives - Gestion FCP{% endblock %}
 
 {% block content %}
-<div class="content">
-    <h1>Valeurs liquidatives</h1>
-    <p>Cette page affichera les valeurs liquidatives des FCP.</p>
-    
-    <div class="card">
-        <h2>Informations</h2>
-        <p>Le contenu de cette page sera développé prochainement pour afficher les valeurs liquidatives historiques et actuelles des différents fonds.</p>
-    </div>
+<div class="page-container">
+    <!-- Sidebar des filtres -->
+    <aside class="filters-sidebar">
+        <div class="filters-header">
+            <h3>🔍 Filtres</h3>
+        </div>
+        
+        <div class="filters-content">
+            <!-- Filtre Période d'analyse -->
+            <div class="filter-group">
+                <label class="filter-label">📅 Période d'analyse</label>
+                <select id="periode-analyse" class="filter-select">
+                    <option value="origine" selected>Origine (toute la période)</option>
+                    <option value="ytd">YTD (Year to Date)</option>
+                    <option value="qtd">QTD (Quarter to Date)</option>
+                    <option value="mtd">MTD (Month to Date)</option>
+                    <option value="wtd">WTD (Week to Date)</option>
+                    <option value="personnalise">Personnalisé</option>
+                </select>
+                
+                <!-- Dates personnalisées (affichées conditionnellement) -->
+                <div id="dates-personnalisees" class="custom-dates" style="display: none;">
+                    <div class="date-input-group">
+                        <label for="date-debut">Date début :</label>
+                        <input type="date" id="date-debut" class="filter-input">
+                    </div>
+                    <div class="date-input-group">
+                        <label for="date-fin">Date fin :</label>
+                        <input type="date" id="date-fin" class="filter-input">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtre Type de fond -->
+            <div class="filter-group">
+                <label class="filter-label">📊 Type de fond</label>
+                <div class="filter-checkboxes">
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="action" class="filter-checkbox" data-filter="type-fond">
+                        <span>Action</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="capital-risque" class="filter-checkbox" data-filter="type-fond">
+                        <span>Capital-Risque</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="diversifie" class="filter-checkbox" data-filter="type-fond">
+                        <span>Diversifié</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="monetaire" class="filter-checkbox" data-filter="type-fond">
+                        <span>Monétaire</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="obligataire" class="filter-checkbox" data-filter="type-fond">
+                        <span>Obligataire</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Filtre Profil de risque -->
+            <div class="filter-group">
+                <label class="filter-label">⚠️ Profil de risque</label>
+                <div class="filter-checkboxes">
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="prudent" class="filter-checkbox" data-filter="profil-risque">
+                        <span>Prudent (1-2)</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="equilibre" class="filter-checkbox" data-filter="profil-risque">
+                        <span>Équilibré (3-4)</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="dynamique" class="filter-checkbox" data-filter="profil-risque">
+                        <span>Dynamique (5-7)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="filter-actions">
+                <button id="appliquer-filtres" class="btn btn-primary">Appliquer les filtres</button>
+                <button id="reinitialiser-filtres" class="btn btn-secondary">Réinitialiser</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Contenu principal -->
+    <main class="main-content-area">
+        <div class="content-header">
+            <h1>Valeurs liquidatives</h1>
+            <div class="header-actions">
+                <button id="export-data" class="btn btn-outline">📥 Exporter</button>
+            </div>
+        </div>
+        
+        <div class="content-body">
+            <!-- Le contenu sera ajouté ultérieurement -->
+            <div class="placeholder-content">
+                <p>📈 Les données des valeurs liquidatives seront affichées ici après application des filtres.</p>
+            </div>
+        </div>
+    </main>
 </div>
+
+<style>
+    .page-container {
+        display: flex;
+        gap: 20px;
+        min-height: calc(100vh - 40px);
+    }
+
+    .filters-sidebar {
+        width: 280px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+    }
+
+    .filters-header h3 {
+        margin: 0 0 20px 0;
+        color: #2c3e50;
+        font-size: 1.3em;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #3498db;
+    }
+
+    .filter-group {
+        margin-bottom: 25px;
+    }
+
+    .filter-label {
+        display: block;
+        font-weight: 600;
+        color: #34495e;
+        margin-bottom: 10px;
+        font-size: 0.95em;
+    }
+
+    .filter-select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 0.9em;
+        background: white;
+        cursor: pointer;
+        transition: border-color 0.3s;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: #3498db;
+    }
+
+    .custom-dates {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px dashed #ddd;
+    }
+
+    .date-input-group {
+        margin-bottom: 10px;
+    }
+
+    .date-input-group label {
+        display: block;
+        font-size: 0.85em;
+        color: #7f8c8d;
+        margin-bottom: 5px;
+    }
+
+    .filter-input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.9em;
+    }
+
+    .filter-checkboxes {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+    }
+
+    .checkbox-label:hover {
+        background-color: #f8f9fa;
+    }
+
+    .filter-checkbox {
+        margin-right: 10px;
+        cursor: pointer;
+        width: 18px;
+        height: 18px;
+    }
+
+    .filter-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 2px solid #ecf0f1;
+    }
+
+    .btn {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: #3498db;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-secondary {
+        background: #95a5a6;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #7f8c8d;
+    }
+
+    .btn-outline {
+        background: white;
+        color: #3498db;
+        border: 2px solid #3498db;
+    }
+
+    .btn-outline:hover {
+        background: #3498db;
+        color: white;
+    }
+
+    .main-content-area {
+        flex: 1;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+    }
+
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #ecf0f1;
+    }
+
+    .content-header h1 {
+        margin: 0;
+        color: #2c3e50;
+    }
+
+    .placeholder-content {
+        text-align: center;
+        padding: 60px 20px;
+        color: #7f8c8d;
+        font-size: 1.1em;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .filters-sidebar {
+            width: 250px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .page-container {
+            flex-direction: column;
+        }
+
+        .filters-sidebar {
+            width: 100%;
+            position: static;
+        }
+    }
+</style>
+
+<script>
+    // Gestion de l'affichage des dates personnalisées
+    document.getElementById('periode-analyse').addEventListener('change', function() {
+        const datesPersonnalisees = document.getElementById('dates-personnalisees');
+        if (this.value === 'personnalise') {
+            datesPersonnalisees.style.display = 'block';
+        } else {
+            datesPersonnalisees.style.display = 'none';
+        }
+    });
+
+    // Appliquer les filtres
+    document.getElementById('appliquer-filtres').addEventListener('click', function() {
+        const periode = document.getElementById('periode-analyse').value;
+        const typesFond = Array.from(document.querySelectorAll('[data-filter="type-fond"]:checked'))
+            .map(cb => cb.value);
+        const profilsRisque = Array.from(document.querySelectorAll('[data-filter="profil-risque"]:checked'))
+            .map(cb => cb.value);
+        
+        console.log('Filtres appliqués:', {
+            periode: periode,
+            typesFond: typesFond,
+            profilsRisque: profilsRisque
+        });
+        
+        // TODO: Appliquer les filtres aux données
+        alert('Filtres appliqués ! Les données seront chargées ultérieurement.');
+    });
+
+    // Réinitialiser les filtres
+    document.getElementById('reinitialiser-filtres').addEventListener('click', function() {
+        document.getElementById('periode-analyse').value = 'origine';
+        document.getElementById('dates-personnalisees').style.display = 'none';
+        document.querySelectorAll('.filter-checkbox').forEach(cb => cb.checked = false);
+        
+        console.log('Filtres réinitialisés');
+    });
+</script>
 {% endblock %}
