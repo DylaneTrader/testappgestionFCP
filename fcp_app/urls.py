@@ -8,6 +8,7 @@ urlpatterns = [
     path('valeurs-liquidatives/', views.valeurs_liquidatives, name='valeurs_liquidatives'),
     path('api/performance-data/', views.api_performance_data, name='api_performance_data'),
     path('api/evolution-vl/', views.api_evolution_vl, name='api_evolution_vl'),
+    path('api/stats-descriptives/', views.api_stats_descriptives, name='api_stats_descriptives'),
     path('composition-fcp/', views.composition_fcp, name='composition_fcp'),
     path('fiche-signaletique/', views.fiche_signaletique, name='fiche_signaletique'),
     path('about/', views.about, name='about'),

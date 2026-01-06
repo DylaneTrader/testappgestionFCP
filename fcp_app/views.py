@@ -294,6 +294,138 @@ def api_evolution_vl(request):
     })
 
 
+def api_stats_descriptives(request):
+    """API pour les statistiques descriptives des rendements journaliers"""
+    import numpy as np
+    from scipy import stats as scipy_stats
+    
+    periode = request.GET.get('periode', 'origine')
+    fcp_ids = request.GET.getlist('fcp_ids')
+    
+    # Calculer les dates selon la période
+    date_debut, date_fin = get_period_dates(periode)
+    
+    # Récupérer les FCP sélectionnés ou tous
+    if fcp_ids:
+        fcps = FCP.objects.filter(id__in=fcp_ids, actif=True)
+    else:
+        fcps = FCP.objects.filter(actif=True)
+    
+    stats_data = []
+    rendements_all = {}  # Pour la heatmap de corrélation
+    
+    for fcp in fcps:
+        # Récupérer les VL
+        vl_query = ValeurLiquidative.objects.filter(
+            fcp=fcp, 
+            valeur__isnull=False
+        ).order_by('date')
+        
+        if date_debut:
+            vl_query = vl_query.filter(date__gte=date_debut)
+        if date_fin:
+            vl_query = vl_query.filter(date__lte=date_fin)
+        
+        vl_list = list(vl_query.values('date', 'valeur'))
+        
+        if len(vl_list) < 2:
+            continue
+        
+        # Calculer les rendements journaliers
+        rendements = []
+        for i in range(1, len(vl_list)):
+            prev_val = float(vl_list[i-1]['valeur'])
+            curr_val = float(vl_list[i]['valeur'])
+            if prev_val != 0:
+                rdt = ((curr_val - prev_val) / prev_val) * 100
+                rendements.append(rdt)
+        
+        if len(rendements) < 2:
+            continue
+        
+        rendements_np = np.array(rendements)
+        rendements_all[fcp.nom] = rendements_np
+        
+        # Calculer les statistiques
+        mean_rdt = np.mean(rendements_np)
+        median_rdt = np.median(rendements_np)
+        std_rdt = np.std(rendements_np, ddof=1)
+        min_rdt = np.min(rendements_np)
+        max_rdt = np.max(rendements_np)
+        
+        # Skewness et Kurtosis
+        if len(rendements_np) >= 3:
+            skewness = scipy_stats.skew(rendements_np)
+        else:
+            skewness = 0
+        
+        if len(rendements_np) >= 4:
+            kurtosis = scipy_stats.kurtosis(rendements_np)
+        else:
+            kurtosis = 0
+        
+        # Quartiles pour le boxplot
+        q1 = np.percentile(rendements_np, 25)
+        q3 = np.percentile(rendements_np, 75)
+        iqr = q3 - q1
+        whisker_low = max(min_rdt, q1 - 1.5 * iqr)
+        whisker_high = min(max_rdt, q3 + 1.5 * iqr)
+        
+        # Outliers
+        outliers = rendements_np[(rendements_np < whisker_low) | (rendements_np > whisker_high)]
+        
+        stats_data.append({
+            'fcp_id': fcp.id,
+            'fcp_nom': fcp.nom,
+            'mean': round(mean_rdt, 4),
+            'median': round(median_rdt, 4),
+            'std': round(std_rdt, 4),
+            'min': round(min_rdt, 4),
+            'max': round(max_rdt, 4),
+            'skewness': round(skewness, 4),
+            'kurtosis': round(kurtosis, 4),
+            'boxplot': {
+                'min': round(whisker_low, 4),
+                'q1': round(q1, 4),
+                'median': round(median_rdt, 4),
+                'q3': round(q3, 4),
+                'max': round(whisker_high, 4),
+                'outliers': [round(o, 4) for o in outliers.tolist()]
+            }
+        })
+    
+    # Calculer la matrice de corrélation
+    correlation_matrix = []
+    fcp_names = list(rendements_all.keys())
+    
+    if len(fcp_names) >= 2:
+        for i, name_i in enumerate(fcp_names):
+            row = []
+            for j, name_j in enumerate(fcp_names):
+                if i == j:
+                    row.append(1.0)
+                else:
+                    # Aligner les séries par taille minimale
+                    len_min = min(len(rendements_all[name_i]), len(rendements_all[name_j]))
+                    if len_min >= 2:
+                        corr = np.corrcoef(
+                            rendements_all[name_i][:len_min],
+                            rendements_all[name_j][:len_min]
+                        )[0, 1]
+                        row.append(round(corr, 3) if not np.isnan(corr) else 0)
+                    else:
+                        row.append(0)
+            correlation_matrix.append(row)
+    
+    return JsonResponse({
+        'stats': stats_data,
+        'correlation': {
+            'labels': fcp_names,
+            'matrix': correlation_matrix
+        }
+    })
+
+
 def home(request):
     """Page d'accueil"""
     # Récupérer des statistiques pour la page d'accueil

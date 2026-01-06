@@ -32,6 +32,16 @@
                             <li><a href="#evolution-vl" class="sub-nav-link">Évolution VL</a></li>
                         </ul>
                     </li>
+                    <li>
+                        <a href="#section-3" class="nav-link" data-section="section-3">
+                            📐 Section 3 : Statistiques
+                        </a>
+                        <ul class="sub-nav">
+                            <li><a href="#boxplot-rendements" class="sub-nav-link">Box Plot Rendements</a></li>
+                            <li><a href="#stats-descriptives" class="sub-nav-link">Stats Descriptives</a></li>
+                            <li><a href="#heatmap-correlation" class="sub-nav-link">Corrélations</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -377,6 +387,69 @@
                 </div>
             </div>
         </section>
+
+        <!-- Section 3 : Statistiques descriptives -->
+        <section class="section" id="section-3">
+            <h2 class="section-title">📐 Section 3 : Statistiques descriptives</h2>
+
+            <!-- Box Plot des rendements journaliers -->
+            <div class="subsection collapsible" id="boxplot-rendements">
+                <div class="subsection-header" onclick="toggleSection(this)">
+                    <h3 class="subsection-title">📦 Box Plot des Rendements Journaliers</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subsection-content">
+                    <div class="chart-container" id="boxplot-container" style="min-height: 400px;">
+                        <canvas id="boxplot-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tableau statistiques descriptives -->
+            <div class="subsection collapsible" id="stats-descriptives">
+                <div class="subsection-header" onclick="toggleSection(this)">
+                    <h3 class="subsection-title">📊 Tableau Statistiques Descriptives</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subsection-content">
+                    <div class="table-container">
+                        <table class="data-table" id="stats-table">
+                            <thead>
+                                <tr>
+                                    <th>FCP</th>
+                                    <th>Rdt Moyen (%)</th>
+                                    <th>Médiane (%)</th>
+                                    <th>Volatilité (%)</th>
+                                    <th>Min (%)</th>
+                                    <th>Max (%)</th>
+                                    <th>Skewness</th>
+                                    <th>Kurtosis</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stats-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Heatmap de corrélation -->
+            <div class="subsection collapsible" id="heatmap-correlation">
+                <div class="subsection-header" onclick="toggleSection(this)">
+                    <h3 class="subsection-title">🔥 Matrice de Corrélation</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="subsection-content">
+                    <div class="heatmap-container" id="correlation-heatmap-container">
+                        <div id="correlation-heatmap"></div>
+                    </div>
+                    <div class="heatmap-legend">
+                        <span class="legend-label">-1</span>
+                        <div class="legend-gradient"></div>
+                        <span class="legend-label">+1</span>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 </div>
 
@@ -406,7 +479,7 @@
     .sidebar-section {
         margin-bottom: 20px;
         padding-bottom: 15px;
-        border-bottom: 1px solid #ecf0f1;
+        border-bottom: 1px solid #E0DEDD;
     }
 
     .sidebar-section:last-child {
@@ -416,7 +489,7 @@
 
     .sidebar-section-title {
         font-size: 0.85em;
-        color: #2c3e50;
+        color: #333333;
         margin: 0 0 10px 0;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -436,7 +509,7 @@
     .nav-link {
         display: block;
         padding: 8px 10px;
-        color: #34495e;
+        color: #333333;
         text-decoration: none;
         border-radius: 5px;
         font-size: 0.85em;
@@ -445,7 +518,7 @@
     }
 
     .nav-link:hover, .nav-link.active {
-        background: #3498db;
+        background: #004080;
         color: white;
     }
 
@@ -458,16 +531,16 @@
     .sub-nav-link {
         display: block;
         padding: 5px 10px;
-        color: #7f8c8d;
+        color: #333333;
         text-decoration: none;
         font-size: 0.8em;
-        border-left: 2px solid #ecf0f1;
+        border-left: 2px solid #E0DEDD;
         transition: all 0.2s;
     }
 
     .sub-nav-link:hover {
-        color: #3498db;
-        border-left-color: #3498db;
+        color: #004080;
+        border-left-color: #004080;
     }
 
     /* Filtres compacts */
@@ -508,7 +581,7 @@
     .filter-label-small {
         font-size: 0.8em;
         font-weight: 600;
-        color: #34495e;
+        color: #333333;
         display: block;
         margin-bottom: 5px;
     }
@@ -542,8 +615,8 @@
 
     .btn-tiny {
         background: none;
-        border: 1px solid #3498db;
-        color: #3498db;
+        border: 1px solid #004080;
+        color: #004080;
         padding: 2px 6px;
         font-size: 0.7em;
         border-radius: 3px;
@@ -551,17 +624,17 @@
     }
 
     .btn-tiny:hover {
-        background: #3498db;
+        background: #004080;
         color: white;
     }
 
     .fcp-selection-compact {
         max-height: 150px;
         overflow-y: auto;
-        border: 1px solid #eee;
+        border: 1px solid #E0DEDD;
         border-radius: 4px;
         padding: 5px;
-        background: #fafafa;
+        background: #f8f8f8;
     }
 
     .checkbox-compact {
@@ -574,7 +647,7 @@
     }
 
     .checkbox-compact:hover {
-        background: #f0f0f0;
+        background: #E0DEDD;
     }
 
     .checkbox-compact input {
@@ -601,18 +674,18 @@
         display: inline-block;
         padding: 3px 8px;
         font-size: 0.7em;
-        background: #ecf0f1;
+        background: #E0DEDD;
         border-radius: 12px;
         transition: all 0.2s;
     }
 
     .pill-checkbox input:checked + span {
-        background: #3498db;
+        background: #004080;
         color: white;
     }
 
     .pill-checkbox:hover span {
-        background: #bdc3c7;
+        background: #c5c3c2;
     }
 
     /* Contenu principal */
@@ -631,20 +704,20 @@
         align-items: center;
         margin-bottom: 20px;
         padding-bottom: 15px;
-        border-bottom: 2px solid #ecf0f1;
+        border-bottom: 2px solid #E0DEDD;
     }
 
     .content-header-compact h1 {
         margin: 0;
         font-size: 1.5em;
-        color: #2c3e50;
+        color: #004080;
         border: none;
         padding: 0;
     }
 
     .period-badge {
-        background: #e8f4fc;
-        color: #2980b9;
+        background: #E0DEDD;
+        color: #004080;
         padding: 5px 12px;
         border-radius: 15px;
         font-size: 0.8em;
@@ -657,11 +730,11 @@
     }
 
     .section-title {
-        color: #2c3e50;
+        color: #004080;
         font-size: 1.2em;
         margin-bottom: 20px;
         padding-bottom: 8px;
-        border-bottom: 3px solid #3498db;
+        border-bottom: 3px solid #004080;
     }
 
     /* Subsections pliables */
@@ -677,12 +750,12 @@
         justify-content: space-between;
         align-items: center;
         padding: 12px 15px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #004080;
         cursor: pointer;
     }
 
     .subsection-header:hover {
-        background: linear-gradient(135deg, #5a6fd6 0%, #6a4190 100%);
+        background: #003366;
     }
 
     .subsection-header .subsection-title {
@@ -726,7 +799,7 @@
     }
 
     .data-table thead {
-        background: #34495e;
+        background: #004080;
         color: white;
     }
 
@@ -740,7 +813,7 @@
 
     .data-table td {
         padding: 8px 12px;
-        border-bottom: 1px solid #ecf0f1;
+        border-bottom: 1px solid #E0DEDD;
     }
 
     .data-table tbody tr:hover {
@@ -779,8 +852,8 @@
     .perf-negative-4 { background-color: rgba(231, 76, 60, 0.55); color: #922b21; }
     .perf-negative-5 { background-color: rgba(231, 76, 60, 0.7); color: white; }
 
-    .perf-neutral { background-color: #f5f5f5; color: #7f8c8d; }
-    .perf-na { background-color: #fafafa; color: #bdc3c7; font-style: italic; }
+    .perf-neutral { background-color: #f5f5f5; color: #333333; }
+    .perf-na { background-color: #E0DEDD; color: #999999; font-style: italic; }
 
     /* Charts */
     .chart-container {
@@ -813,8 +886,8 @@
     .loading-spinner {
         width: 40px;
         height: 40px;
-        border: 4px solid #ecf0f1;
-        border-top: 4px solid #3498db;
+        border: 4px solid #E0DEDD;
+        border-top: 4px solid #004080;
         border-radius: 50%;
         animation: spin 1s linear infinite;
     }
@@ -882,7 +955,7 @@
     .evolution-filter-label {
         font-size: 0.85em;
         font-weight: 600;
-        color: #34495e;
+        color: #333333;
     }
 
     .evolution-select {
@@ -896,7 +969,7 @@
 
     .evolution-select:focus {
         outline: none;
-        border-color: #3498db;
+        border-color: #004080;
     }
 
     .evolution-period-pills {
@@ -916,19 +989,19 @@
         display: inline-block;
         padding: 6px 14px;
         font-size: 0.85em;
-        background: #ecf0f1;
+        background: #E0DEDD;
         border-radius: 20px;
         transition: all 0.2s;
         font-weight: 500;
     }
 
     .period-pill input:checked + span {
-        background: #3498db;
+        background: #004080;
         color: white;
     }
 
     .period-pill:hover span {
-        background: #bdc3c7;
+        background: #c5c3c2;
     }
 
     .checkbox-inline {
@@ -951,7 +1024,7 @@
         align-items: center;
         justify-content: center;
         min-height: 300px;
-        color: #95a5a6;
+        color: #333333;
         text-align: center;
     }
 
@@ -972,10 +1045,10 @@
     .benchmark-info {
         margin-top: 15px;
         padding: 10px 15px;
-        background: #e8f4fc;
+        background: #E0DEDD;
         border-radius: 5px;
         font-size: 0.85em;
-        color: #2980b9;
+        color: #004080;
     }
 
     .benchmark-tag {
@@ -985,11 +1058,11 @@
     /* Carte dernière VL */
     .derniere-vl-card {
         margin-top: 20px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #004080;
         border-radius: 12px;
         padding: 20px;
         color: white;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 15px rgba(0, 64, 128, 0.3);
     }
 
     .vl-card-header {
@@ -1046,6 +1119,96 @@
 
     .perf-negative {
         color: #ff6b6b;
+    }
+
+    /* Styles pour la Section 3 - Statistiques */
+    .heatmap-container {
+        overflow-x: auto;
+        padding: 10px;
+    }
+
+    #correlation-heatmap {
+        display: grid;
+        gap: 2px;
+        font-size: 0.75em;
+    }
+
+    .heatmap-cell {
+        width: 60px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 3px;
+        font-weight: 600;
+        transition: transform 0.2s;
+    }
+
+    .heatmap-cell:hover {
+        transform: scale(1.1);
+        z-index: 10;
+    }
+
+    .heatmap-header {
+        background: #004080;
+        color: white;
+        font-weight: 700;
+        font-size: 0.7em;
+        text-align: center;
+        padding: 5px 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .heatmap-row-header {
+        background: #004080;
+        color: white;
+        font-weight: 600;
+        font-size: 0.7em;
+        padding: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 120px;
+    }
+
+    .heatmap-legend {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+        padding: 10px;
+    }
+
+    .legend-gradient {
+        width: 200px;
+        height: 20px;
+        background: linear-gradient(to right, #e74c3c, #f39c12, #f1f1f1, #3498db, #004080);
+        border-radius: 3px;
+    }
+
+    .legend-label {
+        font-weight: 600;
+        color: #333333;
+        font-size: 0.9em;
+    }
+
+    /* Box plot styles */
+    #boxplot-container {
+        position: relative;
+    }
+
+    .boxplot-tooltip {
+        position: absolute;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 5px;
+        font-size: 0.85em;
+        pointer-events: none;
+        z-index: 100;
     }
 </style>
 
@@ -1263,7 +1426,7 @@
         });
         
         if (visibleCount === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#7f8c8d;">Aucun FCP sélectionné</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#333333;">Aucun FCP sélectionné</td></tr>';
         }
     }
 
@@ -1290,7 +1453,7 @@
         });
         
         if (filteredData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#7f8c8d;">Aucune donnée</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#333333;">Aucune donnée</td></tr>';
         }
     }
 
@@ -1336,7 +1499,7 @@
         });
         
         if (rendementData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#7f8c8d;">Aucune donnée</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#333333;">Aucune donnée</td></tr>';
             return;
         }
         
@@ -1442,7 +1605,7 @@
         });
         
         if (filteredFcps.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="${periodes.length + 1}" style="text-align:center; color:#7f8c8d;">Aucune donnée</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="${periodes.length + 1}" style="text-align:center; color:#333333;">Aucune donnée</td></tr>`;
         }
     }
 
@@ -1488,7 +1651,7 @@
         });
         
         if (filteredFcps.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="${periodes.length + 1}" style="text-align:center; color:#7f8c8d;">Aucune donnée</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="${periodes.length + 1}" style="text-align:center; color:#333333;">Aucune donnée</td></tr>`;
         }
     }
 
@@ -1590,6 +1753,10 @@
         fillRendementAnnualise();
         fillPerformancesCalendaires();
         fillPerformancesGlissantes();
+        // Section 3 : Statistiques descriptives
+        if (typeof fetchStatsDescriptives === 'function') {
+            fetchStatsDescriptives();
+        }
     }
 
     // === EVENT LISTENERS ===
@@ -1711,8 +1878,8 @@
         const datasets = [{
             label: data.fcp_nom,
             data: data.evolution_fcp.map(item => ({ x: item.date, y: item.valeur })),
-            borderColor: '#2196F3',
-            backgroundColor: 'rgba(33, 150, 243, 0.1)',
+            borderColor: '#004080',
+            backgroundColor: 'rgba(0, 64, 128, 0.1)',
             fill: true,
             tension: 0.3,
             pointRadius: 0,
@@ -1724,8 +1891,8 @@
             datasets.push({
                 label: 'Benchmark composite',
                 data: data.evolution_benchmark.map(item => ({ x: item.date, y: item.valeur })),
-                borderColor: '#FF9800',
-                backgroundColor: 'rgba(255, 152, 0, 0.05)',
+                borderColor: '#333333',
+                backgroundColor: 'rgba(51, 51, 51, 0.05)',
                 fill: false,
                 tension: 0.3,
                 pointRadius: 0,
@@ -1866,6 +2033,252 @@
         // Si déjà des données, juste recharger le graphique pour afficher/masquer le benchmark
         fetchEvolutionData();
     });
+
+    // === SECTION 3 : STATISTIQUES DESCRIPTIVES ===
+
+    let boxplotChart = null;
+    let statsData = null;
+
+    async function fetchStatsDescriptives() {
+        const periode = document.getElementById('periode-analyse').value;
+        const selectedFcps = Array.from(document.querySelectorAll('.fcp-checkbox:checked'))
+            .map(cb => cb.value);
+        
+        if (selectedFcps.length === 0) {
+            clearStatsSection();
+            return;
+        }
+        
+        try {
+            const params = new URLSearchParams();
+            params.append('periode', periode);
+            selectedFcps.forEach(id => params.append('fcp_ids', id));
+            
+            const response = await fetch(`/api/stats-descriptives/?${params.toString()}`);
+            statsData = await response.json();
+            
+            if (statsData.stats && statsData.stats.length > 0) {
+                renderBoxplot(statsData.stats);
+                renderStatsTable(statsData.stats);
+                renderCorrelationHeatmap(statsData.correlation);
+            } else {
+                clearStatsSection();
+            }
+        } catch (error) {
+            console.error('Erreur lors du chargement des statistiques:', error);
+        }
+    }
+
+    function clearStatsSection() {
+        if (boxplotChart) {
+            boxplotChart.destroy();
+            boxplotChart = null;
+        }
+        document.getElementById('stats-tbody').innerHTML = 
+            '<tr><td colspan="8" style="text-align:center; color:#333333;">Aucune donnée disponible</td></tr>';
+        document.getElementById('correlation-heatmap').innerHTML = '';
+    }
+
+    function renderBoxplot(stats) {
+        const ctx = document.getElementById('boxplot-chart').getContext('2d');
+        
+        if (boxplotChart) {
+            boxplotChart.destroy();
+        }
+        
+        // Préparer les données pour le boxplot
+        const labels = stats.map(s => s.fcp_nom.length > 20 ? s.fcp_nom.substring(0, 17) + '...' : s.fcp_nom);
+        const boxplotData = stats.map(s => ({
+            min: s.boxplot.min,
+            q1: s.boxplot.q1,
+            median: s.boxplot.median,
+            q3: s.boxplot.q3,
+            max: s.boxplot.max
+        }));
+        
+        // Créer un graphique à barres horizontales pour simuler le boxplot
+        const datasets = [
+            {
+                label: 'Min-Q1',
+                data: boxplotData.map(d => d.q1 - d.min),
+                backgroundColor: 'rgba(0, 64, 128, 0.2)',
+                borderColor: '#004080',
+                borderWidth: 1,
+                stack: 'box'
+            },
+            {
+                label: 'Q1-Médiane',
+                data: boxplotData.map(d => d.median - d.q1),
+                backgroundColor: 'rgba(0, 64, 128, 0.5)',
+                borderColor: '#004080',
+                borderWidth: 1,
+                stack: 'box'
+            },
+            {
+                label: 'Médiane-Q3',
+                data: boxplotData.map(d => d.q3 - d.median),
+                backgroundColor: 'rgba(0, 64, 128, 0.7)',
+                borderColor: '#004080',
+                borderWidth: 1,
+                stack: 'box'
+            },
+            {
+                label: 'Q3-Max',
+                data: boxplotData.map(d => d.max - d.q3),
+                backgroundColor: 'rgba(0, 64, 128, 0.3)',
+                borderColor: '#004080',
+                borderWidth: 1,
+                stack: 'box'
+            }
+        ];
+        
+        // Offset pour les valeurs négatives
+        const minValues = boxplotData.map(d => d.min);
+        
+        boxplotChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Offset',
+                    data: minValues,
+                    backgroundColor: 'transparent',
+                    borderColor: 'transparent',
+                    stack: 'box'
+                }, ...datasets]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: 'Distribution des Rendements Journaliers (%)',
+                        font: { size: 14, weight: 'bold' }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const idx = context.dataIndex;
+                                const stat = stats[idx];
+                                return [
+                                    `Min: ${stat.boxplot.min.toFixed(3)}%`,
+                                    `Q1: ${stat.boxplot.q1.toFixed(3)}%`,
+                                    `Médiane: ${stat.boxplot.median.toFixed(3)}%`,
+                                    `Q3: ${stat.boxplot.q3.toFixed(3)}%`,
+                                    `Max: ${stat.boxplot.max.toFixed(3)}%`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        title: {
+                            display: true,
+                            text: 'Rendement journalier (%)',
+                            font: { weight: 'bold' }
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        ticks: {
+                            font: { size: 10 }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function renderStatsTable(stats) {
+        const tbody = document.getElementById('stats-tbody');
+        
+        if (!stats || stats.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#333333;">Aucune donnée</td></tr>';
+            return;
+        }
+        
+        let html = '';
+        stats.forEach(stat => {
+            const meanClass = stat.mean >= 0 ? 'positive' : 'negative';
+            const medianClass = stat.median >= 0 ? 'positive' : 'negative';
+            
+            html += `
+                <tr>
+                    <td><strong>${stat.fcp_nom}</strong></td>
+                    <td class="${meanClass}">${stat.mean.toFixed(4)}</td>
+                    <td class="${medianClass}">${stat.median.toFixed(4)}</td>
+                    <td>${stat.std.toFixed(4)}</td>
+                    <td class="negative">${stat.min.toFixed(4)}</td>
+                    <td class="positive">${stat.max.toFixed(4)}</td>
+                    <td>${stat.skewness.toFixed(4)}</td>
+                    <td>${stat.kurtosis.toFixed(4)}</td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = html;
+    }
+
+    function renderCorrelationHeatmap(correlation) {
+        const container = document.getElementById('correlation-heatmap');
+        
+        if (!correlation || !correlation.labels || correlation.labels.length < 2) {
+            container.innerHTML = '<p style="text-align:center; color:#333333;">Sélectionnez au moins 2 FCP pour afficher les corrélations</p>';
+            return;
+        }
+        
+        const labels = correlation.labels;
+        const matrix = correlation.matrix;
+        const n = labels.length;
+        
+        // Créer la grille
+        let html = `<div style="display: grid; grid-template-columns: 120px repeat(${n}, 60px); gap: 2px;">`;
+        
+        // En-tête vide + colonnes
+        html += '<div class="heatmap-header"></div>';
+        labels.forEach(label => {
+            const shortLabel = label.length > 10 ? label.substring(0, 8) + '..' : label;
+            html += `<div class="heatmap-header" title="${label}">${shortLabel}</div>`;
+        });
+        
+        // Lignes
+        for (let i = 0; i < n; i++) {
+            const shortLabel = labels[i].length > 15 ? labels[i].substring(0, 13) + '..' : labels[i];
+            html += `<div class="heatmap-row-header" title="${labels[i]}">${shortLabel}</div>`;
+            
+            for (let j = 0; j < n; j++) {
+                const corr = matrix[i][j];
+                const color = getCorrelationColor(corr);
+                const textColor = Math.abs(corr) > 0.5 ? 'white' : '#333333';
+                
+                html += `<div class="heatmap-cell" style="background-color: ${color}; color: ${textColor};" 
+                         title="${labels[i]} vs ${labels[j]}: ${corr.toFixed(3)}">
+                    ${corr.toFixed(2)}
+                </div>`;
+            }
+        }
+        
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function getCorrelationColor(corr) {
+        // Palette de couleurs : rouge négatif -> blanc neutre -> bleu positif
+        if (corr >= 0.8) return '#004080';
+        if (corr >= 0.6) return '#3366aa';
+        if (corr >= 0.4) return '#6699cc';
+        if (corr >= 0.2) return '#99bbdd';
+        if (corr >= -0.2) return '#f1f1f1';
+        if (corr >= -0.4) return '#f5b7b1';
+        if (corr >= -0.6) return '#f1948a';
+        if (corr >= -0.8) return '#e74c3c';
+        return '#c0392b';
+    }
 
     // === INITIALISATION ===
 
