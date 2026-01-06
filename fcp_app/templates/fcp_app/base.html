@@ -8,24 +8,89 @@
     <link rel="stylesheet" href="{% static 'fcp_app/css/style.css' %}">
 </head>
 <body>
-    <nav>
-        <ul>
-            <li><a href="{% url 'fcp_app:home' %}" {% if request.resolver_match.url_name == 'home' %}class="active"{% endif %}>Accueil</a></li>
-            <li><a href="{% url 'fcp_app:valeurs_liquidatives' %}" {% if request.resolver_match.url_name == 'valeurs_liquidatives' %}class="active"{% endif %}>Valeurs liquidatives</a></li>
-            <li><a href="{% url 'fcp_app:composition_fcp' %}" {% if request.resolver_match.url_name == 'composition_fcp' %}class="active"{% endif %}>Composition FCP</a></li>
-            <li><a href="{% url 'fcp_app:fiche_signaletique' %}" {% if request.resolver_match.url_name == 'fiche_signaletique' %}class="active"{% endif %}>Fiche signalétique</a></li>
-            <li><a href="{% url 'fcp_app:souscriptions_rachats' %}" {% if request.resolver_match.url_name == 'souscriptions_rachats' %}class="active"{% endif %}>Souscriptions rachats & Actifs net</a></li>
-            <li><a href="{% url 'fcp_app:about' %}" {% if request.resolver_match.url_name == 'about' %}class="active"{% endif %}>À propos</a></li>
-        </ul>
-    </nav>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>📊 Gestion FCP</h2>
+            <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li>
+                    <a href="{% url 'fcp_app:home' %}" {% if request.resolver_match.url_name == 'home' %}class="active"{% endif %}>
+                        <span class="icon">🏠</span>
+                        <span class="text">Accueil</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'fcp_app:valeurs_liquidatives' %}" {% if request.resolver_match.url_name == 'valeurs_liquidatives' %}class="active"{% endif %}>
+                        <span class="icon">📈</span>
+                        <span class="text">Valeurs liquidatives</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'fcp_app:composition_fcp' %}" {% if request.resolver_match.url_name == 'composition_fcp' %}class="active"{% endif %}>
+                        <span class="icon">🎯</span>
+                        <span class="text">Composition FCP</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'fcp_app:fiche_signaletique' %}" {% if request.resolver_match.url_name == 'fiche_signaletique' %}class="active"{% endif %}>
+                        <span class="icon">📋</span>
+                        <span class="text">Fiche signalétique</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'fcp_app:souscriptions_rachats' %}" {% if request.resolver_match.url_name == 'souscriptions_rachats' %}class="active"{% endif %}>
+                        <span class="icon">💰</span>
+                        <span class="text">Souscriptions & Rachats</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'fcp_app:about' %}" {% if request.resolver_match.url_name == 'about' %}class="active"{% endif %}>
+                        <span class="icon">ℹ️</span>
+                        <span class="text">À propos</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <p>© 2026 Gestion FCP</p>
+        </div>
+    </aside>
 
-    <div class="container">
-        {% block content %}
-        {% endblock %}
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
     </div>
 
-    <footer>
-        <p>&copy; 2026 Gestion FCP. Tous droits réservés.</p>
-    </footer>
+    <script>
+        // Toggle sidebar on mobile
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mainContent = document.querySelector('.main-content');
+        
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        });
+
+        // Close sidebar on mobile when clicking outside
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
+                    sidebar.classList.add('collapsed');
+                    mainContent.classList.add('expanded');
+                }
+            }
+        });
+    </script>
 </body>
 </html>
