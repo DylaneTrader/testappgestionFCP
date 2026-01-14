@@ -151,8 +151,26 @@
             <span id="period-display" class="period-badge">Origine</span>
         </div>
         
+        <!-- Navigation des onglets -->
+        <div class="tabs-container">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-tab="tab-section-1">
+                    <span class="tab-icon">📊</span>
+                    <span class="tab-label">Vue d'ensemble</span>
+                </button>
+                <button class="tab-btn" data-tab="tab-section-2">
+                    <span class="tab-icon">📈</span>
+                    <span class="tab-label">Récapitulatif</span>
+                </button>
+                <button class="tab-btn" data-tab="tab-section-3">
+                    <span class="tab-icon">📐</span>
+                    <span class="tab-label">Statistiques</span>
+                </button>
+            </div>
+        </div>
+        
         <!-- Section 1 : Vue d'ensemble comparative -->
-        <section class="section" id="section-1">
+        <section class="section tab-content active" id="tab-section-1" data-section="section-1">
             <h2 class="section-title">📊 Section 1 : Vue d'ensemble comparative</h2>
             
             <!-- Classification des FCP -->
@@ -243,7 +261,7 @@
         </section>
 
         <!-- Section 2 : Récapitulatif des performances -->
-        <section class="section" id="section-2">
+        <section class="section tab-content" id="tab-section-2" data-section="section-2">
             <h2 class="section-title">📈 Section 2 : Récapitulatif des performances</h2>
             
             <!-- Performances Calendaires -->
@@ -389,7 +407,7 @@
         </section>
 
         <!-- Section 3 : Statistiques descriptives -->
-        <section class="section" id="section-3">
+        <section class="section tab-content" id="tab-section-3" data-section="section-3">
             <h2 class="section-title">📐 Section 3 : Statistiques descriptives</h2>
 
             <!-- Box Plot des rendements journaliers -->
@@ -2282,7 +2300,43 @@
 
     // === INITIALISATION ===
 
+    // Tab Navigation Management
+    function initializeTabs() {
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+
+                // Remove active class from all buttons and contents
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                // Add active class to clicked button and corresponding content
+                this.classList.add('active');
+                const tabContent = document.getElementById(tabId);
+                if (tabContent) {
+                    tabContent.classList.add('active');
+                }
+
+                // Save the active tab to localStorage
+                localStorage.setItem('activeTab', tabId);
+            });
+        });
+
+        // Restore the last active tab from localStorage
+        const savedTab = localStorage.getItem('activeTab');
+        if (savedTab) {
+            const savedButton = document.querySelector(`[data-tab="${savedTab}"]`);
+            if (savedButton) {
+                savedButton.click();
+            }
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
+        initializeTabs();
         applyFilters();
         fetchMultiPeriodData();
     });
