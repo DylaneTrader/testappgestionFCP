@@ -834,6 +834,167 @@ document.addEventListener('DOMContentLoaded', function() {
             toggle.classList.toggle('active', this.checked);
         });
     });
+    
+    // ====================================
+    // HISTORIQUE TAB FUNCTIONALITY
+    // ====================================
+    
+    // Pagination state
+    let historyCurrentPage = 1;
+    const historyPageSize = 50;
+    let historyData = [...vlDataRaw].reverse(); // Most recent first
+    
+    // Calculate daily and cumulative variations
+    function calculateVariations(data) {
+        if (!data || data.length === 0) return [];
+        
+        // Original data is sorted oldest to newest, we reversed it
+        // So we need to calculate from the perspective of reversed data
+        const originalData = [...data].reverse(); // Back to oldest first for calculations
+        const firstValue = originalData[0].valeur;
+        
+        return data.map((item, index) => {
+            const originalIndex = originalData.length - 1 - index;
+            const prevIndex = originalIndex - 1;
+            
+            let var1j = 0;
+            if (prevIndex >= 0) {
+                const prevValue = originalData[prevIndex].valeur;
+                var1j = ((item.valeur - prevValue) / prevValue) * 100;
+            }
+            
+            const varCumul = ((item.valeur - firstValue) / firstValue) * 100;
+            
+            return {
+                ...item,
+                var1j: var1j,
+                varCumul: varCumul
+            };
+        });
+    }
+    
+    // Render history table
+    function renderHistoryTable() {
+        const tableBody = document.getElementById('historyTableBody');
+        if (!tableBody) return;
+        
+        const dataWithVariations = calculateVariations(historyData);
+        const startIndex = (historyCurrentPage - 1) * historyPageSize;
+        const endIndex = Math.min(startIndex + historyPageSize, dataWithVariations.length);
+        const pageData = dataWithVariations.slice(startIndex, endIndex);
+        
+        tableBody.innerHTML = '';
+        
+        if (pageData.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center py-5 text-muted">
+                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                        Aucune donnée disponible
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        pageData.forEach((item, index) => {
+            const date = new Date(item.date);
+            const formattedDate = date.toLocaleDateString('fr-FR', { 
+                day: '2-digit', 
+                month: 'short', 
+                year: 'numeric' 
+            });
+            
+            const var1jClass = item.var1j >= 0 ? 'text-success' : 'text-danger';
+            const var1jIcon = item.var1j >= 0 ? 'bi-arrow-up' : 'bi-arrow-down';
+            const var1jSign = item.var1j >= 0 ? '+' : '';
+            
+            const varCumulClass = item.varCumul >= 0 ? 'text-success' : 'text-danger';
+            const varCumulSign = item.varCumul >= 0 ? '+' : '';
+            
+            tableBody.innerHTML += `
+                <tr>
+                    <td class="px-4 py-3">
+                        <span class="fw-medium">${formattedDate}</span>
+                    </td>
+                    <td class="px-4 py-3 text-end">
+                        <span class="fw-bold" style="color: var(--primary-color);">
+                            ${new Intl.NumberFormat('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(item.valeur)}
+                        </span>
+                        <span class="text-muted ms-1">XOF</span>
+                    </td>
+                    <td class="px-4 py-3 text-end">
+                        <span class="${var1jClass}">
+                            <i class="bi ${var1jIcon} me-1"></i>${var1jSign}${item.var1j.toFixed(2)}%
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-end">
+                        <span class="${varCumulClass} fw-medium">
+                            ${varCumulSign}${item.varCumul.toFixed(2)}%
+                        </span>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        // Update pagination info
+        document.getElementById('showingFrom').textContent = startIndex + 1;
+        document.getElementById('showingTo').textContent = endIndex;
+        document.getElementById('totalRows').textContent = dataWithVariations.length;
+        
+        // Update pagination buttons
+        document.getElementById('prevPageBtn').disabled = historyCurrentPage === 1;
+        document.getElementById('nextPageBtn').disabled = endIndex >= dataWithVariations.length;
+    }
+    
+    // Pagination handlers
+    document.getElementById('prevPageBtn')?.addEventListener('click', function() {
+        if (historyCurrentPage > 1) {
+            historyCurrentPage--;
+            renderHistoryTable();
+        }
+    });
+    
+    document.getElementById('nextPageBtn')?.addEventListener('click', function() {
+        const maxPage = Math.ceil(historyData.length / historyPageSize);
+        if (historyCurrentPage < maxPage) {
+            historyCurrentPage++;
+            renderHistoryTable();
+        }
+    });
+    
+    // History FCP Selector
+    document.getElementById('historyFcpSelector')?.addEventListener('change', function() {
+        const selectedFcp = this.value;
+        window.location.href = '?fcp=' + encodeURIComponent(selectedFcp);
+    });
+    
+    // Export CSV
+    document.getElementById('exportCsvBtn')?.addEventListener('click', function() {
+        const dataWithVariations = calculateVariations(historyData);
+        
+        let csv = 'Date;Valeur Liquidative;Variation 1J (%);Variation Cumul (%)\n';
+        dataWithVariations.forEach(item => {
+            const date = new Date(item.date).toLocaleDateString('fr-FR');
+            csv += `${date};${item.valeur.toFixed(2)};${item.var1j.toFixed(2)};${item.varCumul.toFixed(2)}\n`;
+        });
+        
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `VL_${selectedFcp.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+    });
+    
+    // Initial render when tab is shown
+    document.querySelector('button[data-bs-target="#history"]')?.addEventListener('shown.bs.tab', function() {
+        renderHistoryTable();
+    });
+    
+    // Also render if history tab is already visible (e.g., direct navigation)
+    if (document.getElementById('history')?.classList.contains('show')) {
+        renderHistoryTable();
+    }
 });
 </script>
 {% endblock %}
