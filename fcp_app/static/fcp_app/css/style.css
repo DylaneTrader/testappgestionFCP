@@ -3,31 +3,34 @@
    ========================================== */
 
 :root {
-    /* Color Palette */
-    --primary-color: #2563eb;
-    --primary-hover: #1d4ed8;
-    --primary-light: #dbeafe;
-    --secondary-color: #64748b;
-    --success-color: #10b981;
-    --warning-color: #f59e0b;
-    --danger-color: #ef4444;
-    --info-color: #06b6d4;
+    /* Color Palette - Custom Theme */
+    --primary-color: #004080;       /* Bleu foncé — titres, boutons principaux */
+    --primary-hover: #003366;       /* Bleu plus foncé pour hover */
+    --primary-light: #e6f0fa;       /* Bleu très clair pour backgrounds */
+    --secondary-color: #333333;     /* Gris foncé — widgets, lignes, icônes */
+    --third-color: #E0DEDD;         /* Gris clair — fonds de cartes, hover */
+    --success-color: #28a745;
+    --warning-color: #e6a800;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
     
     /* Background Colors */
     --bg-primary: #ffffff;
-    --bg-secondary: #f8fafc;
-    --bg-dark: #0f172a;
-    --bg-sidebar: #1e293b;
+    --bg-secondary: #f5f5f4;        /* Fond légèrement gris */
+    --bg-dark: #1a1a1a;
+    --bg-sidebar: #004080;          /* Sidebar en bleu foncé */
+    --bg-sidebar-dark: #003366;
     
     /* Text Colors */
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --text-muted: #94a3b8;
+    --text-primary: #333333;        /* Gris foncé pour texte principal */
+    --text-secondary: #555555;      /* Gris moyen pour texte secondaire */
+    --text-muted: #777777;          /* Gris pour texte atténué */
     --text-white: #ffffff;
+    --text-on-primary: #ffffff;     /* Texte sur fond bleu */
     
     /* Border Colors */
-    --border-color: #e2e8f0;
-    --border-light: #f1f5f9;
+    --border-color: #E0DEDD;        /* Gris clair pour bordures */
+    --border-light: #ebebeb;
     
     /* Sidebar */
     --sidebar-width: 280px;
@@ -72,7 +75,7 @@ body {
     left: 0;
     width: var(--sidebar-width);
     height: 100vh;
-    background: linear-gradient(180deg, var(--bg-sidebar) 0%, var(--bg-dark) 100%);
+    background: linear-gradient(180deg, var(--bg-sidebar) 0%, var(--bg-sidebar-dark) 100%);
     z-index: 1000;
     transition: width var(--transition-normal);
     display: flex;
@@ -92,8 +95,8 @@ body {
 
 .logo-icon {
     font-size: 32px;
-    color: var(--primary-color);
-    background: var(--primary-light);
+    color: var(--text-white);
+    background: rgba(255, 255, 255, 0.15);
     padding: 10px;
     border-radius: 12px;
 }
@@ -134,9 +137,10 @@ body {
 }
 
 .sidebar-nav .nav-link.active {
-    background: var(--primary-color);
+    background: rgba(255, 255, 255, 0.2);
     color: var(--text-white);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-left: 3px solid var(--text-white);
 }
 
 .sidebar-nav .nav-link i {
@@ -347,17 +351,17 @@ body {
 }
 
 .stat-icon.success {
-    background: #d1fae5;
+    background: #d4edda;
     color: var(--success-color);
 }
 
 .stat-icon.warning {
-    background: #fef3c7;
+    background: #fff3cd;
     color: var(--warning-color);
 }
 
 .stat-icon.info {
-    background: #cffafe;
+    background: #d1ecf1;
     color: var(--info-color);
 }
 
@@ -389,12 +393,12 @@ body {
 }
 
 .stat-change.positive {
-    background: #d1fae5;
+    background: #d4edda;
     color: var(--success-color);
 }
 
 .stat-change.negative {
-    background: #fee2e2;
+    background: #f8d7da;
     color: var(--danger-color);
 }
 
@@ -445,13 +449,15 @@ body {
 .btn-primary {
     background: var(--primary-color);
     border-color: var(--primary-color);
+    color: var(--text-white);
 }
 
 .btn-primary:hover {
     background: var(--primary-hover);
     border-color: var(--primary-hover);
+    color: var(--text-white);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 64, 128, 0.35);
 }
 
 .btn-outline-secondary {
@@ -513,7 +519,7 @@ body {
 .info-card-icon {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, var(--primary-light), #eff6ff);
+    background: linear-gradient(135deg, var(--primary-light), #f0f4f8);
     border-radius: 20px;
     display: flex;
     align-items: center;
