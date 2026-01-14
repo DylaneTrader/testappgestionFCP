@@ -1,111 +1,841 @@
 {% extends 'fcp_app/base.html' %}
+{% load static %}
 
 {% block title %}Valeurs Liquidatives - FCP Reporting{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Tabs Styling */
+    .nav-tabs-custom {
+        border-bottom: 2px solid var(--border-color);
+        gap: 8px;
+    }
+    
+    .nav-tabs-custom .nav-link {
+        border: none;
+        color: var(--text-secondary);
+        font-weight: 500;
+        padding: 12px 20px;
+        border-radius: 8px 8px 0 0;
+        transition: all 0.2s ease;
+        position: relative;
+    }
+    
+    .nav-tabs-custom .nav-link:hover {
+        color: var(--primary-color);
+        background: var(--third-color);
+    }
+    
+    .nav-tabs-custom .nav-link.active {
+        color: var(--primary-color);
+        background: var(--bg-primary);
+        border-bottom: 3px solid var(--primary-color);
+    }
+    
+    /* Filter Pills */
+    .filter-pills {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    
+    .filter-pill {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        border: 1px solid var(--border-color);
+        background: var(--bg-primary);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .filter-pill:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+    
+    .filter-pill.active {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+    
+    /* Chart Container */
+    .chart-container {
+        position: relative;
+        height: 350px;
+        width: 100%;
+    }
+    
+    .chart-container-scatter {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+    
+    /* Toggle Switch */
+    .toggle-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .toggle-option:hover {
+        background: var(--third-color);
+    }
+    
+    .toggle-option.active {
+        background: var(--primary-light);
+        color: var(--primary-color);
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    /* Metric Cards */
+    .metric-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.2s ease;
+    }
+    
+    .metric-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+    }
+    
+    .metric-card .metric-label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+    }
+    
+    .metric-card .metric-value {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    .metric-card .metric-change {
+        font-size: 13px;
+        margin-top: 6px;
+    }
+    
+    .metric-card .metric-change.positive {
+        color: var(--success-color);
+    }
+    
+    .metric-card .metric-change.negative {
+        color: var(--danger-color);
+    }
+    
+    /* Section Headers */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    
+    .section-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .section-title i {
+        color: var(--primary-color);
+    }
+    
+    /* Options Bar */
+    .options-bar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    
+    /* Select Custom */
+    .select-custom {
+        padding: 8px 32px 8px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 13px;
+        color: var(--text-primary);
+        background: var(--bg-primary);
+        cursor: pointer;
+        min-width: 160px;
+    }
+    
+    .select-custom:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1);
+    }
+    
+    /* Legend Custom */
+    .chart-legend {
+        display: flex;
+        justify-content: center;
+        gap: 24px;
+        margin-top: 16px;
+        flex-wrap: wrap;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+    
+    .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    
+    .legend-line {
+        width: 24px;
+        height: 3px;
+        border-radius: 2px;
+    }
+    
+    /* Scatter Point Labels */
+    .scatter-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        margin-top: 16px;
+    }
+    
+    .scatter-info-item {
+        text-align: center;
+    }
+    
+    .scatter-info-item .label {
+        font-size: 11px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
+    
+    .scatter-info-item .value {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<!-- Stats Overview -->
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-icon primary">
-            <i class="bi bi-currency-exchange"></i>
-        </div>
-        <div class="stat-content">
-            <h4>Valeur Liquidative</h4>
-            <div class="stat-value">--</div>
-            <span class="stat-change positive">
-                <i class="bi bi-arrow-up"></i> --%
-            </span>
-        </div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon success">
-            <i class="bi bi-graph-up-arrow"></i>
-        </div>
-        <div class="stat-content">
-            <h4>Actif Net</h4>
-            <div class="stat-value">-- XOF</div>
-            <span class="stat-change positive">
-                <i class="bi bi-arrow-up"></i> --%
-            </span>
-        </div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon warning">
-            <i class="bi bi-bar-chart-fill"></i>
-        </div>
-        <div class="stat-content">
-            <h4>Nombre de Parts</h4>
-            <div class="stat-value">--</div>
-            <span class="stat-change positive">
-                <i class="bi bi-arrow-up"></i> --
-            </span>
-        </div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon info">
-            <i class="bi bi-calendar-check"></i>
-        </div>
-        <div class="stat-content">
-            <h4>Dernière MAJ</h4>
-            <div class="stat-value">--/--/----</div>
-            <span class="stat-change">
-                <i class="bi bi-clock"></i> --:--
-            </span>
-        </div>
-    </div>
-</div>
+<!-- Navigation Tabs -->
+<ul class="nav nav-tabs nav-tabs-custom mb-4" id="vlTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+            <i class="bi bi-grid-1x2-fill me-2"></i>Vue d'ensemble
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab">
+            <i class="bi bi-table me-2"></i>Historique
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis" type="button" role="tab">
+            <i class="bi bi-bar-chart-line me-2"></i>Analyse
+        </button>
+    </li>
+</ul>
 
-<!-- Main Content Card -->
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="card-title">
-            <i class="bi bi-table me-2"></i>Historique des Valeurs Liquidatives
-        </h5>
-        <div class="d-flex gap-2">
-            <button class="btn btn-sm btn-outline-secondary">
-                <i class="bi bi-funnel"></i> Filtrer
-            </button>
-            <button class="btn btn-sm btn-outline-secondary">
-                <i class="bi bi-download"></i> Exporter
-            </button>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="empty-state">
-            <div class="empty-state-icon">
-                <i class="bi bi-currency-exchange"></i>
+<!-- Tab Content -->
+<div class="tab-content" id="vlTabsContent">
+    <!-- Vue d'ensemble Tab -->
+    <div class="tab-pane fade show active" id="overview" role="tabpanel">
+        
+        <!-- Évolution VL Section -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <!-- Header with filters -->
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="bi bi-graph-up"></i>
+                        <span>Évolution de la Valeur Liquidative</span>
+                    </div>
+                    
+                    <div class="options-bar">
+                        <!-- FCP Selector -->
+                        <select class="select-custom" id="fcpSelector">
+                            <option value="fcp1" selected>FCP Croissance</option>
+                            <option value="fcp2">FCP Équilibre</option>
+                            <option value="fcp3">FCP Sécurité</option>
+                        </select>
+                        
+                        <!-- Benchmark Toggle -->
+                        <label class="toggle-option" id="benchmarkToggle">
+                            <input class="form-check-input" type="checkbox" id="showBenchmark">
+                            <span>Benchmark</span>
+                        </label>
+                        
+                        <!-- Cumulative Toggle -->
+                        <label class="toggle-option" id="cumulativeToggle">
+                            <input class="form-check-input" type="checkbox" id="showCumulative">
+                            <span>Vue Cumulée</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Period Filters -->
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                    <div class="filter-pills" id="periodFilters">
+                        <button class="filter-pill" data-period="1m">1M</button>
+                        <button class="filter-pill" data-period="3m">3M</button>
+                        <button class="filter-pill" data-period="6m">6M</button>
+                        <button class="filter-pill active" data-period="1y">1A</button>
+                        <button class="filter-pill" data-period="5y">5A</button>
+                        <button class="filter-pill" data-period="all">Tout</button>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-calendar3 me-1"></i>Personnalisé
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-download me-1"></i>Exporter
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Chart -->
+                <div class="chart-container">
+                    <canvas id="vlEvolutionChart"></canvas>
+                </div>
+                
+                <!-- Legend -->
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-line" style="background: #004080;"></div>
+                        <span>FCP Croissance</span>
+                    </div>
+                    <div class="legend-item" id="benchmarkLegend" style="display: none;">
+                        <div class="legend-line" style="background: #E0DEDD; border: 1px dashed #333;"></div>
+                        <span>Benchmark (BRVM Composite)</span>
+                    </div>
+                </div>
             </div>
-            <h3>Aucune donnée disponible</h3>
-            <p>Les valeurs liquidatives de vos FCP apparaîtront ici une fois que les données seront importées dans le système.</p>
-            <button class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Importer des données
-            </button>
+        </div>
+        
+        <!-- Metric Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="metric-card">
+                    <div class="metric-label">Dernière VL</div>
+                    <div class="metric-value">12 458 <small style="font-size: 14px;">XOF</small></div>
+                    <div class="metric-change positive">
+                        <i class="bi bi-arrow-up"></i> +0.45% (1j)
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="metric-card">
+                    <div class="metric-label">Rendement YTD</div>
+                    <div class="metric-value" style="color: var(--success-color);">+8.52%</div>
+                    <div class="metric-change">
+                        vs Benchmark: +2.1%
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="metric-card">
+                    <div class="metric-label">Rendement Annualisé</div>
+                    <div class="metric-value" style="color: var(--success-color);">+6.78%</div>
+                    <div class="metric-change">
+                        Sur 3 ans
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+                <div class="metric-card">
+                    <div class="metric-label">Volatilité</div>
+                    <div class="metric-value">4.25%</div>
+                    <div class="metric-change">
+                        Écart-type annualisé
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Risk/Return Scatter Plot -->
+        <div class="card">
+            <div class="card-body">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="bi bi-bullseye"></i>
+                        <span>Rendement / Risque</span>
+                    </div>
+                    
+                    <!-- Period Filters for Scatter -->
+                    <div class="filter-pills" id="scatterPeriodFilters">
+                        <button class="filter-pill" data-period="wtd">WTD</button>
+                        <button class="filter-pill" data-period="mtd">MTD</button>
+                        <button class="filter-pill" data-period="qtd">QTD</button>
+                        <button class="filter-pill" data-period="std">STD</button>
+                        <button class="filter-pill active" data-period="ytd">YTD</button>
+                        <button class="filter-pill" data-period="origin">Origine</button>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="chart-container-scatter">
+                            <canvas id="riskReturnChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="scatter-info flex-column h-100 justify-content-center">
+                            <div class="scatter-info-item mb-3">
+                                <div class="label">Rendement</div>
+                                <div class="value" style="color: var(--success-color);">+8.52%</div>
+                            </div>
+                            <div class="scatter-info-item mb-3">
+                                <div class="label">Risque (Volatilité)</div>
+                                <div class="value">4.25%</div>
+                            </div>
+                            <div class="scatter-info-item mb-3">
+                                <div class="label">Ratio de Sharpe</div>
+                                <div class="value">1.85</div>
+                            </div>
+                            <div class="scatter-info-item">
+                                <div class="label">Position</div>
+                                <div class="value" style="color: var(--primary-color);">
+                                    <i class="bi bi-star-fill me-1"></i>Optimal
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Scatter Legend -->
+                <div class="chart-legend mt-3">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #004080;"></div>
+                        <span>FCP Croissance</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #28a745;"></div>
+                        <span>FCP Équilibre</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #e6a800;"></div>
+                        <span>FCP Sécurité</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: #333333; opacity: 0.5;"></div>
+                        <span>Benchmark</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- Historique Tab -->
+    <div class="tab-pane fade" id="history" role="tabpanel">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-table me-2"></i>Historique des Valeurs Liquidatives
+                </h5>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-funnel"></i> Filtrer
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-download"></i> Exporter
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="bi bi-table"></i>
+                    </div>
+                    <h3>Historique à venir</h3>
+                    <p>Le tableau historique des valeurs liquidatives sera disponible dans cette section.</p>
+                </div>
+            </div>
         </div>
     </div>
-</div>
-
-<!-- Chart Section -->
-<div class="row mt-4">
-    <div class="col-12">
+    
+    <!-- Analyse Tab -->
+    <div class="tab-pane fade" id="analysis" role="tabpanel">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title">
-                    <i class="bi bi-graph-up me-2"></i>Évolution de la Valeur Liquidative
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-bar-chart-line me-2"></i>Analyse Avancée
                 </h5>
             </div>
             <div class="card-body">
-                <div class="empty-state" style="padding: 40px;">
-                    <div class="empty-state-icon" style="width: 80px; height: 80px;">
-                        <i class="bi bi-bar-chart-line" style="font-size: 32px;"></i>
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="bi bi-graph-up-arrow"></i>
                     </div>
-                    <h3>Graphique non disponible</h3>
-                    <p>Le graphique d'évolution sera affiché après l'import des données.</p>
+                    <h3>Analyse à venir</h3>
+                    <p>Les outils d'analyse avancée seront disponibles dans cette section.</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sample data generation
+    function generateVLData(months, startValue = 10000) {
+        const data = [];
+        const labels = [];
+        let value = startValue;
+        const today = new Date();
+        
+        for (let i = months; i >= 0; i--) {
+            const date = new Date(today);
+            date.setMonth(date.getMonth() - i);
+            labels.push(date.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' }));
+            
+            // Random walk with slight upward trend
+            value = value * (1 + (Math.random() - 0.45) * 0.03);
+            data.push(Math.round(value));
+        }
+        return { labels, data };
+    }
+    
+    function generateBenchmarkData(labels, startValue = 10000) {
+        const data = [];
+        let value = startValue;
+        
+        for (let i = 0; i < labels.length; i++) {
+            value = value * (1 + (Math.random() - 0.48) * 0.025);
+            data.push(Math.round(value));
+        }
+        return data;
+    }
+    
+    // Initial data
+    let vlData = generateVLData(12);
+    let benchmarkData = generateBenchmarkData(vlData.labels);
+    
+    // VL Evolution Chart
+    const vlCtx = document.getElementById('vlEvolutionChart').getContext('2d');
+    const vlChart = new Chart(vlCtx, {
+        type: 'line',
+        data: {
+            labels: vlData.labels,
+            datasets: [{
+                label: 'FCP Croissance',
+                data: vlData.data,
+                borderColor: '#004080',
+                backgroundColor: 'rgba(0, 64, 128, 0.1)',
+                borderWidth: 2.5,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+                pointHoverRadius: 6,
+                pointHoverBackgroundColor: '#004080',
+                pointHoverBorderColor: '#fff',
+                pointHoverBorderWidth: 2
+            }, {
+                label: 'Benchmark',
+                data: benchmarkData,
+                borderColor: '#999999',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: false,
+                tension: 0.4,
+                pointRadius: 0,
+                pointHoverRadius: 5,
+                hidden: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: { size: 13 },
+                    bodyFont: { size: 12 },
+                    padding: 12,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + new Intl.NumberFormat('fr-FR').format(context.raw) + ' XOF';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#777777',
+                        font: { size: 11 }
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    },
+                    ticks: {
+                        color: '#777777',
+                        font: { size: 11 },
+                        callback: function(value) {
+                            return new Intl.NumberFormat('fr-FR').format(value);
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Risk/Return Scatter Chart
+    const scatterCtx = document.getElementById('riskReturnChart').getContext('2d');
+    const scatterChart = new Chart(scatterCtx, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'FCP Croissance',
+                data: [{ x: 4.25, y: 8.52 }],
+                backgroundColor: '#004080',
+                pointRadius: 12,
+                pointHoverRadius: 14
+            }, {
+                label: 'FCP Équilibre',
+                data: [{ x: 3.1, y: 5.8 }],
+                backgroundColor: '#28a745',
+                pointRadius: 12,
+                pointHoverRadius: 14
+            }, {
+                label: 'FCP Sécurité',
+                data: [{ x: 1.8, y: 3.2 }],
+                backgroundColor: '#e6a800',
+                pointRadius: 12,
+                pointHoverRadius: 14
+            }, {
+                label: 'Benchmark',
+                data: [{ x: 5.5, y: 6.4 }],
+                backgroundColor: 'rgba(51, 51, 51, 0.5)',
+                pointRadius: 10,
+                pointHoverRadius: 12,
+                pointStyle: 'triangle'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            return [
+                                context.dataset.label,
+                                'Rendement: ' + context.raw.y.toFixed(2) + '%',
+                                'Risque: ' + context.raw.x.toFixed(2) + '%'
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Risque (Volatilité %)',
+                        color: '#555555',
+                        font: { size: 12, weight: '500' }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    },
+                    ticks: {
+                        color: '#777777',
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    min: 0,
+                    max: 8
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Rendement %',
+                        color: '#555555',
+                        font: { size: 12, weight: '500' }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    },
+                    ticks: {
+                        color: '#777777',
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    min: 0,
+                    max: 12
+                }
+            }
+        }
+    });
+    
+    // Period Filter Click Handler
+    document.querySelectorAll('#periodFilters .filter-pill').forEach(pill => {
+        pill.addEventListener('click', function() {
+            document.querySelectorAll('#periodFilters .filter-pill').forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            
+            const period = this.dataset.period;
+            let months;
+            switch(period) {
+                case '1m': months = 1; break;
+                case '3m': months = 3; break;
+                case '6m': months = 6; break;
+                case '1y': months = 12; break;
+                case '5y': months = 60; break;
+                case 'all': months = 120; break;
+                default: months = 12;
+            }
+            
+            const newData = generateVLData(months);
+            vlChart.data.labels = newData.labels;
+            vlChart.data.datasets[0].data = newData.data;
+            vlChart.data.datasets[1].data = generateBenchmarkData(newData.labels);
+            vlChart.update();
+        });
+    });
+    
+    // Scatter Period Filter Click Handler
+    document.querySelectorAll('#scatterPeriodFilters .filter-pill').forEach(pill => {
+        pill.addEventListener('click', function() {
+            document.querySelectorAll('#scatterPeriodFilters .filter-pill').forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update scatter data based on period (simulated)
+            const period = this.dataset.period;
+            const multiplier = {
+                'wtd': 0.3,
+                'mtd': 0.5,
+                'qtd': 0.7,
+                'std': 0.85,
+                'ytd': 1,
+                'origin': 1.5
+            }[period] || 1;
+            
+            scatterChart.data.datasets[0].data = [{ x: 4.25 * multiplier, y: 8.52 * multiplier }];
+            scatterChart.data.datasets[1].data = [{ x: 3.1 * multiplier, y: 5.8 * multiplier }];
+            scatterChart.data.datasets[2].data = [{ x: 1.8 * multiplier, y: 3.2 * multiplier }];
+            scatterChart.data.datasets[3].data = [{ x: 5.5 * multiplier, y: 6.4 * multiplier }];
+            scatterChart.update();
+        });
+    });
+    
+    // Benchmark Toggle
+    document.getElementById('showBenchmark').addEventListener('change', function() {
+        vlChart.data.datasets[1].hidden = !this.checked;
+        document.getElementById('benchmarkLegend').style.display = this.checked ? 'flex' : 'none';
+        vlChart.update();
+    });
+    
+    // Cumulative Toggle
+    document.getElementById('showCumulative').addEventListener('change', function() {
+        if (this.checked) {
+            // Convert to cumulative returns
+            const baseValue = vlChart.data.datasets[0].data[0];
+            vlChart.data.datasets[0].data = vlChart.data.datasets[0].data.map(v => 
+                ((v - baseValue) / baseValue * 100).toFixed(2)
+            );
+            
+            const benchBase = vlChart.data.datasets[1].data[0];
+            vlChart.data.datasets[1].data = vlChart.data.datasets[1].data.map(v => 
+                ((v - benchBase) / benchBase * 100).toFixed(2)
+            );
+            
+            vlChart.options.scales.y.ticks.callback = function(value) {
+                return value + '%';
+            };
+        } else {
+            // Restore original data
+            const currentPeriod = document.querySelector('#periodFilters .filter-pill.active').dataset.period;
+            let months;
+            switch(currentPeriod) {
+                case '1m': months = 1; break;
+                case '3m': months = 3; break;
+                case '6m': months = 6; break;
+                case '1y': months = 12; break;
+                case '5y': months = 60; break;
+                case 'all': months = 120; break;
+                default: months = 12;
+            }
+            
+            const newData = generateVLData(months);
+            vlChart.data.datasets[0].data = newData.data;
+            vlChart.data.datasets[1].data = generateBenchmarkData(newData.labels);
+            
+            vlChart.options.scales.y.ticks.callback = function(value) {
+                return new Intl.NumberFormat('fr-FR').format(value);
+            };
+        }
+        vlChart.update();
+    });
+    
+    // Toggle options active state
+    document.querySelectorAll('.toggle-option').forEach(toggle => {
+        const checkbox = toggle.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener('change', function() {
+            toggle.classList.toggle('active', this.checked);
+        });
+    });
+});
+</script>
 {% endblock %}
