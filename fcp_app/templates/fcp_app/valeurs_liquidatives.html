@@ -1240,6 +1240,10 @@
     const classificationData = {{ classification_data|safe }};
     let performanceData = {{ performance_data|safe }};
     
+    // Vérifier que les données sont bien chargées
+    console.log('Classification Data:', classificationData);
+    console.log('Performance Data:', performanceData);
+    
     // Données de performances multi-périodes (sera chargé via API)
     let multiPeriodData = {};
     
@@ -2062,7 +2066,14 @@
         const selectedFcps = Array.from(document.querySelectorAll('.fcp-checkbox:checked'))
             .map(cb => cb.value);
         
+        console.log('fetchStatsDescriptives appelée:', {
+            periode,
+            selectedFcpsCount: selectedFcps.length,
+            selectedFcps: selectedFcps.slice(0, 3)
+        });
+        
         if (selectedFcps.length === 0) {
+            console.log('Aucun FCP sélectionné');
             clearStatsSection();
             return;
         }
@@ -2072,14 +2083,24 @@
             params.append('periode', periode);
             selectedFcps.forEach(id => params.append('fcp_ids', id));
             
-            const response = await fetch(`/api/stats-descriptives/?${params.toString()}`);
+            const url = `/api/stats-descriptives/?${params.toString()}`;
+            console.log('Appel API:', url);
+            
+            const response = await fetch(url);
             statsData = await response.json();
             
+            console.log('Réponse reçue:', {
+                statsCount: statsData.stats ? statsData.stats.length : 0,
+                hasCorrelation: !!statsData.correlation
+            });
+            
             if (statsData.stats && statsData.stats.length > 0) {
+                console.log('Rendu des statistiques...');
                 renderBoxplot(statsData.stats);
                 renderStatsTable(statsData.stats);
                 renderCorrelationHeatmap(statsData.correlation);
             } else {
+                console.log('Aucune donnée de stat reçue');
                 clearStatsSection();
             }
         } catch (error) {
@@ -2325,9 +2346,14 @@
             });
         });
 
-        // Restore the last active tab from localStorage
+        // Restore the last active tab from localStorage (only if not on first load)
+        if (document.readyState === 'loading') {
+            // Still loading, don't restore yet
+            return;
+        }
+        
         const savedTab = localStorage.getItem('activeTab');
-        if (savedTab) {
+        if (savedTab && savedTab !== 'tab-section-1') {
             const savedButton = document.querySelector(`[data-tab="${savedTab}"]`);
             if (savedButton) {
                 savedButton.click();
@@ -2337,8 +2363,15 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         initializeTabs();
-        applyFilters();
-        fetchMultiPeriodData();
+        // Charger les données avant d'appliquer les filtres
+        Promise.all([
+            fetchMultiPeriodData(),
+        ]).then(() => {
+            applyFilters();
+        }).catch(error => {
+            console.error('Erreur lors du chargement initial:', error);
+            applyFilters(); // Appliquer les filtres même en cas d'erreur
+        });
     });
 </script>
 
