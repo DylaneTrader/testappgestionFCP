@@ -1385,17 +1385,28 @@
         
         try {
             showLoading(true);
-            const promises = periodes.map(periode => 
-                fetch(`/api/performance-data/?periode=${periode}`)
-                    .then(res => res.json())
-                    .then(data => ({ periode, data: data.performance_data }))
-            );
-            
-            const results = await Promise.all(promises);
-            
-            results.forEach(({ periode, data }) => {
-                multiPeriodData[periode] = data;
-            });
+            // Limiter les requêtes parallèles à 3 pour ne pas surcharger le serveur
+            const batchSize = 3;
+            for (let i = 0; i < periodes.length; i += batchSize) {
+                const batch = periodes.slice(i, i + batchSize);
+                const promises = batch.map(periode => 
+                    fetch(`/api/performance-data/?periode=${periode}`)
+                        .then(res => res.json())
+                        .then(data => ({ periode, data: data.performance_data }))
+                        .catch(err => {
+                            console.error(`Erreur pour période ${periode}:`, err);
+                            return { periode, data: [] };
+                        })
+                );
+                
+                const results = await Promise.all(promises);
+                
+                results.forEach(({ periode, data }) => {
+                    if (data) {
+                        multiPeriodData[periode] = data;
+                    }
+                });
+            }
             
             fillPerformancesCalendaires();
             fillPerformancesGlissantes();
@@ -1423,38 +1434,38 @@
 
     function fillClassificationTable() {
         const tbody = document.getElementById('classification-tbody');
-        tbody.innerHTML = '';
         
         const selectedFcpIds = getSelectedFcpIds();
         const selectedTypes = getSelectedTypes();
         const selectedProfils = getSelectedProfils();
         
-        let visibleCount = 0;
+        const filteredData = classificationData.filter(item => 
+            fcpPassesFilters(item, selectedFcpIds, selectedTypes, selectedProfils)
+        );
         
-        classificationData.forEach(item => {
-            if (fcpPassesFilters(item, selectedFcpIds, selectedTypes, selectedProfils)) {
-                visibleCount++;
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td><strong>${item.nom}</strong></td>
-                    <td>${item.type_fcp}</td>
-                    <td>${item.echelle_risque}</td>
-                    <td>${item.profil_risque}</td>
-                    <td>${formatBenchmark(item.benchmark_obligataire)}</td>
-                    <td>${formatBenchmark(item.benchmark_brvmc)}</td>
-                    <td>${item.horizon}</td>
-                `;
-            }
-        });
-        
-        if (visibleCount === 0) {
+        if (filteredData.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#333333;">Aucun FCP sélectionné</td></tr>';
+            return;
         }
+        
+        // Construire le HTML en une seule passe
+        let html = filteredData.map(item => `
+            <tr>
+                <td><strong>${item.nom}</strong></td>
+                <td>${item.type_fcp}</td>
+                <td>${item.echelle_risque}</td>
+                <td>${item.profil_risque}</td>
+                <td>${formatBenchmark(item.benchmark_obligataire)}</td>
+                <td>${formatBenchmark(item.benchmark_brvmc)}</td>
+                <td>${item.horizon}</td>
+            </tr>
+        `).join('');
+        
+        tbody.innerHTML = html;
     }
 
     function fillPerformanceTable() {
         const tbody = document.getElementById('performance-tbody');
-        tbody.innerHTML = '';
         
         const selectedFcpNames = getSelectedFcpNames();
         const selectedTypes = getSelectedTypes();
@@ -1464,19 +1475,24 @@
             .filter(item => performancePassesFilters(item, selectedFcpNames, selectedTypes, selectedProfils))
             .sort((a, b) => b.performance - a.performance);
         
-        filteredData.forEach(item => {
-            const row = tbody.insertRow();
-            const perfClass = item.performance >= 0 ? 'positive' : 'negative';
-            row.innerHTML = `
-                <td><strong>${item.nom}</strong></td>
-                <td class="${perfClass}">${formatPerformance(item.performance)}</td>
-                <td>${item.volatilite.toFixed(2)}%</td>
-            `;
-        });
-        
         if (filteredData.length === 0) {
             tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#333333;">Aucune donnée</td></tr>';
+            return;
         }
+        
+        // Construire le HTML en une seule passe
+        let html = filteredData.map(item => {
+            const perfClass = item.performance >= 0 ? 'positive' : 'negative';
+            return `
+                <tr>
+                    <td><strong>${item.nom}</strong></td>
+                    <td class="${perfClass}">${item.performance.toFixed(2)}%</td>
+                    <td>${item.volatilite.toFixed(2)}%</td>
+                </tr>
+            `;
+        }).join('');
+        
+        tbody.innerHTML = html;
     }
 
     function fillRendementAnnualise() {
@@ -1587,7 +1603,6 @@
 
     function fillPerformancesCalendaires() {
         const tbody = document.getElementById('perf-calendaires-tbody');
-        tbody.innerHTML = '';
         
         const selectedFcpNames = getSelectedFcpNames();
         const selectedTypes = getSelectedTypes();
@@ -1612,28 +1627,30 @@
             .filter(item => performancePassesFilters(item, selectedFcpNames, selectedTypes, selectedProfils))
             .sort((a, b) => (b.ytd || 0) - (a.ytd || 0));
         
-        filteredFcps.forEach(fcp => {
-            const tr = document.createElement('tr');
-            let html = `<td><strong>${fcp.nom}</strong></td>`;
+        if (filteredFcps.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="${periodes.length + 1}" style="text-align:center; color:#333333;">Aucune donnée</td></tr>`;
+            return;
+        }
+        
+        // Construire le HTML en une seule passe
+        let html = filteredFcps.map(fcp => {
+            let row = `<tr><td><strong>${fcp.nom}</strong></td>`;
             
             periodes.forEach(periode => {
                 const value = fcp[periode];
                 const perfClass = getPerformanceClass(value);
-                html += `<td class="perf-cell ${perfClass}">${formatPerformance(value)}</td>`;
+                row += `<td class="perf-cell ${perfClass}">${formatPerformance(value)}</td>`;
             });
             
-            tr.innerHTML = html;
-            tbody.appendChild(tr);
-        });
+            row += '</tr>';
+            return row;
+        }).join('');
         
-        if (filteredFcps.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="${periodes.length + 1}" style="text-align:center; color:#333333;">Aucune donnée</td></tr>`;
-        }
+        tbody.innerHTML = html;
     }
 
     function fillPerformancesGlissantes() {
         const tbody = document.getElementById('perf-glissantes-tbody');
-        tbody.innerHTML = '';
         
         const selectedFcpNames = getSelectedFcpNames();
         const selectedTypes = getSelectedTypes();
@@ -1658,23 +1675,26 @@
             .filter(item => performancePassesFilters(item, selectedFcpNames, selectedTypes, selectedProfils))
             .sort((a, b) => (b['1y'] || b.origine || 0) - (a['1y'] || a.origine || 0));
         
-        filteredFcps.forEach(fcp => {
-            const tr = document.createElement('tr');
-            let html = `<td><strong>${fcp.nom}</strong></td>`;
+        if (filteredFcps.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="${periodes.length + 1}" style="text-align:center; color:#333333;">Aucune donnée</td></tr>`;
+            return;
+        }
+        
+        // Construire le HTML en une seule passe
+        let html = filteredFcps.map(fcp => {
+            let row = `<tr><td><strong>${fcp.nom}</strong></td>`;
             
             periodes.forEach(periode => {
                 const value = fcp[periode];
                 const perfClass = getPerformanceClass(value);
-                html += `<td class="perf-cell ${perfClass}">${formatPerformance(value)}</td>`;
+                row += `<td class="perf-cell ${perfClass}">${formatPerformance(value)}</td>`;
             });
             
-            tr.innerHTML = html;
-            tbody.appendChild(tr);
-        });
+            row += '</tr>';
+            return row;
+        }).join('');
         
-        if (filteredFcps.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="${periodes.length + 1}" style="text-align:center; color:#333333;">Aucune donnée</td></tr>`;
-        }
+        tbody.innerHTML = html;
     }
 
     function updateScatterChart() {
@@ -1767,18 +1787,27 @@
     }
 
     // === FONCTION PRINCIPALE ===
-
+    
+    let filterTimeout = null;
+    
     function applyFilters() {
-        fillClassificationTable();
-        fillPerformanceTable();
-        updateScatterChart();
-        fillRendementAnnualise();
-        fillPerformancesCalendaires();
-        fillPerformancesGlissantes();
-        // Section 3 : Statistiques descriptives
-        if (typeof fetchStatsDescriptives === 'function') {
-            fetchStatsDescriptives();
+        // Debounce les appels rapides de filtres
+        if (filterTimeout) {
+            clearTimeout(filterTimeout);
         }
+        
+        filterTimeout = setTimeout(() => {
+            fillClassificationTable();
+            fillPerformanceTable();
+            updateScatterChart();
+            fillRendementAnnualise();
+            fillPerformancesCalendaires();
+            fillPerformancesGlissantes();
+            // Section 3 : Statistiques descriptives
+            if (typeof fetchStatsDescriptives === 'function') {
+                fetchStatsDescriptives();
+            }
+        }, 300); // Attendre 300ms avant de mettre à jour
     }
 
     // === EVENT LISTENERS ===
