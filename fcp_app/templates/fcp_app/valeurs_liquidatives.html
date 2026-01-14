@@ -288,9 +288,9 @@
                     <div class="options-bar">
                         <!-- FCP Selector -->
                         <select class="select-custom" id="fcpSelector">
-                            <option value="fcp1" selected>FCP Croissance</option>
-                            <option value="fcp2">FCP Équilibre</option>
-                            <option value="fcp3">FCP Sécurité</option>
+                            {% for fcp_name in fcp_list %}
+                            <option value="{{ fcp_name }}" {% if fcp_name == selected_fcp %}selected{% endif %}>{{ fcp_name }}</option>
+                            {% endfor %}
                         </select>
                         
                         <!-- Benchmark Toggle -->
@@ -337,7 +337,7 @@
                 <div class="chart-legend">
                     <div class="legend-item">
                         <div class="legend-line" style="background: #004080;"></div>
-                        <span>FCP Croissance</span>
+                        <span id="legendFcpName">{{ selected_fcp }}</span>
                     </div>
                     <div class="legend-item" id="benchmarkLegend" style="display: none;">
                         <div class="legend-line" style="background: #E0DEDD; border: 1px dashed #333;"></div>
@@ -351,35 +351,35 @@
         <div class="row mb-4">
             <div class="col-md-3 col-sm-6 mb-3">
                 <div class="metric-card">
-                    <div class="metric-label">Dernière VL</div>
-                    <div class="metric-value">12 458 <small style="font-size: 14px;">XOF</small></div>
-                    <div class="metric-change positive">
-                        <i class="bi bi-arrow-up"></i> +0.45% (1j)
+                    <div class="metric-label">Dernière VL ({{ stats.derniere_date|default:"--" }})</div>
+                    <div class="metric-value" id="metricDerniereVL">{{ stats.derniere_vl|floatformat:2|default:"--" }} <small style="font-size: 14px;">XOF</small></div>
+                    <div class="metric-change {% if stats.var_1j >= 0 %}positive{% else %}negative{% endif %}" id="metricVar1J">
+                        <i class="bi bi-arrow-{% if stats.var_1j >= 0 %}up{% else %}down{% endif %}"></i> {% if stats.var_1j >= 0 %}+{% endif %}{{ stats.var_1j|default:"0" }}% (1j)
                     </div>
                 </div>
             </div>
             <div class="col-md-3 col-sm-6 mb-3">
                 <div class="metric-card">
                     <div class="metric-label">Rendement YTD</div>
-                    <div class="metric-value" style="color: var(--success-color);">+8.52%</div>
+                    <div class="metric-value {% if stats.var_ytd >= 0 %}text-success{% else %}text-danger{% endif %}" id="metricYTD">{% if stats.var_ytd >= 0 %}+{% endif %}{{ stats.var_ytd|default:"0" }}%</div>
                     <div class="metric-change">
-                        vs Benchmark: +2.1%
+                        Depuis début d'année
                     </div>
                 </div>
             </div>
             <div class="col-md-3 col-sm-6 mb-3">
                 <div class="metric-card">
-                    <div class="metric-label">Rendement Annualisé</div>
-                    <div class="metric-value" style="color: var(--success-color);">+6.78%</div>
+                    <div class="metric-label">Rendement 1 an</div>
+                    <div class="metric-value {% if stats.var_1y >= 0 %}text-success{% else %}text-danger{% endif %}" id="metricVar1Y">{% if stats.var_1y >= 0 %}+{% endif %}{{ stats.var_1y|default:"0" }}%</div>
                     <div class="metric-change">
-                        Sur 3 ans
+                        Sur 12 mois glissants
                     </div>
                 </div>
             </div>
             <div class="col-md-3 col-sm-6 mb-3">
                 <div class="metric-card">
                     <div class="metric-label">Volatilité</div>
-                    <div class="metric-value">4.25%</div>
+                    <div class="metric-value" id="metricVolatilite">{{ stats.volatilite|default:"0" }}%</div>
                     <div class="metric-change">
                         Écart-type annualisé
                     </div>
@@ -393,17 +393,12 @@
                 <div class="section-header">
                     <div class="section-title">
                         <i class="bi bi-bullseye"></i>
-                        <span>Rendement / Risque</span>
+                        <span>Rendement / Risque - Tous les FCP</span>
                     </div>
                     
                     <!-- Period Filters for Scatter -->
                     <div class="filter-pills" id="scatterPeriodFilters">
-                        <button class="filter-pill" data-period="wtd">WTD</button>
-                        <button class="filter-pill" data-period="mtd">MTD</button>
-                        <button class="filter-pill" data-period="qtd">QTD</button>
-                        <button class="filter-pill" data-period="std">STD</button>
-                        <button class="filter-pill active" data-period="ytd">YTD</button>
-                        <button class="filter-pill" data-period="origin">Origine</button>
+                        <button class="filter-pill active" data-period="origin">Depuis Origine</button>
                     </div>
                 </div>
                 
@@ -464,26 +459,90 @@
     <!-- Historique Tab -->
     <div class="tab-pane fade" id="history" role="tabpanel">
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <h5 class="card-title mb-0">
-                    <i class="bi bi-table me-2"></i>Historique des Valeurs Liquidatives
+                    <i class="bi bi-table me-2"></i>Historique des Valeurs Liquidatives - {{ selected_fcp }}
                 </h5>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-sm btn-outline-secondary">
-                        <i class="bi bi-funnel"></i> Filtrer
-                    </button>
-                    <button class="btn btn-sm btn-outline-secondary">
-                        <i class="bi bi-download"></i> Exporter
+                <div class="d-flex gap-2 align-items-center flex-wrap">
+                    <select class="select-custom" id="historyFcpSelector" style="min-width: 200px;">
+                        {% for fcp_name in fcp_list %}
+                        <option value="{{ fcp_name }}" {% if fcp_name == selected_fcp %}selected{% endif %}>{{ fcp_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-sm btn-outline-secondary" id="exportCsvBtn">
+                        <i class="bi bi-download me-1"></i>Exporter CSV
                     </button>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="bi bi-table"></i>
+            <div class="card-body p-0">
+                <!-- Stats Summary -->
+                <div class="history-stats d-flex justify-content-around flex-wrap py-3 px-4 border-bottom" style="background: var(--bg-secondary);">
+                    <div class="text-center px-3">
+                        <div class="text-muted small text-uppercase">Nb. Observations</div>
+                        <div class="fw-bold fs-5" style="color: var(--primary-color);">{{ stats.nb_vl|default:"0" }}</div>
                     </div>
-                    <h3>Historique à venir</h3>
-                    <p>Le tableau historique des valeurs liquidatives sera disponible dans cette section.</p>
+                    <div class="text-center px-3">
+                        <div class="text-muted small text-uppercase">Première Date</div>
+                        <div class="fw-bold">{{ stats.premiere_date|default:"--" }}</div>
+                    </div>
+                    <div class="text-center px-3">
+                        <div class="text-muted small text-uppercase">Dernière Date</div>
+                        <div class="fw-bold">{{ stats.derniere_date|default:"--" }}</div>
+                    </div>
+                    <div class="text-center px-3">
+                        <div class="text-muted small text-uppercase">Perf. Origine</div>
+                        <div class="fw-bold {% if stats.var_origine >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            {% if stats.var_origine >= 0 %}+{% endif %}{{ stats.var_origine|default:"0" }}%
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Table Container -->
+                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table table-hover table-striped mb-0" id="historyTable">
+                        <thead class="sticky-top" style="background: var(--bg-primary);">
+                            <tr>
+                                <th class="px-4 py-3" style="min-width: 120px;">
+                                    <span class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-calendar3"></i> Date
+                                    </span>
+                                </th>
+                                <th class="px-4 py-3 text-end" style="min-width: 140px;">
+                                    <span class="d-flex align-items-center justify-content-end gap-2">
+                                        Valeur Liquidative <i class="bi bi-currency-exchange"></i>
+                                    </span>
+                                </th>
+                                <th class="px-4 py-3 text-end" style="min-width: 120px;">
+                                    <span class="d-flex align-items-center justify-content-end gap-2">
+                                        Var. 1J <i class="bi bi-graph-up-arrow"></i>
+                                    </span>
+                                </th>
+                                <th class="px-4 py-3 text-end" style="min-width: 120px;">
+                                    <span class="d-flex align-items-center justify-content-end gap-2">
+                                        Var. Cumul <i class="bi bi-bar-chart-line"></i>
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- Rempli par JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between align-items-center px-4 py-3 border-top">
+                    <div class="text-muted small">
+                        Affichage <span id="showingFrom">1</span>-<span id="showingTo">50</span> sur <span id="totalRows">{{ stats.nb_vl|default:"0" }}</span> lignes
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-secondary" id="prevPageBtn" disabled>
+                            <i class="bi bi-chevron-left"></i> Précédent
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" id="nextPageBtn">
+                            Suivant <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -514,72 +573,59 @@
 {% block extra_js %}
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Sample data generation
-    function generateVLData(months, startValue = 10000) {
-        const data = [];
-        const labels = [];
-        let value = startValue;
-        const today = new Date();
+    // Données VL depuis Django
+    const vlDataRaw = {{ vl_data_json|safe }};
+    const allFcpStats = {{ all_fcp_stats_json|safe }};
+    const selectedFcp = "{{ selected_fcp }}";
+    
+    // Fonction pour filtrer les données par période
+    function filterDataByPeriod(data, period) {
+        if (!data || data.length === 0) return { labels: [], values: [] };
         
-        for (let i = months; i >= 0; i--) {
-            const date = new Date(today);
-            date.setMonth(date.getMonth() - i);
-            labels.push(date.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' }));
-            
-            // Random walk with slight upward trend
-            value = value * (1 + (Math.random() - 0.45) * 0.03);
-            data.push(Math.round(value));
+        const lastDate = new Date(data[data.length - 1].date);
+        let startDate;
+        
+        switch(period) {
+            case '1m': startDate = new Date(lastDate); startDate.setMonth(startDate.getMonth() - 1); break;
+            case '3m': startDate = new Date(lastDate); startDate.setMonth(startDate.getMonth() - 3); break;
+            case '6m': startDate = new Date(lastDate); startDate.setMonth(startDate.getMonth() - 6); break;
+            case '1y': startDate = new Date(lastDate); startDate.setFullYear(lastDate.getFullYear() - 1); break;
+            case '5y': startDate = new Date(lastDate); startDate.setFullYear(lastDate.getFullYear() - 5); break;
+            default: startDate = new Date(data[0].date);
         }
-        return { labels, data };
+        
+        const filtered = data.filter(d => new Date(d.date) >= startDate);
+        return {
+            labels: filtered.map(d => d.date),
+            values: filtered.map(d => d.valeur)
+        };
     }
     
-    function generateBenchmarkData(labels, startValue = 10000) {
-        const data = [];
-        let value = startValue;
-        
-        for (let i = 0; i < labels.length; i++) {
-            value = value * (1 + (Math.random() - 0.48) * 0.025);
-            data.push(Math.round(value));
-        }
-        return data;
-    }
-    
-    // Initial data
-    let vlData = generateVLData(12);
-    let benchmarkData = generateBenchmarkData(vlData.labels);
+    // Données initiales (1 an par défaut)
+    let currentData = filterDataByPeriod(vlDataRaw, '1y');
     
     // VL Evolution Chart
     const vlCtx = document.getElementById('vlEvolutionChart').getContext('2d');
     const vlChart = new Chart(vlCtx, {
         type: 'line',
         data: {
-            labels: vlData.labels,
+            labels: currentData.labels,
             datasets: [{
-                label: 'FCP Croissance',
-                data: vlData.data,
+                label: selectedFcp,
+                data: currentData.values,
                 borderColor: '#004080',
                 backgroundColor: 'rgba(0, 64, 128, 0.1)',
                 borderWidth: 2.5,
                 fill: true,
-                tension: 0.4,
+                tension: 0.2,
                 pointRadius: 0,
                 pointHoverRadius: 6,
                 pointHoverBackgroundColor: '#004080',
                 pointHoverBorderColor: '#fff',
                 pointHoverBorderWidth: 2
-            }, {
-                label: 'Benchmark',
-                data: benchmarkData,
-                borderColor: '#999999',
-                borderWidth: 2,
-                borderDash: [5, 5],
-                fill: false,
-                tension: 0.4,
-                pointRadius: 0,
-                pointHoverRadius: 5,
-                hidden: true
             }]
         },
         options: {
@@ -600,20 +646,30 @@ document.addEventListener('DOMContentLoaded', function() {
                     padding: 12,
                     cornerRadius: 8,
                     callbacks: {
+                        title: function(context) {
+                            const date = new Date(context[0].label);
+                            return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+                        },
                         label: function(context) {
-                            return context.dataset.label + ': ' + new Intl.NumberFormat('fr-FR').format(context.raw) + ' XOF';
+                            return context.dataset.label + ': ' + new Intl.NumberFormat('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).format(context.raw) + ' XOF';
                         }
                     }
                 }
             },
             scales: {
                 x: {
+                    type: 'category',
                     grid: {
                         display: false
                     },
                     ticks: {
                         color: '#777777',
-                        font: { size: 11 }
+                        font: { size: 10 },
+                        maxTicksLimit: 12,
+                        callback: function(value, index) {
+                            const date = new Date(this.getLabelForValue(value));
+                            return date.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+                        }
                     }
                 },
                 y: {
@@ -632,37 +688,26 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Risk/Return Scatter Chart
+    // Risk/Return Scatter Chart avec données réelles
     const scatterCtx = document.getElementById('riskReturnChart').getContext('2d');
+    
+    // Générer les couleurs pour les FCP
+    const colors = ['#004080', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1', '#e83e8c', '#fd7e14', '#20c997', '#6c757d'];
+    
+    const scatterDatasets = allFcpStats.map((fcp, index) => ({
+        label: fcp.nom,
+        data: [{ x: fcp.volatilite, y: fcp.rendement }],
+        backgroundColor: fcp.selected ? '#004080' : colors[index % colors.length],
+        pointRadius: fcp.selected ? 14 : 8,
+        pointHoverRadius: fcp.selected ? 16 : 10,
+        borderColor: fcp.selected ? '#fff' : 'transparent',
+        borderWidth: fcp.selected ? 3 : 0
+    }));
+    
     const scatterChart = new Chart(scatterCtx, {
         type: 'scatter',
         data: {
-            datasets: [{
-                label: 'FCP Croissance',
-                data: [{ x: 4.25, y: 8.52 }],
-                backgroundColor: '#004080',
-                pointRadius: 12,
-                pointHoverRadius: 14
-            }, {
-                label: 'FCP Équilibre',
-                data: [{ x: 3.1, y: 5.8 }],
-                backgroundColor: '#28a745',
-                pointRadius: 12,
-                pointHoverRadius: 14
-            }, {
-                label: 'FCP Sécurité',
-                data: [{ x: 1.8, y: 3.2 }],
-                backgroundColor: '#e6a800',
-                pointRadius: 12,
-                pointHoverRadius: 14
-            }, {
-                label: 'Benchmark',
-                data: [{ x: 5.5, y: 6.4 }],
-                backgroundColor: 'rgba(51, 51, 51, 0.5)',
-                pointRadius: 10,
-                pointHoverRadius: 12,
-                pointStyle: 'triangle'
-            }]
+            datasets: scatterDatasets
         },
         options: {
             responsive: true,
@@ -680,7 +725,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             return [
                                 context.dataset.label,
                                 'Rendement: ' + context.raw.y.toFixed(2) + '%',
-                                'Risque: ' + context.raw.x.toFixed(2) + '%'
+                                'Volatilité: ' + context.raw.x.toFixed(2) + '%'
                             ];
                         }
                     }
@@ -702,9 +747,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         callback: function(value) {
                             return value + '%';
                         }
-                    },
-                    min: 0,
-                    max: 8
+                    }
                 },
                 y: {
                     title: {
@@ -721,9 +764,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         callback: function(value) {
                             return value + '%';
                         }
-                    },
-                    min: 0,
-                    max: 12
+                    }
                 }
             }
         }
@@ -736,91 +777,48 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('active');
             
             const period = this.dataset.period;
-            let months;
-            switch(period) {
-                case '1m': months = 1; break;
-                case '3m': months = 3; break;
-                case '6m': months = 6; break;
-                case '1y': months = 12; break;
-                case '5y': months = 60; break;
-                case 'all': months = 120; break;
-                default: months = 12;
-            }
+            const filteredData = filterDataByPeriod(vlDataRaw, period);
             
-            const newData = generateVLData(months);
-            vlChart.data.labels = newData.labels;
-            vlChart.data.datasets[0].data = newData.data;
-            vlChart.data.datasets[1].data = generateBenchmarkData(newData.labels);
+            vlChart.data.labels = filteredData.labels;
+            vlChart.data.datasets[0].data = filteredData.values;
             vlChart.update();
         });
     });
     
-    // Scatter Period Filter Click Handler
-    document.querySelectorAll('#scatterPeriodFilters .filter-pill').forEach(pill => {
-        pill.addEventListener('click', function() {
-            document.querySelectorAll('#scatterPeriodFilters .filter-pill').forEach(p => p.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Update scatter data based on period (simulated)
-            const period = this.dataset.period;
-            const multiplier = {
-                'wtd': 0.3,
-                'mtd': 0.5,
-                'qtd': 0.7,
-                'std': 0.85,
-                'ytd': 1,
-                'origin': 1.5
-            }[period] || 1;
-            
-            scatterChart.data.datasets[0].data = [{ x: 4.25 * multiplier, y: 8.52 * multiplier }];
-            scatterChart.data.datasets[1].data = [{ x: 3.1 * multiplier, y: 5.8 * multiplier }];
-            scatterChart.data.datasets[2].data = [{ x: 1.8 * multiplier, y: 3.2 * multiplier }];
-            scatterChart.data.datasets[3].data = [{ x: 5.5 * multiplier, y: 6.4 * multiplier }];
-            scatterChart.update();
-        });
+    // FCP Selector Change Handler
+    document.getElementById('fcpSelector').addEventListener('change', function() {
+        const selectedFcp = this.value;
+        window.location.href = '?fcp=' + encodeURIComponent(selectedFcp);
     });
     
     // Benchmark Toggle
     document.getElementById('showBenchmark').addEventListener('change', function() {
-        vlChart.data.datasets[1].hidden = !this.checked;
-        document.getElementById('benchmarkLegend').style.display = this.checked ? 'flex' : 'none';
-        vlChart.update();
+        if (this.checked) {
+            document.getElementById('benchmarkLegend').style.display = 'flex';
+        } else {
+            document.getElementById('benchmarkLegend').style.display = 'none';
+        }
     });
     
     // Cumulative Toggle
     document.getElementById('showCumulative').addEventListener('change', function() {
-        if (this.checked) {
-            // Convert to cumulative returns
-            const baseValue = vlChart.data.datasets[0].data[0];
-            vlChart.data.datasets[0].data = vlChart.data.datasets[0].data.map(v => 
-                ((v - baseValue) / baseValue * 100).toFixed(2)
-            );
-            
-            const benchBase = vlChart.data.datasets[1].data[0];
-            vlChart.data.datasets[1].data = vlChart.data.datasets[1].data.map(v => 
-                ((v - benchBase) / benchBase * 100).toFixed(2)
+        const currentValues = vlChart.data.datasets[0].data;
+        
+        if (this.checked && currentValues.length > 0) {
+            // Convert to cumulative returns (%)
+            const baseValue = currentValues[0];
+            vlChart.data.datasets[0].data = currentValues.map(v => 
+                ((v - baseValue) / baseValue * 100)
             );
             
             vlChart.options.scales.y.ticks.callback = function(value) {
-                return value + '%';
+                return value.toFixed(2) + '%';
             };
         } else {
             // Restore original data
-            const currentPeriod = document.querySelector('#periodFilters .filter-pill.active').dataset.period;
-            let months;
-            switch(currentPeriod) {
-                case '1m': months = 1; break;
-                case '3m': months = 3; break;
-                case '6m': months = 6; break;
-                case '1y': months = 12; break;
-                case '5y': months = 60; break;
-                case 'all': months = 120; break;
-                default: months = 12;
-            }
-            
-            const newData = generateVLData(months);
-            vlChart.data.datasets[0].data = newData.data;
-            vlChart.data.datasets[1].data = generateBenchmarkData(newData.labels);
+            const period = document.querySelector('#periodFilters .filter-pill.active').dataset.period;
+            const filteredData = filterDataByPeriod(vlDataRaw, period);
+            vlChart.data.datasets[0].data = filteredData.values;
             
             vlChart.options.scales.y.ticks.callback = function(value) {
                 return new Intl.NumberFormat('fr-FR').format(value);
