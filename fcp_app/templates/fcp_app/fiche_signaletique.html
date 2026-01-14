@@ -1,0 +1,187 @@
+{% extends 'fcp_app/base.html' %}
+
+{% block title %}Fiche Signalétique - FCP Reporting{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- FCP Identity Card -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-credit-card-2-front me-2"></i>Identité du FCP
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="empty-state" style="padding: 30px;">
+                    <div class="empty-state-icon" style="width: 70px; height: 70px;">
+                        <i class="bi bi-building" style="font-size: 28px;"></i>
+                    </div>
+                    <h3>Informations non disponibles</h3>
+                    <p style="max-width: 300px;">Les informations d'identité du FCP seront affichées ici.</p>
+                </div>
+                
+                <!-- Placeholder for future data -->
+                <div class="d-none">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <td class="text-muted">Nom du FCP</td>
+                                <td class="fw-semibold text-end">--</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Code ISIN</td>
+                                <td class="fw-semibold text-end">--</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Classification</td>
+                                <td class="fw-semibold text-end">--</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Date de création</td>
+                                <td class="fw-semibold text-end">--</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Durée</td>
+                                <td class="fw-semibold text-end">-- ans</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Management Info -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-people-fill me-2"></i>Informations de Gestion
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="empty-state" style="padding: 30px;">
+                    <div class="empty-state-icon" style="width: 70px; height: 70px;">
+                        <i class="bi bi-person-badge" style="font-size: 28px;"></i>
+                    </div>
+                    <h3>Informations non disponibles</h3>
+                    <p style="max-width: 300px;">Les informations de gestion seront affichées ici.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Financial Terms -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-cash-coin me-2"></i>Conditions Financières
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="empty-state" style="padding: 30px;">
+                    <div class="empty-state-icon" style="width: 70px; height: 70px;">
+                        <i class="bi bi-calculator" style="font-size: 28px;"></i>
+                    </div>
+                    <h3>Conditions non définies</h3>
+                    <p style="max-width: 300px;">Les frais et commissions seront affichés ici.</p>
+                </div>
+                
+                <!-- Placeholder for future data -->
+                <div class="d-none">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <td class="text-muted">Frais de gestion</td>
+                                <td class="fw-semibold text-end">-- %</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Commission de souscription</td>
+                                <td class="fw-semibold text-end">-- %</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Commission de rachat</td>
+                                <td class="fw-semibold text-end">-- %</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Montant minimum de souscription</td>
+                                <td class="fw-semibold text-end">-- XOF</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Valeur nominale de la part</td>
+                                <td class="fw-semibold text-end">-- XOF</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Investment Policy -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-compass me-2"></i>Politique d'Investissement
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="empty-state" style="padding: 30px;">
+                    <div class="empty-state-icon" style="width: 70px; height: 70px;">
+                        <i class="bi bi-bullseye" style="font-size: 28px;"></i>
+                    </div>
+                    <h3>Politique non définie</h3>
+                    <p style="max-width: 300px;">La stratégie d'investissement sera décrite ici.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Risk Profile -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="bi bi-shield-exclamation me-2"></i>Profil de Risque
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="bi bi-speedometer2"></i>
+            </div>
+            <h3>Profil de risque non évalué</h3>
+            <p>L'indicateur de risque et les avertissements associés seront affichés une fois le FCP configuré.</p>
+            <button class="btn btn-primary">
+                <i class="bi bi-gear me-2"></i>Configurer le FCP
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Documents -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title">
+            <i class="bi bi-file-earmark-pdf me-2"></i>Documents Réglementaires
+        </h5>
+        <button class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-upload"></i> Ajouter un document
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="empty-state" style="padding: 40px;">
+            <div class="empty-state-icon" style="width: 80px; height: 80px;">
+                <i class="bi bi-folder2-open" style="font-size: 32px;"></i>
+            </div>
+            <h3>Aucun document disponible</h3>
+            <p>Les documents réglementaires (prospectus, DICI, rapports) seront listés ici.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends 'fcp_app/base.html' %}
+
+{% block title %}Composition - FCP Reporting{% endblock %}
+
+{% block content %}
+<!-- Stats Overview -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon primary">
+            <i class="bi bi-pie-chart-fill"></i>
+        </div>
+        <div class="stat-content">
+            <h4>Classes d'Actifs</h4>
+            <div class="stat-value">--</div>
+            <span class="stat-change">Catégories</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon success">
+            <i class="bi bi-building"></i>
+        </div>
+        <div class="stat-content">
+            <h4>Actions</h4>
+            <div class="stat-value">-- %</div>
+            <span class="stat-change positive">
+                <i class="bi bi-arrow-up"></i> --%
+            </span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon warning">
+            <i class="bi bi-bank"></i>
+        </div>
+        <div class="stat-content">
+            <h4>Obligations</h4>
+            <div class="stat-value">-- %</div>
+            <span class="stat-change negative">
+                <i class="bi bi-arrow-down"></i> --%
+            </span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon info">
+            <i class="bi bi-cash-stack"></i>
+        </div>
+        <div class="stat-content">
+            <h4>Liquidités</h4>
+            <div class="stat-value">-- %</div>
+            <span class="stat-change">Disponible</span>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="row">
+    <!-- Allocation Chart -->
+    <div class="col-lg-5 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-pie-chart me-2"></i>Répartition par Classe d'Actifs
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="empty-state" style="padding: 40px;">
+                    <div class="empty-state-icon" style="width: 80px; height: 80px;">
+                        <i class="bi bi-pie-chart-fill" style="font-size: 32px;"></i>
+                    </div>
+                    <h3>Graphique non disponible</h3>
+                    <p>La répartition du portefeuille sera affichée ici.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Holdings -->
+    <div class="col-lg-7 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title">
+                    <i class="bi bi-list-ol me-2"></i>Principales Lignes du Portefeuille
+                </h5>
+                <button class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-eye"></i> Voir tout
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="empty-state" style="padding: 40px;">
+                    <div class="empty-state-icon" style="width: 80px; height: 80px;">
+                        <i class="bi bi-list-task" style="font-size: 32px;"></i>
+                    </div>
+                    <h3>Aucune position disponible</h3>
+                    <p>Les lignes du portefeuille seront affichées après l'import.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Composition Table -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title">
+            <i class="bi bi-table me-2"></i>Composition Détaillée
+        </h5>
+        <div class="d-flex gap-2">
+            <select class="form-select form-select-sm" style="width: auto;">
+                <option selected>Toutes les classes</option>
+                <option>Actions</option>
+                <option>Obligations</option>
+                <option>Monétaire</option>
+                <option>Autres</option>
+            </select>
+            <button class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-download"></i> Exporter
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="bi bi-folder-x"></i>
+            </div>
+            <h3>Aucune donnée de composition</h3>
+            <p>La composition détaillée du FCP sera disponible une fois que les données seront importées dans le système.</p>
+            <button class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Importer la composition
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,183 @@
+{% extends 'fcp_app/base.html' %}
+
+{% block title %}À Propos - FCP Reporting{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="card mb-4" style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); border: none;">
+    <div class="card-body text-center text-white py-5">
+        <div class="mb-4">
+            <i class="bi bi-graph-up-arrow" style="font-size: 64px; opacity: 0.9;"></i>
+        </div>
+        <h2 class="display-6 fw-bold mb-3">FCP Reporting Pro</h2>
+        <p class="lead mb-0" style="opacity: 0.9; max-width: 600px; margin: 0 auto;">
+            Solution professionnelle de reporting et de suivi des Fonds Communs de Placement
+        </p>
+        <div class="mt-4">
+            <span class="badge bg-white text-primary px-3 py-2 fs-6">Version 1.0.0</span>
+        </div>
+    </div>
+</div>
+
+<!-- Features Grid -->
+<div class="info-grid mb-4">
+    <div class="info-card">
+        <div class="info-card-icon">
+            <i class="bi bi-speedometer2"></i>
+        </div>
+        <h3>Suivi en Temps Réel</h3>
+        <p>Suivez l'évolution des valeurs liquidatives et de la performance de vos FCP en temps réel avec des tableaux de bord intuitifs.</p>
+    </div>
+    
+    <div class="info-card">
+        <div class="info-card-icon">
+            <i class="bi bi-pie-chart-fill"></i>
+        </div>
+        <h3>Analyse de Composition</h3>
+        <p>Visualisez la répartition détaillée du portefeuille par classe d'actifs, secteur et géographie.</p>
+    </div>
+    
+    <div class="info-card">
+        <div class="info-card-icon">
+            <i class="bi bi-file-earmark-bar-graph"></i>
+        </div>
+        <h3>Rapports Automatisés</h3>
+        <p>Générez des rapports professionnels conformes aux exigences réglementaires en quelques clics.</p>
+    </div>
+    
+    <div class="info-card">
+        <div class="info-card-icon">
+            <i class="bi bi-shield-check"></i>
+        </div>
+        <h3>Sécurité des Données</h3>
+        <p>Vos données sont protégées par des protocoles de sécurité avancés et conformes aux normes du secteur.</p>
+    </div>
+</div>
+
+<!-- Info Sections -->
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-building me-2"></i>À Propos de Nous
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    FCP Reporting Pro est une solution développée pour les professionnels de la gestion d'actifs 
+                    souhaitant optimiser leur suivi et reporting des Fonds Communs de Placement.
+                </p>
+                <p class="text-muted mb-0">
+                    Notre objectif est de fournir des outils modernes et efficaces pour simplifier 
+                    la gestion quotidienne et améliorer la qualité du reporting financier.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-envelope-fill me-2"></i>Contact & Support
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="stat-icon primary me-3" style="width: 44px; height: 44px; font-size: 18px;">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Email</small>
+                        <span class="fw-semibold">support@fcp-reporting.com</span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center mb-3">
+                    <div class="stat-icon success me-3" style="width: 44px; height: 44px; font-size: 18px;">
+                        <i class="bi bi-telephone"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Téléphone</small>
+                        <span class="fw-semibold">+225 XX XX XX XX XX</span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon info me-3" style="width: 44px; height: 44px; font-size: 18px;">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Adresse</small>
+                        <span class="fw-semibold">Abidjan, Côte d'Ivoire</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Technical Info -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="bi bi-code-slash me-2"></i>Informations Techniques
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon primary me-3" style="width: 48px; height: 48px;">
+                        <i class="bi bi-filetype-py"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Framework</small>
+                        <span class="fw-bold">Django 6.0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3 mb-md-0">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon success me-3" style="width: 48px; height: 48px;">
+                        <i class="bi bi-bootstrap"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">UI Framework</small>
+                        <span class="fw-bold">Bootstrap 5.3</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon warning me-3" style="width: 48px; height: 48px;">
+                        <i class="bi bi-database"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted d-block">Base de données</small>
+                        <span class="fw-bold">SQLite / PostgreSQL</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <hr class="my-4">
+        
+        <div class="text-center">
+            <p class="text-muted mb-3">
+                <i class="bi bi-c-circle me-1"></i> 2026 FCP Reporting Pro - Tous droits réservés
+            </p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="#" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-book me-1"></i> Documentation
+                </a>
+                <a href="#" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-github me-1"></i> GitHub
+                </a>
+                <a href="#" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-bug me-1"></i> Signaler un bug
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends 'fcp_app/base.html' %}
+
+{% block title %}Valeurs Liquidatives - FCP Reporting{% endblock %}
+
+{% block content %}
+<!-- Stats Overview -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon primary">
+            <i class="bi bi-currency-exchange"></i>
+        </div>
+        <div class="stat-content">
+            <h4>Valeur Liquidative</h4>
+            <div class="stat-value">--</div>
+            <span class="stat-change positive">
+                <i class="bi bi-arrow-up"></i> --%
+            </span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon success">
+            <i class="bi bi-graph-up-arrow"></i>
+        </div>
+        <div class="stat-content">
+            <h4>Actif Net</h4>
+            <div class="stat-value">-- XOF</div>
+            <span class="stat-change positive">
+                <i class="bi bi-arrow-up"></i> --%
+            </span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon warning">
+            <i class="bi bi-bar-chart-fill"></i>
+        </div>
+        <div class="stat-content">
+            <h4>Nombre de Parts</h4>
+            <div class="stat-value">--</div>
+            <span class="stat-change positive">
+                <i class="bi bi-arrow-up"></i> --
+            </span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon info">
+            <i class="bi bi-calendar-check"></i>
+        </div>
+        <div class="stat-content">
+            <h4>Dernière MAJ</h4>
+            <div class="stat-value">--/--/----</div>
+            <span class="stat-change">
+                <i class="bi bi-clock"></i> --:--
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Card -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title">
+            <i class="bi bi-table me-2"></i>Historique des Valeurs Liquidatives
+        </h5>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-funnel"></i> Filtrer
+            </button>
+            <button class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-download"></i> Exporter
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="bi bi-currency-exchange"></i>
+            </div>
+            <h3>Aucune donnée disponible</h3>
+            <p>Les valeurs liquidatives de vos FCP apparaîtront ici une fois que les données seront importées dans le système.</p>
+            <button class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Importer des données
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Chart Section -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-graph-up me-2"></i>Évolution de la Valeur Liquidative
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="empty-state" style="padding: 40px;">
+                    <div class="empty-state-icon" style="width: 80px; height: 80px;">
+                        <i class="bi bi-bar-chart-line" style="font-size: 32px;"></i>
+                    </div>
+                    <h3>Graphique non disponible</h3>
+                    <p>Le graphique d'évolution sera affiché après l'import des données.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
