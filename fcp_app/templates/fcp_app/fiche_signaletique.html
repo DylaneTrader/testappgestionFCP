@@ -49,24 +49,24 @@
         background: var(--bg-primary);
         border: 1px solid var(--border-color);
         border-radius: 12px;
-        padding: 24px;
+        padding: 16px;
     }
     
     .risk-scale {
         display: flex;
-        gap: 4px;
-        margin: 20px 0;
+        gap: 3px;
+        margin: 12px 0 8px;
     }
     
     .risk-level {
         flex: 1;
-        height: 40px;
-        border-radius: 6px;
+        height: 32px;
+        border-radius: 4px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 700;
-        font-size: 14px;
+        font-size: 12px;
         color: white;
         transition: all 0.3s ease;
         opacity: 0.4;
@@ -89,30 +89,70 @@
     .risk-labels {
         display: flex;
         justify-content: space-between;
-        font-size: 12px;
+        font-size: 11px;
         color: var(--text-muted);
-        margin-top: 8px;
     }
     
-    .risk-current {
-        text-align: center;
-        margin-top: 16px;
-        padding-top: 16px;
-        border-top: 1px solid var(--border-color);
+    .risk-current-inline {
+        text-align: right;
     }
     
-    .risk-current .risk-value {
-        font-size: 32px;
+    .risk-value-inline {
+        font-size: 20px;
         font-weight: 700;
         color: var(--text-primary);
+        display: block;
+        line-height: 1;
     }
     
-    .risk-current .risk-label {
-        font-size: 14px;
+    .risk-label-inline {
+        font-size: 11px;
         color: var(--text-secondary);
-        margin-top: 4px;
     }
     
+    /* Info Cards Mini */
+    .info-card-mini {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        height: 100%;
+        transition: all 0.2s ease;
+    }
+    
+    .info-card-mini:hover {
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .card-icon-mini {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+    
+    .card-label-mini {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: var(--text-muted);
+        margin-bottom: 2px;
+    }
+    
+    .card-value-mini {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-primary);
+        line-height: 1.2;
+    }
+
     /* Info Cards */
     .info-card-compact {
         background: var(--bg-primary);
@@ -159,52 +199,96 @@
         margin-top: 4px;
     }
     
-    /* Benchmark Allocation */
-    .benchmark-bar {
+    /* Benchmark Allocation - Donut Chart Style */
+    .benchmark-allocation-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 16px;
+    }
+    
+    .benchmark-donut-container {
         display: flex;
-        height: 32px;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .donut-wrapper {
+        position: relative;
+        width: 90px;
+        height: 90px;
+        flex-shrink: 0;
+    }
+    
+    .donut-chart {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        transform: rotate(-90deg);
+    }
+    
+    .donut-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+    
+    .donut-center-value {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1;
+    }
+    
+    .donut-center-label {
+        font-size: 9px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+    }
+    
+    .benchmark-details {
+        flex: 1;
+    }
+    
+    .benchmark-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: var(--bg-secondary);
         border-radius: 8px;
-        overflow: hidden;
-        margin: 16px 0;
+        margin-bottom: 6px;
     }
     
-    .benchmark-segment {
+    .benchmark-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .benchmark-item-left {
         display: flex;
         align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        font-weight: 600;
-        color: white;
-        transition: all 0.3s ease;
+        gap: 10px;
     }
     
-    .benchmark-segment.oblig {
-        background: linear-gradient(135deg, #004080, #003366);
-    }
-    
-    .benchmark-segment.brvm {
-        background: linear-gradient(135deg, #28a745, #1e7e34);
-    }
-    
-    .benchmark-legend {
-        display: flex;
-        justify-content: center;
-        gap: 32px;
-        margin-top: 12px;
-    }
-    
-    .benchmark-legend-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 13px;
-        color: var(--text-secondary);
-    }
-    
-    .benchmark-legend-dot {
+    .benchmark-color-indicator {
         width: 12px;
         height: 12px;
-        border-radius: 50%;
+        border-radius: 3px;
+        flex-shrink: 0;
+    }
+    
+    .benchmark-item-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+    
+    .benchmark-item-value {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
     }
     
     /* FCP Table */
@@ -410,12 +494,18 @@
 <div class="row">
     <!-- Left Column - Selected FCP Details -->
     <div class="col-lg-5 mb-4">
-        <!-- Risk Scale Card -->
-        <div class="risk-scale-container mb-4">
-            <h5 class="mb-0" style="font-weight: 600; color: var(--text-primary);">
-                <i class="bi bi-speedometer2 me-2" style="color: var(--primary-color);"></i>
-                Échelle de Risque
-            </h5>
+        <!-- Risk Scale Card - Compact -->
+        <div class="risk-scale-container mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0" style="font-weight: 600; color: var(--text-primary);">
+                    <i class="bi bi-speedometer2 me-2" style="color: var(--primary-color);"></i>
+                    Échelle de Risque
+                </h6>
+                <div class="risk-current-inline">
+                    <span class="risk-value-inline">{{ selected_fcp_data.echelle_risque }}/7</span>
+                    <span class="risk-label-inline">{{ selected_fcp_data.risk_label }}</span>
+                </div>
+            </div>
             
             <div class="risk-scale">
                 <div class="risk-level risk-level-1 {% if selected_fcp_data.echelle_risque == 1 %}active{% endif %}">1</div>
@@ -431,86 +521,133 @@
                 <span>Risque faible</span>
                 <span>Risque élevé</span>
             </div>
-            
-            <div class="risk-current">
-                <div class="risk-value">{{ selected_fcp_data.echelle_risque }}/7</div>
-                <div class="risk-label">{{ selected_fcp_data.risk_label }}</div>
-            </div>
         </div>
         
-        <!-- Info Cards Grid -->
-        <div class="row g-3 mb-4">
+        <!-- Info Cards Grid - 2x2 Compact -->
+        <div class="row g-2 mb-3">
             <div class="col-6">
-                <div class="info-card-compact">
-                    <div class="card-icon" style="background: var(--primary-light); color: var(--primary-color);">
+                <div class="info-card-mini">
+                    <div class="card-icon-mini" style="background: var(--primary-light); color: var(--primary-color);">
                         <i class="{{ selected_fcp_data.type_icon }}"></i>
                     </div>
-                    <div class="card-label">Type de Fond</div>
-                    <div class="card-value">{{ selected_fcp_data.type_fond }}</div>
+                    <div>
+                        <div class="card-label-mini">Type</div>
+                        <div class="card-value-mini">{{ selected_fcp_data.type_fond }}</div>
+                    </div>
                 </div>
             </div>
             <div class="col-6">
-                <div class="info-card-compact">
-                    <div class="card-icon" style="background: #d4edda; color: #28a745;">
+                <div class="info-card-mini">
+                    <div class="card-icon-mini" style="background: #d4edda; color: #28a745;">
                         <i class="bi bi-calendar-range"></i>
                     </div>
-                    <div class="card-label">Horizon</div>
-                    <div class="card-value">{{ selected_fcp_data.horizon }} ans</div>
-                    <div class="card-subtitle">Recommandé</div>
+                    <div>
+                        <div class="card-label-mini">Horizon</div>
+                        <div class="card-value-mini">{{ selected_fcp_data.horizon }} ans</div>
+                    </div>
                 </div>
             </div>
             <div class="col-6">
-                <div class="info-card-compact">
-                    <div class="card-icon" style="background: #fff3cd; color: #e6a800;">
+                <div class="info-card-mini">
+                    <div class="card-icon-mini" style="background: #fff3cd; color: #e6a800;">
                         <i class="bi bi-currency-exchange"></i>
                     </div>
-                    <div class="card-label">Devise</div>
-                    <div class="card-value">{{ selected_fcp_data.devise }}</div>
-                    <div class="card-subtitle">Franc CFA</div>
+                    <div>
+                        <div class="card-label-mini">Devise</div>
+                        <div class="card-value-mini">{{ selected_fcp_data.devise }}</div>
+                    </div>
                 </div>
             </div>
             <div class="col-6">
-                <div class="info-card-compact">
-                    <div class="card-icon" style="background: #d1ecf1; color: #17a2b8;">
+                <div class="info-card-mini">
+                    <div class="card-icon-mini" style="background: #d1ecf1; color: #17a2b8;">
                         <i class="bi bi-building"></i>
                     </div>
-                    <div class="card-label">Gestionnaire</div>
-                    <div class="card-value" style="font-size: 16px;">{{ selected_fcp_data.gestionnaire }}</div>
+                    <div>
+                        <div class="card-label-mini">Gestionnaire</div>
+                        <div class="card-value-mini" style="font-size: 13px;">{{ selected_fcp_data.gestionnaire }}</div>
+                    </div>
                 </div>
             </div>
         </div>
         
-        <!-- Benchmark Allocation Card -->
-        <div class="info-card-compact">
-            <h6 style="font-weight: 600; color: var(--text-primary); margin-bottom: 16px;">
-                <i class="bi bi-pie-chart me-2" style="color: var(--primary-color);"></i>
+        <!-- Benchmark Allocation Card - Donut Chart -->
+        <div class="benchmark-allocation-card">
+            <h6 style="font-weight: 600; color: var(--text-primary); margin-bottom: 12px; font-size: 14px;">
+                <i class="bi bi-pie-chart-fill me-2" style="color: var(--primary-color);"></i>
                 Allocation Benchmark
             </h6>
             
-            <div class="benchmark-bar">
-                {% if selected_fcp_data.benchmark_oblig > 0 %}
-                <div class="benchmark-segment oblig" style="width: {{ selected_fcp_data.benchmark_oblig }}%;">
-                    {{ selected_fcp_data.benchmark_oblig }}%
+            <div class="benchmark-donut-container">
+                <!-- Donut Chart SVG -->
+                <div class="donut-wrapper">
+                    <svg class="donut-chart" viewBox="0 0 36 36" id="benchmarkDonut">
+                        <!-- Background circle -->
+                        <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e9ecef" stroke-width="3"/>
+                        <!-- Segments will be added by JS -->
+                    </svg>
+                    <div class="donut-center">
+                        <div class="donut-center-value">100%</div>
+                        <div class="donut-center-label">Total</div>
+                    </div>
                 </div>
-                {% endif %}
-                {% if selected_fcp_data.benchmark_brvmc > 0 %}
-                <div class="benchmark-segment brvm" style="width: {{ selected_fcp_data.benchmark_brvmc }}%;">
-                    {{ selected_fcp_data.benchmark_brvmc }}%
-                </div>
-                {% endif %}
-            </div>
-            
-            <div class="benchmark-legend">
-                <div class="benchmark-legend-item">
-                    <div class="benchmark-legend-dot" style="background: #004080;"></div>
-                    <span>Obligataire ({{ selected_fcp_data.benchmark_oblig }}%)</span>
-                </div>
-                <div class="benchmark-legend-item">
-                    <div class="benchmark-legend-dot" style="background: #28a745;"></div>
-                    <span>BRVM Composite ({{ selected_fcp_data.benchmark_brvmc }}%)</span>
+                
+                <!-- Legend Details -->
+                <div class="benchmark-details">
+                    <div class="benchmark-item">
+                        <div class="benchmark-item-left">
+                            <div class="benchmark-color-indicator" style="background: #004080;"></div>
+                            <span class="benchmark-item-name">Obligataire</span>
+                        </div>
+                        <span class="benchmark-item-value" style="color: #004080;">{{ selected_fcp_data.benchmark_oblig }}%</span>
+                    </div>
+                    <div class="benchmark-item">
+                        <div class="benchmark-item-left">
+                            <div class="benchmark-color-indicator" style="background: #28a745;"></div>
+                            <span class="benchmark-item-name">BRVM C</span>
+                        </div>
+                        <span class="benchmark-item-value" style="color: #28a745;">{{ selected_fcp_data.benchmark_brvmc }}%</span>
+                    </div>
                 </div>
             </div>
         </div>
+        
+        <script>
+        // Initialize donut chart
+        document.addEventListener('DOMContentLoaded', function() {
+            const oblig = {{ selected_fcp_data.benchmark_oblig }};
+            const brvm = {{ selected_fcp_data.benchmark_brvmc }};
+            const svg = document.getElementById('benchmarkDonut');
+            const circumference = 2 * Math.PI * 15.915;
+            
+            // Create segments
+            if (oblig > 0) {
+                const segment1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                segment1.setAttribute('cx', '18');
+                segment1.setAttribute('cy', '18');
+                segment1.setAttribute('r', '15.915');
+                segment1.setAttribute('fill', 'none');
+                segment1.setAttribute('stroke', '#004080');
+                segment1.setAttribute('stroke-width', '3.5');
+                segment1.setAttribute('stroke-dasharray', `${oblig * circumference / 100} ${circumference}`);
+                segment1.setAttribute('stroke-dashoffset', '0');
+                svg.appendChild(segment1);
+            }
+            
+            if (brvm > 0) {
+                const segment2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                segment2.setAttribute('cx', '18');
+                segment2.setAttribute('cy', '18');
+                segment2.setAttribute('r', '15.915');
+                segment2.setAttribute('fill', 'none');
+                segment2.setAttribute('stroke', '#28a745');
+                segment2.setAttribute('stroke-width', '3.5');
+                segment2.setAttribute('stroke-dasharray', `${brvm * circumference / 100} ${circumference}`);
+                segment2.setAttribute('stroke-dashoffset', `-${oblig * circumference / 100}`);
+                svg.appendChild(segment2);
+            }
+        });
+        </script>
     </div>
     
     <!-- Right Column - FCP Table -->
