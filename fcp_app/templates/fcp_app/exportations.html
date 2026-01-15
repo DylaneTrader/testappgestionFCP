@@ -1,0 +1,3459 @@
+﻿{% extends 'fcp_app/base.html' %}
+{% load static %}
+
+{% block title %}Exportations - FCP Reporting{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Export Tabs Styling */
+    .export-tabs {
+        background: var(--bg-primary);
+        border-radius: 12px;
+        padding: 8px;
+        display: inline-flex;
+        gap: 8px;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 24px;
+    }
+    
+    .export-tab {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .export-tab:hover {
+        background: var(--third-color);
+        color: var(--primary-color);
+    }
+    
+    .export-tab.active {
+        background: var(--primary-color);
+        color: white;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .export-tab i {
+        font-size: 18px;
+    }
+    
+    /* Tab Content */
+    .tab-content-export {
+        display: none;
+    }
+    
+    .tab-content-export.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Export Card */
+    .export-card {
+        background: var(--bg-primary);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 24px;
+    }
+    
+    .export-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .export-card-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+    
+    .export-card-icon.ppt {
+        background: linear-gradient(135deg, #D24726 0%, #B7472A 100%);
+        color: white;
+    }
+    
+    .export-card-icon.pdf {
+        background: linear-gradient(135deg, #E53935 0%, #C62828 100%);
+        color: white;
+    }
+    
+    .export-card-icon.excel {
+        background: linear-gradient(135deg, #217346 0%, #185C37 100%);
+        color: white;
+    }
+    
+    .export-card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+    }
+    
+    .export-card-subtitle {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin: 0;
+    }
+    
+    /* Export Options */
+    .export-options {
+        display: grid;
+        gap: 16px;
+    }
+    
+    .option-group {
+        margin-bottom: 16px;
+    }
+    
+    .option-group-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .option-group-title i {
+        color: var(--primary-color);
+    }
+    
+    /* FCP Selection */
+    .fcp-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 12px;
+    }
+    
+    .fcp-checkbox {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+    }
+    
+    .fcp-checkbox:hover {
+        background: var(--third-color);
+    }
+    
+    .fcp-checkbox.selected {
+        background: var(--primary-light);
+        border-color: var(--primary-color);
+    }
+    
+    .fcp-checkbox input {
+        margin-right: 12px;
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-color);
+    }
+    
+    .fcp-checkbox-label {
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+    
+    /* Content Selection */
+    .content-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+    }
+    
+    .content-option {
+        display: flex;
+        align-items: center;
+        padding: 14px 16px;
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+    }
+    
+    .content-option:hover {
+        background: var(--third-color);
+    }
+    
+    .content-option.selected {
+        background: var(--primary-light);
+        border-color: var(--primary-color);
+    }
+    
+    .content-option input {
+        margin-right: 12px;
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-color);
+    }
+    
+    .content-option-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: var(--primary-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        color: var(--primary-color);
+    }
+    
+    .content-option-text {
+        flex: 1;
+    }
+    
+    .content-option-title {
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 14px;
+    }
+    
+    .content-option-desc {
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+    
+    /* Date Range */
+    .date-range-container {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    
+    .date-input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .date-input-group label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+    
+    .date-input-group input {
+        padding: 10px 14px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 14px;
+        min-width: 180px;
+    }
+    
+    .date-input-group input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-light);
+    }
+    
+    /* Quick Date Buttons */
+    .quick-dates {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+    }
+    
+    .quick-date-btn {
+        padding: 8px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        background: var(--bg-primary);
+        color: var(--text-secondary);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .quick-date-btn:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+    
+    .quick-date-btn.active {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+    
+    /* Export Actions */
+    .export-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+        margin-top: 24px;
+    }
+    
+    .export-actions-left {
+        display: flex;
+        gap: 12px;
+    }
+    
+    .btn-export {
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .btn-export-primary {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+    }
+    
+    .btn-export-primary:hover {
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .btn-export-secondary {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+    }
+    
+    .btn-export-secondary:hover {
+        background: var(--bg-secondary);
+        border-color: var(--primary-color);
+    }
+    
+    /* Preview Section */
+    .preview-section {
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        padding: 24px;
+        margin-top: 24px;
+    }
+    
+    .preview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+    
+    .preview-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .preview-title i {
+        color: var(--primary-color);
+    }
+    
+    .preview-content {
+        background: var(--bg-primary);
+        border-radius: 8px;
+        padding: 20px;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px dashed var(--border-color);
+    }
+    
+    .preview-placeholder {
+        text-align: center;
+        color: var(--text-muted);
+    }
+    
+    .preview-placeholder i {
+        font-size: 48px;
+        margin-bottom: 12px;
+        opacity: 0.5;
+    }
+    
+    .preview-placeholder p {
+        margin: 0;
+        font-size: 14px;
+    }
+    
+    /* Format Options for CSV/XLSX */
+    .format-options {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+    
+    .format-option {
+        flex: 1;
+        max-width: 200px;
+        padding: 16px;
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+    }
+    
+    .format-option:hover {
+        background: var(--third-color);
+    }
+    
+    .format-option.selected {
+        background: var(--primary-light);
+        border-color: var(--primary-color);
+    }
+    
+    .format-option input {
+        display: none;
+    }
+    
+    .format-option-icon {
+        width: 56px;
+        height: 56px;
+        margin: 0 auto 12px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+    }
+    
+    .format-option-icon.csv {
+        background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+        color: white;
+    }
+    
+    .format-option-icon.xlsx {
+        background: linear-gradient(135deg, #217346 0%, #185C37 100%);
+        color: white;
+    }
+    
+    .format-option-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+    }
+    
+    .format-option-desc {
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+    
+    /* Selection Summary */
+    .selection-summary {
+        background: var(--primary-light);
+        border-radius: 8px;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    
+    .selection-summary i {
+        color: var(--primary-color);
+        font-size: 20px;
+    }
+    
+    .selection-summary-text {
+        flex: 1;
+    }
+    
+    .selection-summary-title {
+        font-weight: 600;
+        color: var(--primary-color);
+        font-size: 14px;
+    }
+    
+    .selection-summary-details {
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+    
+    /* Select All Checkbox */
+    .select-all-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 16px;
+        padding: 12px 16px;
+        background: var(--bg-secondary);
+        border-radius: 8px;
+    }
+    
+    .select-all-container input {
+        margin-right: 12px;
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-color);
+    }
+    
+    .select-all-container label {
+        font-weight: 600;
+        color: var(--text-primary);
+        cursor: pointer;
+    }
+    
+    /* Loading State */
+    .btn-export.loading {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+    
+    .btn-export.loading .btn-text {
+        display: none;
+    }
+    
+    .btn-export .spinner {
+        display: none;
+    }
+    
+    .btn-export.loading .spinner {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border: 2px solid transparent;
+        border-top-color: currentColor;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* Template Selection for PPT */
+    .template-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+    }
+    
+    .template-option {
+        padding: 16px;
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+    }
+    
+    .template-option:hover {
+        background: var(--third-color);
+    }
+    
+    .template-option.selected {
+        background: var(--primary-light);
+        border-color: var(--primary-color);
+    }
+    
+    .template-option input {
+        display: none;
+    }
+    
+    .template-preview {
+        width: 100%;
+        height: 100px;
+        background: var(--bg-primary);
+        border-radius: 8px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--border-color);
+    }
+    
+    .template-preview i {
+        font-size: 36px;
+        color: var(--text-muted);
+    }
+    
+    .template-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 14px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .export-tabs {
+            flex-wrap: wrap;
+            width: 100%;
+        }
+        
+        .export-tab {
+            flex: 1;
+            justify-content: center;
+            min-width: 100px;
+        }
+        
+        .date-range-container {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .date-input-group input {
+            width: 100%;
+        }
+        
+        .export-actions {
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .export-actions-left {
+            width: 100%;
+        }
+        
+        .btn-export {
+            flex: 1;
+            justify-content: center;
+        }
+    }
+    
+    /* Factsheet Specific Styles */
+    .fcp-select-container select {
+        max-width: 400px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        font-size: 15px;
+        font-weight: 500;
+    }
+    
+    .fcp-select-container select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-light);
+    }
+    
+    /* ========================================
+       FACTSHEET PAGE LAYOUT STYLES
+       ======================================== */
+    
+    .factsheet-page {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+        overflow: hidden;
+    }
+    
+    /* Factsheet Header */
+    .factsheet-header {
+        background: linear-gradient(135deg, #004080 0%, #002855 100%);
+        padding: 20px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    
+    .factsheet-header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .factsheet-logo {
+        width: 50px;
+        height: 50px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+    }
+    
+    .factsheet-header-info {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .factsheet-header-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .factsheet-fcp-select {
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 8px;
+        padding: 8px 12px;
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
+        min-width: 250px;
+        cursor: pointer;
+    }
+    
+    .factsheet-fcp-select option {
+        background: #004080;
+        color: white;
+    }
+    
+    .factsheet-fcp-select:focus {
+        outline: none;
+        border-color: rgba(255,255,255,0.6);
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.2);
+    }
+    
+    .factsheet-subtitle {
+        color: rgba(255,255,255,0.7);
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .factsheet-type-badge {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+    
+    .factsheet-type-badge.type-diversifie { background: rgba(0, 64, 128, 0.8); }
+    .factsheet-type-badge.type-obligataire { background: rgba(40, 167, 69, 0.8); }
+    .factsheet-type-badge.type-actions { background: rgba(220, 53, 69, 0.8); }
+    .factsheet-type-badge.type-monetaire { background: rgba(255, 193, 7, 0.8); }
+    
+    .factsheet-header-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+    }
+    
+    .factsheet-month-input {
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 8px;
+        padding: 8px 12px;
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .factsheet-month-input:focus {
+        outline: none;
+        border-color: rgba(255,255,255,0.6);
+    }
+    
+    .factsheet-month-input::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+    }
+    
+    .quick-month-btns {
+        display: flex;
+        gap: 6px;
+    }
+    
+    .quick-month-btn {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: rgba(255,255,255,0.8);
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 11px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .quick-month-btn:hover {
+        background: rgba(255,255,255,0.2);
+    }
+    
+    .quick-month-btn.active {
+        background: rgba(255,255,255,0.25);
+        border-color: rgba(255,255,255,0.5);
+        color: white;
+    }
+    
+    /* ========== NOUVEAU LAYOUT FACTSHEET ========== */
+    
+    /* Main Body - 80% */
+    .factsheet-main-body {
+        padding: 16px;
+        background: white;
+    }
+    
+    .factsheet-columns {
+        display: flex;
+        gap: 16px;
+    }
+    
+    .factsheet-col-left {
+        flex: 0 0 55%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 0;
+        overflow: hidden;
+    }
+    
+    .factsheet-col-right {
+        flex: 0 0 calc(45% - 16px);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-width: 0;
+    }
+    
+    @media (max-width: 1200px) {
+        .factsheet-columns {
+            flex-direction: column;
+        }
+        .factsheet-col-left, .factsheet-col-right {
+            flex: 1 1 100%;
+        }
+    }
+    
+    /* Section Style */
+    .fs-section {
+        background: white;
+        border-radius: 10px;
+        padding: 14px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border-left: 3px solid #004080;
+    }
+    
+    .fs-section.fs-section-highlight {
+        border-left-color: #2196F3;
+        background: linear-gradient(135deg, #e3f2fd 0%, white 100%);
+    }
+    
+    .fs-section-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #004080;
+        margin-bottom: 10px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #eee;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+    
+    .fs-section-title i {
+        font-size: 14px;
+        color: #0066cc;
+    }
+    
+    /* Chart Container */
+    .fs-chart-container {
+        background: #fafbfc;
+        border-radius: 8px;
+        padding: 10px;
+        position: relative;
+        width: 100%;
+        height: 250px;
+    }
+    
+    .fs-chart-container canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+    
+    .chart-legend {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 8px;
+        font-size: 11px;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: #666;
+    }
+    
+    .legend-color {
+        width: 16px;
+        height: 4px;
+        border-radius: 2px;
+    }
+    
+    .legend-color.fcp { background: #004080; }
+    .legend-color.bench { background: #ff9800; }
+    
+    /* Dual Charts (Allocation + Maturité) */
+    .fs-dual-charts {
+        display: flex;
+        gap: 12px;
+    }
+    
+    .fs-chart-half {
+        flex: 1;
+        text-align: center;
+        height: 180px;
+        position: relative;
+    }
+    
+    .fs-chart-half canvas {
+        width: 100% !important;
+        height: 150px !important;
+    }
+    
+    .fs-chart-subtitle {
+        font-size: 11px;
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 6px;
+    }
+    
+    /* Tables */
+    .fs-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+    }
+    
+    .fs-table thead tr {
+        background: linear-gradient(135deg, #004080 0%, #003060 100%);
+    }
+    
+    .fs-table th {
+        color: white;
+        padding: 8px 6px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 10px;
+        text-transform: uppercase;
+    }
+    
+    .fs-table th:first-child {
+        border-radius: 5px 0 0 0;
+        text-align: left;
+        padding-left: 10px;
+    }
+    
+    .fs-table th:last-child {
+        border-radius: 0 5px 0 0;
+    }
+    
+    .fs-table td {
+        padding: 7px 6px;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+        font-weight: 500;
+    }
+    
+    .fs-table td.row-label {
+        text-align: left;
+        font-weight: 600;
+        color: #333;
+        padding-left: 10px;
+        background: #f8f9fa;
+    }
+    
+    .fs-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .fs-table tbody tr:hover {
+        background: #f0f7ff;
+    }
+    
+    .fs-table tr.row-bench {
+        background: #fafafa;
+    }
+    
+    .fs-table tr.row-diff td:not(.row-label) {
+        font-weight: 700;
+    }
+    
+    .fs-table tr.row-total {
+        background: #e8f0fe;
+        font-weight: 700;
+    }
+    
+    .fs-table tr.row-total td {
+        border-top: 2px solid #004080;
+    }
+    
+    .fs-table-compact th,
+    .fs-table-compact td {
+        padding: 6px 4px;
+        font-size: 10px;
+    }
+    
+    /* Fiche Signalétique - Info Grid */
+    .fs-info-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .fs-info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+    }
+    
+    .fs-info-row:nth-child(odd) {
+        background: rgba(0, 64, 128, 0.03);
+    }
+    
+    .fs-info-row span:first-child {
+        color: #555;
+        font-weight: 500;
+    }
+    
+    .fs-info-row span:last-child {
+        font-weight: 600;
+        color: #004080;
+    }
+    
+    .fs-info-row.highlight {
+        background: linear-gradient(135deg, #004080 0%, #003060 100%);
+        color: white !important;
+        margin-top: 4px;
+    }
+    
+    .fs-info-row.highlight span {
+        color: white !important;
+    }
+    
+    /* Risk Scale in Fiche Signalétique */
+    .fs-risk-scale {
+        margin-bottom: 12px;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .risk-scale-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 6px;
+        text-align: center;
+    }
+    
+    .risk-scale-bar {
+        display: flex;
+        gap: 3px;
+        margin-bottom: 4px;
+    }
+    
+    .risk-level {
+        flex: 1;
+        text-align: center;
+        padding: 6px 0;
+        font-size: 11px;
+        font-weight: 700;
+        color: white;
+        border-radius: 4px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .risk-level.r1 { background: #28a745; }
+    .risk-level.r2 { background: #5cb85c; }
+    .risk-level.r3 { background: #8bc34a; }
+    .risk-level.r4 { background: #ffc107; }
+    .risk-level.r5 { background: #ff9800; }
+    .risk-level.r6 { background: #ff5722; }
+    .risk-level.r7 { background: #dc3545; }
+    
+    .risk-level.active {
+        transform: scale(1.2);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        z-index: 1;
+    }
+    
+    .risk-scale-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 9px;
+        color: #999;
+    }
+    
+    /* Secondary Body - 20% */
+    .factsheet-secondary-body {
+        padding: 12px 16px;
+        background: white;
+        border-top: 2px solid #dee2e6;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .fs-comment-section {
+        border-left-color: #28a745;
+    }
+    
+    .fs-disclaimer-section {
+        border-left-color: #ffc107;
+    }
+    
+    .fs-comment-input {
+        width: 100%;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 10px;
+        font-size: 12px;
+        resize: vertical;
+        font-family: inherit;
+    }
+    
+    .fs-disclaimer-text {
+        width: 100%;
+        padding: 10px;
+        font-size: 11px;
+        line-height: 1.5;
+        color: #666;
+        background: #f9f9f9;
+        border-radius: 6px;
+        font-family: inherit;
+    }
+    
+    .fs-comment-input:focus,
+    .fs-disclaimer-input:focus {
+        outline: none;
+        border-color: #004080;
+        box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.1);
+    }
+    
+    .fs-comment-input::placeholder {
+        color: #aaa;
+    }
+    
+    .fs-disclaimer-input {
+        background: #fffbeb;
+        font-size: 11px;
+        color: #666;
+    }
+    
+    /* Factsheet Footer */
+    .factsheet-footer {
+        background: linear-gradient(135deg, #004080 0%, #002855 100%);
+        padding: 14px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    
+    .factsheet-footer-left {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .footer-brand {
+        color: white;
+        font-weight: 600;
+        font-size: 13px;
+    }
+    
+    .footer-date {
+        color: rgba(255,255,255,0.6);
+        font-size: 11px;
+    }
+    
+    .factsheet-footer-actions {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    
+    .selection-summary-inline {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: rgba(255,255,255,0.8);
+        background: rgba(255,255,255,0.1);
+        padding: 8px 14px;
+        border-radius: 20px;
+    }
+    
+    .selection-summary-inline i {
+        color: #ff6b6b;
+    }
+    
+    .btn-generate-factsheet {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+    }
+    
+    .btn-generate-factsheet:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.5);
+    }
+    
+    .btn-generate-factsheet.loading {
+        opacity: 0.7;
+        pointer-events: none;
+    }
+    
+    .btn-generate-factsheet.loading .btn-text {
+        display: none;
+    }
+    
+    .btn-generate-factsheet .spinner {
+        display: none;
+    }
+    
+    .btn-generate-factsheet.loading .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid transparent;
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewModalLabel">
+                    <i class="bi bi-eye me-2"></i>Aperçu de l'export
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="previewContent">
+                <!-- Preview content will be injected here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-primary" id="confirmExportBtn">
+                    <i class="bi bi-download me-2"></i>Confirmer l'export
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">Centre d'Exportation</h2>
+        <p class="text-muted mb-0">Exportez vos données FCP dans différents formats</p>
+    </div>
+</div>
+
+<!-- Export Tabs -->
+<div class="export-tabs">
+    <button class="export-tab active" data-tab="factsheet">
+        <i class="bi bi-file-earmark-richtext"></i>
+        <span>Factsheet</span>
+    </button>
+    <button class="export-tab" data-tab="ppt">
+        <i class="bi bi-file-earmark-ppt"></i>
+        <span>PowerPoint</span>
+    </button>
+    <button class="export-tab" data-tab="pdf">
+        <i class="bi bi-file-earmark-pdf"></i>
+        <span>PDF</span>
+    </button>
+    <button class="export-tab" data-tab="csv">
+        <i class="bi bi-file-earmark-spreadsheet"></i>
+        <span>CSV / XLSX</span>
+    </button>
+</div>
+
+<!-- Factsheet Tab Content -->
+<div class="tab-content-export active" id="tab-factsheet">
+    <!-- Factsheet Layout Style -->
+    <div class="factsheet-page">
+        <!-- En-tête du Factsheet -->
+        <div class="factsheet-header">
+            <div class="factsheet-header-left">
+                <div class="factsheet-logo">
+                    <i class="bi bi-bank2"></i>
+                </div>
+                <div class="factsheet-header-info">
+                    <select id="fcpSelectFactsheet" class="factsheet-fcp-select">
+                        <option value="">-- Sélectionner un FCP --</option>
+                        {% for fcp in fcp_list %}
+                        <option value="{{ fcp }}">{{ fcp }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="factsheet-header-meta">
+                        <span class="factsheet-type-badge" id="fcpTypeBadge">--</span>
+                        <span class="factsheet-subtitle">Factsheet Mensuel</span>
+                    </div>
+                </div>
+            </div>
+            <div class="factsheet-header-right">
+                <input type="month" id="monthFactsheet" class="factsheet-month-input">
+                <div class="quick-month-btns">
+                    <button class="quick-month-btn active" onclick="setFactsheetMonth('last')">Mois préc.</button>
+                    <button class="quick-month-btn" onclick="setFactsheetMonth('current')">Mois actuel</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Corps du Factsheet - Partie Principale (80%) -->
+        <div class="factsheet-main-body">
+            <div class="factsheet-columns">
+                <!-- ==================== COLONNE GAUCHE ==================== -->
+                <div class="factsheet-col-left">
+                    
+                    <!-- Graphique Performance Base 100 -->
+                    <div class="fs-section">
+                        <div class="fs-section-title">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            Évolution de la Performance (Base 100)
+                        </div>
+                        <div class="fs-chart-container">
+                            <canvas id="chartPerformanceBase100"></canvas>
+                            <div class="chart-legend">
+                                <span class="legend-item"><span class="legend-color fcp"></span> FCP</span>
+                                <span class="legend-item"><span class="legend-color bench"></span> Benchmark</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tableau Performances To-Date -->
+                    <div class="fs-section">
+                        <div class="fs-section-title">
+                            <i class="bi bi-calendar-check"></i>
+                            Performances To-Date
+                        </div>
+                        <table class="fs-table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>WTD</th>
+                                    <th>MTD</th>
+                                    <th>QTD</th>
+                                    <th>STD</th>
+                                    <th>YTD</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="row-label">FCP</td>
+                                    <td id="td_fcp_wtd">--</td>
+                                    <td id="td_fcp_mtd">--</td>
+                                    <td id="td_fcp_qtd">--</td>
+                                    <td id="td_fcp_std">--</td>
+                                    <td id="td_fcp_ytd">--</td>
+                                </tr>
+                                <tr class="row-bench">
+                                    <td class="row-label">Benchmark</td>
+                                    <td id="td_bench_wtd">--</td>
+                                    <td id="td_bench_mtd">--</td>
+                                    <td id="td_bench_qtd">--</td>
+                                    <td id="td_bench_std">--</td>
+                                    <td id="td_bench_ytd">--</td>
+                                </tr>
+                                <tr class="row-diff">
+                                    <td class="row-label">Différence</td>
+                                    <td id="td_diff_wtd">--</td>
+                                    <td id="td_diff_mtd">--</td>
+                                    <td id="td_diff_qtd">--</td>
+                                    <td id="td_diff_std">--</td>
+                                    <td id="td_diff_ytd">--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Tableau Performances Glissantes -->
+                    <div class="fs-section">
+                        <div class="fs-section-title">
+                            <i class="bi bi-calendar3"></i>
+                            Performances Glissantes
+                        </div>
+                        <table class="fs-table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>1M</th>
+                                    <th>3M</th>
+                                    <th>6M</th>
+                                    <th>1A</th>
+                                    <th>3A</th>
+                                    <th>5A</th>
+                                    <th>Origine</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="row-label">FCP</td>
+                                    <td id="gl_fcp_1m">--</td>
+                                    <td id="gl_fcp_3m">--</td>
+                                    <td id="gl_fcp_6m">--</td>
+                                    <td id="gl_fcp_1y">--</td>
+                                    <td id="gl_fcp_3y">--</td>
+                                    <td id="gl_fcp_5y">--</td>
+                                    <td id="gl_fcp_orig">--</td>
+                                </tr>
+                                <tr class="row-bench">
+                                    <td class="row-label">Benchmark</td>
+                                    <td id="gl_bench_1m">--</td>
+                                    <td id="gl_bench_3m">--</td>
+                                    <td id="gl_bench_6m">--</td>
+                                    <td id="gl_bench_1y">--</td>
+                                    <td id="gl_bench_3y">--</td>
+                                    <td id="gl_bench_5y">--</td>
+                                    <td id="gl_bench_orig">--</td>
+                                </tr>
+                                <tr class="row-diff">
+                                    <td class="row-label">Différence</td>
+                                    <td id="gl_diff_1m">--</td>
+                                    <td id="gl_diff_3m">--</td>
+                                    <td id="gl_diff_6m">--</td>
+                                    <td id="gl_diff_1y">--</td>
+                                    <td id="gl_diff_3y">--</td>
+                                    <td id="gl_diff_5y">--</td>
+                                    <td id="gl_diff_orig">--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Caractéristiques du Portefeuille - 2 graphiques côte Ã  côte -->
+                    <div class="fs-section">
+                        <div class="fs-section-title">
+                            <i class="bi bi-pie-chart"></i>
+                            Caractéristiques du Portefeuille
+                        </div>
+                        <div class="fs-dual-charts">
+                            <div class="fs-chart-half">
+                                <div class="fs-chart-subtitle">Allocation Moyenne Mensuelle</div>
+                                <canvas id="chartAllocation" height="300"></canvas>
+                            </div>
+                            <div class="fs-chart-half">
+                                <div class="fs-chart-subtitle">Exposition par Maturité</div>
+                                <canvas id="chartMaturite" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tableau Caractéristiques Sous-Portefeuille Actions -->
+                    <div class="fs-section">
+                        <div class="fs-section-title">
+                            <i class="bi bi-graph-up"></i>
+                            Caractéristiques Actions
+                        </div>
+                        <table class="fs-table fs-table-compact">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>P/E</th>
+                                    <th>P/B</th>
+                                    <th>Div Yield</th>
+                                    <th>Beta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="row-label">FCP</td>
+                                    <td id="act_fcp_pe">--</td>
+                                    <td id="act_fcp_pb">--</td>
+                                    <td id="act_fcp_div">--</td>
+                                    <td id="act_fcp_beta">--</td>
+                                </tr>
+                                <tr class="row-bench">
+                                    <td class="row-label">Benchmark</td>
+                                    <td id="act_bench_pe">--</td>
+                                    <td id="act_bench_pb">--</td>
+                                    <td id="act_bench_div">--</td>
+                                    <td id="act_bench_beta">--</td>
+                                </tr>
+                                <tr class="row-diff">
+                                    <td class="row-label">Différence</td>
+                                    <td id="act_diff_pe">--</td>
+                                    <td id="act_diff_pb">--</td>
+                                    <td id="act_diff_div">--</td>
+                                    <td id="act_diff_beta">--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Tableau Caractéristiques Sous-Portefeuille Obligations -->
+                    <div class="fs-section">
+                        <div class="fs-section-title">
+                            <i class="bi bi-cash-stack"></i>
+                            Caractéristiques Obligations
+                        </div>
+                        <table class="fs-table fs-table-compact">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Nb Lignes</th>
+                                    <th>Duration</th>
+                                    <th>Sensibilité</th>
+                                    <th>Maturité</th>
+                                    <th>YTM</th>
+                                    <th>Coupon</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="row-label">FCP</td>
+                                    <td id="obl_nb">--</td>
+                                    <td id="obl_duration">--</td>
+                                    <td id="obl_sensib">--</td>
+                                    <td id="obl_maturite">--</td>
+                                    <td id="obl_ytm">--</td>
+                                    <td id="obl_coupon">--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+                
+                <!-- ==================== COLONNE DROITE ==================== -->
+                <div class="factsheet-col-right">
+                    
+                    <!-- Fiche Signalétique -->
+                    <div class="fs-section fs-section-highlight">
+                        <div class="fs-section-title">
+                            <i class="bi bi-info-circle"></i>
+                            Fiche Signalétique
+                        </div>
+                        
+                        <!-- Échelle de Risque -->
+                        <div class="fs-risk-scale">
+                            <div class="risk-scale-label">Échelle de Risque</div>
+                            <div class="risk-scale-bar">
+                                <span class="risk-level r1" data-level="1">1</span>
+                                <span class="risk-level r2" data-level="2">2</span>
+                                <span class="risk-level r3" data-level="3">3</span>
+                                <span class="risk-level r4" data-level="4">4</span>
+                                <span class="risk-level r5" data-level="5">5</span>
+                                <span class="risk-level r6" data-level="6">6</span>
+                                <span class="risk-level r7" data-level="7">7</span>
+                            </div>
+                            <div class="risk-scale-labels">
+                                <span>Risque faible</span>
+                                <span>Risque élevé</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Informations -->
+                        <div class="fs-info-grid">
+                            <div class="fs-info-row">
+                                <span>Type de fond</span>
+                                <span id="info_type">--</span>
+                            </div>
+                            <div class="fs-info-row">
+                                <span>Stratégie</span>
+                                <span id="info_strategie">--</span>
+                            </div>
+                            <div class="fs-info-row">
+                                <span>Horizon d'investissement</span>
+                                <span id="info_horizon">--</span>
+                            </div>
+                            <div class="fs-info-row">
+                                <span>Benchmark</span>
+                                <span id="info_benchmark">--</span>
+                            </div>
+                            <div class="fs-info-row">
+                                <span>Date de création</span>
+                                <span id="info_date_creation">--</span>
+                            </div>
+                            <div class="fs-info-row">
+                                <span>Dépositaire</span>
+                                <span id="info_depositaire">--</span>
+                            </div>
+                            <div class="fs-info-row">
+                                <span>Frais de gestion</span>
+                                <span id="info_frais_gestion">--</span>
+                            </div>
+                            <div class="fs-info-row">
+                                <span>Frais d'entrée</span>
+                                <span id="info_frais_entree">--</span>
+                            </div>
+                            <div class="fs-info-row">
+                                <span>Frais de sortie</span>
+                                <span id="info_frais_sortie">--</span>
+                            </div>
+                            <div class="fs-info-row highlight">
+                                <span>Valeur Liquidative</span>
+                                <span id="info_vl">--</span>
+                            </div>
+                            <div class="fs-info-row highlight">
+                                <span>Actif Net</span>
+                                <span id="info_actif_net">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tableau Indicateurs de Risque -->
+                    <div class="fs-section">
+                        <div class="fs-section-title">
+                            <i class="bi bi-shield-exclamation"></i>
+                            Indicateurs de Risque
+                        </div>
+                        <table class="fs-table fs-table-compact">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>YTD</th>
+                                    <th>1A</th>
+                                    <th>3A</th>
+                                    <th>5A</th>
+                                    <th>Orig.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="row-label">Max Drawdown</td>
+                                    <td id="risk_mdd_ytd">--</td>
+                                    <td id="risk_mdd_1y">--</td>
+                                    <td id="risk_mdd_3y">--</td>
+                                    <td id="risk_mdd_5y">--</td>
+                                    <td id="risk_mdd_orig">--</td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">Tracking Error</td>
+                                    <td id="risk_te_ytd">--</td>
+                                    <td id="risk_te_1y">--</td>
+                                    <td id="risk_te_3y">--</td>
+                                    <td id="risk_te_5y">--</td>
+                                    <td id="risk_te_orig">--</td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">Volatilité</td>
+                                    <td id="risk_vol_ytd">--</td>
+                                    <td id="risk_vol_1y">--</td>
+                                    <td id="risk_vol_3y">--</td>
+                                    <td id="risk_vol_5y">--</td>
+                                    <td id="risk_vol_orig">--</td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">VaR (95%)</td>
+                                    <td id="risk_var_ytd">--</td>
+                                    <td id="risk_var_1y">--</td>
+                                    <td id="risk_var_3y">--</td>
+                                    <td id="risk_var_5y">--</td>
+                                    <td id="risk_var_orig">--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Tableau Rendement Ajusté au Risque -->
+                    <div class="fs-section">
+                        <div class="fs-section-title">
+                            <i class="bi bi-sliders"></i>
+                            Rendement Ajusté au Risque
+                        </div>
+                        <table class="fs-table fs-table-compact">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>1A</th>
+                                    <th>3A</th>
+                                    <th>Origine</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="row-label">Beta</td>
+                                    <td id="adj_beta_1y">--</td>
+                                    <td id="adj_beta_3y">--</td>
+                                    <td id="adj_beta_orig">--</td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">Ratio Information</td>
+                                    <td id="adj_info_1y">--</td>
+                                    <td id="adj_info_3y">--</td>
+                                    <td id="adj_info_orig">--</td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">Sharpe</td>
+                                    <td id="adj_sharpe_1y">--</td>
+                                    <td id="adj_sharpe_3y">--</td>
+                                    <td id="adj_sharpe_orig">--</td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">Sortino</td>
+                                    <td id="adj_sortino_1y">--</td>
+                                    <td id="adj_sortino_3y">--</td>
+                                    <td id="adj_sortino_orig">--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Tableau Contribution Ã  la Performance -->
+                    <div class="fs-section">
+                        <div class="fs-section-title">
+                            <i class="bi bi-bar-chart-steps"></i>
+                            Contribution Ã  la Performance
+                        </div>
+                        <table class="fs-table fs-table-compact">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Portefeuille</th>
+                                    <th>Benchmark</th>
+                                    <th>Différence</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="row-label">Actions</td>
+                                    <td id="contrib_act_ptf">--</td>
+                                    <td id="contrib_act_bench">--</td>
+                                    <td id="contrib_act_diff">--</td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">Obligations</td>
+                                    <td id="contrib_obl_ptf">--</td>
+                                    <td id="contrib_obl_bench">--</td>
+                                    <td id="contrib_obl_diff">--</td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">OPCVM</td>
+                                    <td id="contrib_opcvm_ptf">--</td>
+                                    <td id="contrib_opcvm_bench">--</td>
+                                    <td id="contrib_opcvm_diff">--</td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">Trésorerie</td>
+                                    <td id="contrib_treso_ptf">--</td>
+                                    <td id="contrib_treso_bench">--</td>
+                                    <td id="contrib_treso_diff">--</td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">Frais de gestion</td>
+                                    <td id="contrib_fraisg_ptf">--</td>
+                                    <td id="contrib_fraisg_bench">--</td>
+                                    <td id="contrib_fraisg_diff">--</td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">Frais de transaction</td>
+                                    <td id="contrib_fraist_ptf">--</td>
+                                    <td id="contrib_fraist_bench">--</td>
+                                    <td id="contrib_fraist_diff">--</td>
+                                </tr>
+                                <tr class="row-total">
+                                    <td class="row-label">Total</td>
+                                    <td id="contrib_total_ptf">--</td>
+                                    <td id="contrib_total_bench">--</td>
+                                    <td id="contrib_total_diff">--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Tableau Attribution Ã  la Performance -->
+                    <div class="fs-section">
+                        <div class="fs-section-title">
+                            <i class="bi bi-diagram-3"></i>
+                            Attribution de la Performance
+                        </div>
+                        <table class="fs-table fs-table-compact">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Allocation</th>
+                                    <th>Sélection</th>
+                                    <th>Interaction</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="row-label">Actions</td>
+                                    <td id="attr_act_alloc">--</td>
+                                    <td id="attr_act_select">--</td>
+                                    <td id="attr_act_inter">--</td>
+                                    <td id="attr_act_total">--</td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">Obligations</td>
+                                    <td id="attr_obl_alloc">--</td>
+                                    <td id="attr_obl_select">--</td>
+                                    <td id="attr_obl_inter">--</td>
+                                    <td id="attr_obl_total">--</td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">OPCVM</td>
+                                    <td id="attr_opcvm_alloc">--</td>
+                                    <td id="attr_opcvm_select">--</td>
+                                    <td id="attr_opcvm_inter">--</td>
+                                    <td id="attr_opcvm_total">--</td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">Trésorerie</td>
+                                    <td id="attr_treso_alloc">--</td>
+                                    <td id="attr_treso_select">--</td>
+                                    <td id="attr_treso_inter">--</td>
+                                    <td id="attr_treso_total">--</td>
+                                </tr>
+                                <tr class="row-total">
+                                    <td class="row-label">Total</td>
+                                    <td id="attr_total_alloc">--</td>
+                                    <td id="attr_total_select">--</td>
+                                    <td id="attr_total_inter">--</td>
+                                    <td id="attr_total_total">--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        
+        <!-- Corps du Factsheet - Partie Secondaire (20%) -->
+        <div class="factsheet-secondary-body">
+            <!-- Commentaire de Gestion -->
+            <div class="fs-section fs-comment-section">
+                <div class="fs-section-title">
+                    <i class="bi bi-chat-left-text"></i>
+                    Commentaire de Gestion
+                </div>
+                <textarea id="commentaireFactsheet" class="fs-comment-input" 
+                    placeholder="Rédigez votre commentaire de gestion mensuel ici..."
+                    rows="3"></textarea>
+            </div>
+            
+            <!-- Avertissement -->
+            <div class="fs-section fs-disclaimer-section">
+                <div class="fs-section-title">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Avertissement
+                </div>
+                <div id="disclaimerFactsheet" class="fs-disclaimer-text">Document simplifié et non contractuel, destiné à être remis exclusivement aux porteurs de parts. La documentation juridique vous est remise avant toute souscription à un fonds. Investir implique des risques : les valeurs des parts ou actions des OPC sont soumises aux fluctuations du marché, les investissements réalisés peuvent donc varier tant à la baisse qu'à la hausse. Par conséquent, les souscripteurs des OPC peuvent perdre tout ou partie de leur capital initialement investi. Il appartient à toute personne intéressée par les OPC, préalablement à toute souscription, de s'assurer de la compatibilité de cette souscription avec les lois dont elle relève ainsi que des conséquences fiscales d'un tel investissement et de prendre connaissance des documents règlementaires en vigueur de chaque OPC. La source des données du présent document est CGF GESTION sauf mention contraire. La date des données du présent document est celle indiquée en tête du document sauf mention contraire.</div>
+            </div>
+        </div>
+        
+        <!-- Pied de page du Factsheet -->
+        <div class="factsheet-footer">
+            <div class="factsheet-footer-left">
+                <span class="footer-brand">CGF Gestion - Gestion d'Actifs</span>
+                <span class="footer-date" id="footerDate">Document généré le --</span>
+            </div>
+            <div class="factsheet-footer-actions">
+                <div class="selection-summary-inline">
+                    <i class="bi bi-file-earmark-pdf"></i>
+                    <span id="summaryFactsheet">Sélectionnez un FCP et un mois</span>
+                </div>
+                <button class="btn-generate-factsheet" onclick="generateFactsheet()">
+                    <span class="spinner"></span>
+                    <i class="bi bi-download"></i>
+                    <span class="btn-text">Générer PDF</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PPT Tab Content -->
+<div class="tab-content-export" id="tab-ppt">
+    <div class="export-card">
+        <div class="export-card-header">
+            <div class="export-card-icon ppt">
+                <i class="bi bi-file-earmark-ppt"></i>
+            </div>
+            <div>
+                <h3 class="export-card-title">Export PowerPoint</h3>
+                <p class="export-card-subtitle">Générez des présentations professionnelles pour vos FCP</p>
+            </div>
+        </div>
+        
+        <div class="export-options">
+            <!-- Template Selection -->
+            <div class="option-group">
+                <div class="option-group-title">
+                    <i class="bi bi-palette"></i>
+                    Choisir un modèle
+                </div>
+                <div class="template-grid">
+                    <label class="template-option selected">
+                        <input type="radio" name="ppt_template" value="standard" checked>
+                        <div class="template-preview">
+                            <i class="bi bi-grid-1x2"></i>
+                        </div>
+                        <div class="template-name">Standard</div>
+                    </label>
+                    <label class="template-option">
+                        <input type="radio" name="ppt_template" value="corporate">
+                        <div class="template-preview">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <div class="template-name">Corporate</div>
+                    </label>
+                    <label class="template-option">
+                        <input type="radio" name="ppt_template" value="minimal">
+                        <div class="template-preview">
+                            <i class="bi bi-square"></i>
+                        </div>
+                        <div class="template-name">Minimal</div>
+                    </label>
+                    <label class="template-option">
+                        <input type="radio" name="ppt_template" value="detailed">
+                        <div class="template-preview">
+                            <i class="bi bi-layout-text-window"></i>
+                        </div>
+                        <div class="template-name">Détaillé</div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- FCP Selection -->
+            <div class="option-group">
+                <div class="option-group-title">
+                    <i class="bi bi-collection"></i>
+                    Sélectionner les FCP
+                </div>
+                <div class="select-all-container">
+                    <input type="checkbox" id="selectAllPpt" onchange="toggleSelectAll('ppt')">
+                    <label for="selectAllPpt">Sélectionner tous les FCP</label>
+                </div>
+                <div class="fcp-grid" id="fcpGridPpt">
+                    {% for fcp in fcp_list %}
+                    <label class="fcp-checkbox">
+                        <input type="checkbox" name="fcp_ppt" value="{{ fcp }}">
+                        <span class="fcp-checkbox-label">{{ fcp }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Content Selection -->
+            <div class="option-group">
+                <div class="option-group-title">
+                    <i class="bi bi-list-check"></i>
+                    Contenu Ã  inclure
+                </div>
+                <div class="content-options">
+                    <label class="content-option selected">
+                        <input type="checkbox" name="content_ppt" value="vl" checked>
+                        <div class="content-option-icon">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <div class="content-option-text">
+                            <div class="content-option-title">Valeurs Liquidatives</div>
+                            <div class="content-option-desc">Graphiques & tableaux VL</div>
+                        </div>
+                    </label>
+                    <label class="content-option selected">
+                        <input type="checkbox" name="content_ppt" value="perf" checked>
+                        <div class="content-option-icon">
+                            <i class="bi bi-percent"></i>
+                        </div>
+                        <div class="content-option-text">
+                            <div class="content-option-title">Performances</div>
+                            <div class="content-option-desc">Calendaires & glissantes</div>
+                        </div>
+                    </label>
+                    <label class="content-option">
+                        <input type="checkbox" name="content_ppt" value="composition">
+                        <div class="content-option-icon">
+                            <i class="bi bi-pie-chart"></i>
+                        </div>
+                        <div class="content-option-text">
+                            <div class="content-option-title">Composition</div>
+                            <div class="content-option-desc">Répartition des actifs</div>
+                        </div>
+                    </label>
+                    <label class="content-option">
+                        <input type="checkbox" name="content_ppt" value="fiche">
+                        <div class="content-option-icon">
+                            <i class="bi bi-file-text"></i>
+                        </div>
+                        <div class="content-option-text">
+                            <div class="content-option-title">Fiche Signalétique</div>
+                            <div class="content-option-desc">Informations du fonds</div>
+                        </div>
+                    </label>
+                    <label class="content-option">
+                        <input type="checkbox" name="content_ppt" value="stats">
+                        <div class="content-option-icon">
+                            <i class="bi bi-calculator"></i>
+                        </div>
+                        <div class="content-option-text">
+                            <div class="content-option-title">Statistiques</div>
+                            <div class="content-option-desc">Volatilité, Sharpe, etc.</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Date Range -->
+            <div class="option-group">
+                <div class="option-group-title">
+                    <i class="bi bi-calendar-range"></i>
+                    Période
+                </div>
+                <div class="date-range-container">
+                    <div class="date-input-group">
+                        <label>Date de début</label>
+                        <input type="date" id="startDatePpt" value="{{ default_start_date }}">
+                    </div>
+                    <div class="date-input-group">
+                        <label>Date de fin</label>
+                        <input type="date" id="endDatePpt" value="{{ default_end_date }}">
+                    </div>
+                </div>
+                <div class="quick-dates">
+                    <button class="quick-date-btn" onclick="setQuickDate('ppt', '1m')">1 Mois</button>
+                    <button class="quick-date-btn" onclick="setQuickDate('ppt', '3m')">3 Mois</button>
+                    <button class="quick-date-btn" onclick="setQuickDate('ppt', '6m')">6 Mois</button>
+                    <button class="quick-date-btn active" onclick="setQuickDate('ppt', '1y')">1 An</button>
+                    <button class="quick-date-btn" onclick="setQuickDate('ppt', 'ytd')">YTD</button>
+                    <button class="quick-date-btn" onclick="setQuickDate('ppt', 'all')">Tout</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="export-actions">
+            <div class="selection-summary">
+                <i class="bi bi-info-circle"></i>
+                <div class="selection-summary-text">
+                    <div class="selection-summary-title">Résumé de la sélection</div>
+                    <div class="selection-summary-details" id="summaryPpt">
+                        0 FCP sélectionné(s) â€¢ 2 sections â€¢ Période: 1 an
+                    </div>
+                </div>
+            </div>
+            <div class="export-actions-left">
+                <button class="btn-export btn-export-secondary" onclick="previewExport('ppt')">
+                    <i class="bi bi-eye"></i>
+                    <span>Aperçu</span>
+                </button>
+                <button class="btn-export btn-export-primary" onclick="generateExport('ppt')">
+                    <span class="spinner"></span>
+                    <i class="bi bi-download"></i>
+                    <span class="btn-text">Générer PPT</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- PDF Tab Content -->
+<div class="tab-content-export" id="tab-pdf">
+    <div class="export-card">
+        <div class="export-card-header">
+            <div class="export-card-icon pdf">
+                <i class="bi bi-file-earmark-pdf"></i>
+            </div>
+            <div>
+                <h3 class="export-card-title">Export PDF</h3>
+                <p class="export-card-subtitle">Générez des rapports PDF pour vos FCP</p>
+            </div>
+        </div>
+        
+        <div class="export-options">
+            <!-- FCP Selection -->
+            <div class="option-group">
+                <div class="option-group-title">
+                    <i class="bi bi-collection"></i>
+                    Sélectionner les FCP
+                </div>
+                <div class="select-all-container">
+                    <input type="checkbox" id="selectAllPdf" onchange="toggleSelectAll('pdf')">
+                    <label for="selectAllPdf">Sélectionner tous les FCP</label>
+                </div>
+                <div class="fcp-grid" id="fcpGridPdf">
+                    {% for fcp in fcp_list %}
+                    <label class="fcp-checkbox">
+                        <input type="checkbox" name="fcp_pdf" value="{{ fcp }}">
+                        <span class="fcp-checkbox-label">{{ fcp }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Content Selection -->
+            <div class="option-group">
+                <div class="option-group-title">
+                    <i class="bi bi-list-check"></i>
+                    Contenu Ã  inclure
+                </div>
+                <div class="content-options">
+                    <label class="content-option selected">
+                        <input type="checkbox" name="content_pdf" value="vl" checked>
+                        <div class="content-option-icon">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <div class="content-option-text">
+                            <div class="content-option-title">Valeurs Liquidatives</div>
+                            <div class="content-option-desc">Graphiques & tableaux VL</div>
+                        </div>
+                    </label>
+                    <label class="content-option selected">
+                        <input type="checkbox" name="content_pdf" value="perf" checked>
+                        <div class="content-option-icon">
+                            <i class="bi bi-percent"></i>
+                        </div>
+                        <div class="content-option-text">
+                            <div class="content-option-title">Performances</div>
+                            <div class="content-option-desc">Calendaires & glissantes</div>
+                        </div>
+                    </label>
+                    <label class="content-option selected">
+                        <input type="checkbox" name="content_pdf" value="composition" checked>
+                        <div class="content-option-icon">
+                            <i class="bi bi-pie-chart"></i>
+                        </div>
+                        <div class="content-option-text">
+                            <div class="content-option-title">Composition</div>
+                            <div class="content-option-desc">Répartition des actifs</div>
+                        </div>
+                    </label>
+                    <label class="content-option selected">
+                        <input type="checkbox" name="content_pdf" value="fiche" checked>
+                        <div class="content-option-icon">
+                            <i class="bi bi-file-text"></i>
+                        </div>
+                        <div class="content-option-text">
+                            <div class="content-option-title">Fiche Signalétique</div>
+                            <div class="content-option-desc">Informations du fonds</div>
+                        </div>
+                    </label>
+                    <label class="content-option">
+                        <input type="checkbox" name="content_pdf" value="stats">
+                        <div class="content-option-icon">
+                            <i class="bi bi-calculator"></i>
+                        </div>
+                        <div class="content-option-text">
+                            <div class="content-option-title">Statistiques</div>
+                            <div class="content-option-desc">Volatilité, Sharpe, etc.</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Date Range -->
+            <div class="option-group">
+                <div class="option-group-title">
+                    <i class="bi bi-calendar-range"></i>
+                    Période
+                </div>
+                <div class="date-range-container">
+                    <div class="date-input-group">
+                        <label>Date de début</label>
+                        <input type="date" id="startDatePdf" value="{{ default_start_date }}">
+                    </div>
+                    <div class="date-input-group">
+                        <label>Date de fin</label>
+                        <input type="date" id="endDatePdf" value="{{ default_end_date }}">
+                    </div>
+                </div>
+                <div class="quick-dates">
+                    <button class="quick-date-btn" onclick="setQuickDate('pdf', '1m')">1 Mois</button>
+                    <button class="quick-date-btn" onclick="setQuickDate('pdf', '3m')">3 Mois</button>
+                    <button class="quick-date-btn" onclick="setQuickDate('pdf', '6m')">6 Mois</button>
+                    <button class="quick-date-btn active" onclick="setQuickDate('pdf', '1y')">1 An</button>
+                    <button class="quick-date-btn" onclick="setQuickDate('pdf', 'ytd')">YTD</button>
+                    <button class="quick-date-btn" onclick="setQuickDate('pdf', 'all')">Tout</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="export-actions">
+            <div class="selection-summary">
+                <i class="bi bi-info-circle"></i>
+                <div class="selection-summary-text">
+                    <div class="selection-summary-title">Résumé de la sélection</div>
+                    <div class="selection-summary-details" id="summaryPdf">
+                        0 FCP sélectionné(s) â€¢ 4 sections â€¢ Période: 1 an
+                    </div>
+                </div>
+            </div>
+            <div class="export-actions-left">
+                <button class="btn-export btn-export-secondary" onclick="previewExport('pdf')">
+                    <i class="bi bi-eye"></i>
+                    <span>Aperçu</span>
+                </button>
+                <button class="btn-export btn-export-primary" onclick="generateExport('pdf')">
+                    <span class="spinner"></span>
+                    <i class="bi bi-download"></i>
+                    <span class="btn-text">Générer PDF</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSV/XLSX Tab Content -->
+<div class="tab-content-export" id="tab-csv">
+    <div class="export-card">
+        <div class="export-card-header">
+            <div class="export-card-icon excel">
+                <i class="bi bi-file-earmark-spreadsheet"></i>
+            </div>
+            <div>
+                <h3 class="export-card-title">Export CSV / XLSX</h3>
+                <p class="export-card-subtitle">Exportez les données brutes pour analyse</p>
+            </div>
+        </div>
+        
+        <div class="export-options">
+            <!-- Format Selection -->
+            <div class="option-group">
+                <div class="option-group-title">
+                    <i class="bi bi-file-earmark"></i>
+                    Format de fichier
+                </div>
+                <div class="format-options">
+                    <label class="format-option selected">
+                        <input type="radio" name="export_format" value="xlsx" checked>
+                        <div class="format-option-icon xlsx">
+                            <i class="bi bi-file-earmark-excel"></i>
+                        </div>
+                        <div class="format-option-title">Excel (.xlsx)</div>
+                        <div class="format-option-desc">Formatage avancé, multi-feuilles</div>
+                    </label>
+                    <label class="format-option">
+                        <input type="radio" name="export_format" value="csv">
+                        <div class="format-option-icon csv">
+                            <i class="bi bi-filetype-csv"></i>
+                        </div>
+                        <div class="format-option-title">CSV (.csv)</div>
+                        <div class="format-option-desc">Compatible tous logiciels</div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- FCP Selection -->
+            <div class="option-group">
+                <div class="option-group-title">
+                    <i class="bi bi-collection"></i>
+                    Sélectionner les FCP
+                </div>
+                <div class="select-all-container">
+                    <input type="checkbox" id="selectAllCsv" onchange="toggleSelectAll('csv')">
+                    <label for="selectAllCsv">Sélectionner tous les FCP</label>
+                </div>
+                <div class="fcp-grid" id="fcpGridCsv">
+                    {% for fcp in fcp_list %}
+                    <label class="fcp-checkbox">
+                        <input type="checkbox" name="fcp_csv" value="{{ fcp }}">
+                        <span class="fcp-checkbox-label">{{ fcp }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Data Selection -->
+            <div class="option-group">
+                <div class="option-group-title">
+                    <i class="bi bi-database"></i>
+                    Données Ã  exporter
+                </div>
+                <div class="content-options">
+                    <label class="content-option selected">
+                        <input type="checkbox" name="data_csv" value="vl" checked>
+                        <div class="content-option-icon">
+                            <i class="bi bi-table"></i>
+                        </div>
+                        <div class="content-option-text">
+                            <div class="content-option-title">Valeurs Liquidatives</div>
+                            <div class="content-option-desc">Historique complet des VL</div>
+                        </div>
+                    </label>
+                    <label class="content-option">
+                        <input type="checkbox" name="data_csv" value="perf">
+                        <div class="content-option-icon">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <div class="content-option-text">
+                            <div class="content-option-title">Performances</div>
+                            <div class="content-option-desc">Rendements calculés</div>
+                        </div>
+                    </label>
+                    <label class="content-option">
+                        <input type="checkbox" name="data_csv" value="returns">
+                        <div class="content-option-icon">
+                            <i class="bi bi-arrow-left-right"></i>
+                        </div>
+                        <div class="content-option-text">
+                            <div class="content-option-title">Rendements journaliers</div>
+                            <div class="content-option-desc">Variations jour par jour</div>
+                        </div>
+                    </label>
+                    <label class="content-option">
+                        <input type="checkbox" name="data_csv" value="stats">
+                        <div class="content-option-icon">
+                            <i class="bi bi-bar-chart"></i>
+                        </div>
+                        <div class="content-option-text">
+                            <div class="content-option-title">Statistiques</div>
+                            <div class="content-option-desc">Indicateurs de risque</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Date Range -->
+            <div class="option-group">
+                <div class="option-group-title">
+                    <i class="bi bi-calendar-range"></i>
+                    Période
+                </div>
+                <div class="date-range-container">
+                    <div class="date-input-group">
+                        <label>Date de début</label>
+                        <input type="date" id="startDateCsv" value="{{ default_start_date }}">
+                    </div>
+                    <div class="date-input-group">
+                        <label>Date de fin</label>
+                        <input type="date" id="endDateCsv" value="{{ default_end_date }}">
+                    </div>
+                </div>
+                <div class="quick-dates">
+                    <button class="quick-date-btn" onclick="setQuickDate('csv', '1m')">1 Mois</button>
+                    <button class="quick-date-btn" onclick="setQuickDate('csv', '3m')">3 Mois</button>
+                    <button class="quick-date-btn" onclick="setQuickDate('csv', '6m')">6 Mois</button>
+                    <button class="quick-date-btn active" onclick="setQuickDate('csv', '1y')">1 An</button>
+                    <button class="quick-date-btn" onclick="setQuickDate('csv', 'ytd')">YTD</button>
+                    <button class="quick-date-btn" onclick="setQuickDate('csv', 'all')">Tout</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="export-actions">
+            <div class="selection-summary">
+                <i class="bi bi-info-circle"></i>
+                <div class="selection-summary-text">
+                    <div class="selection-summary-title">Résumé de la sélection</div>
+                    <div class="selection-summary-details" id="summaryCsv">
+                        0 FCP sélectionné(s) â€¢ Format: XLSX â€¢ Période: 1 an
+                    </div>
+                </div>
+            </div>
+            <div class="export-actions-left">
+                <button class="btn-export btn-export-primary" onclick="generateExport('csv')">
+                    <span class="spinner"></span>
+                    <i class="bi bi-download"></i>
+                    <span class="btn-text">Exporter les données</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js avec adaptateur de dates -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+<script>
+    // Tab Navigation
+    document.querySelectorAll('.export-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.export-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content-export').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+        });
+    });
+    
+    // Initialize all checkboxes and radio buttons
+    function initializeSelections() {
+        // FCP checkboxes
+        document.querySelectorAll('.fcp-checkbox input[type="checkbox"]').forEach(input => {
+            input.addEventListener('change', function(e) {
+                e.stopPropagation();
+                const label = this.closest('.fcp-checkbox');
+                label.classList.toggle('selected', this.checked);
+                updateSelectAllState();
+                updateSummary();
+            });
+        });
+        
+        // Content option checkboxes
+        document.querySelectorAll('.content-option input[type="checkbox"]').forEach(input => {
+            input.addEventListener('change', function(e) {
+                e.stopPropagation();
+                const label = this.closest('.content-option');
+                label.classList.toggle('selected', this.checked);
+                updateSummary();
+            });
+        });
+        
+        // Format option radio buttons
+        document.querySelectorAll('.format-option input[type="radio"]').forEach(input => {
+            input.addEventListener('change', function() {
+                document.querySelectorAll('.format-option').forEach(opt => opt.classList.remove('selected'));
+                this.closest('.format-option').classList.add('selected');
+                updateSummary();
+            });
+        });
+        
+        // Template option radio buttons
+        document.querySelectorAll('.template-option input[type="radio"]').forEach(input => {
+            input.addEventListener('change', function() {
+                document.querySelectorAll('.template-option').forEach(opt => opt.classList.remove('selected'));
+                this.closest('.template-option').classList.add('selected');
+            });
+        });
+        
+        // Remove onclick attributes that cause double-toggle
+        document.querySelectorAll('.fcp-checkbox[onclick], .content-option[onclick], .format-option[onclick]').forEach(el => {
+            el.removeAttribute('onclick');
+        });
+    }
+    
+    // Update Select All checkbox state
+    function updateSelectAllState() {
+        ['Ppt', 'Pdf', 'Csv'].forEach(suffix => {
+            const grid = document.getElementById('fcpGrid' + suffix);
+            if (grid) {
+                const checkboxes = grid.querySelectorAll('input[type="checkbox"]');
+                const checkedCount = grid.querySelectorAll('input[type="checkbox"]:checked').length;
+                const selectAll = document.getElementById('selectAll' + suffix);
+                if (selectAll) {
+                    selectAll.checked = checkboxes.length > 0 && checkedCount === checkboxes.length;
+                    selectAll.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+                }
+            }
+        });
+    }
+    
+    // Select All Toggle
+    function toggleSelectAll(type) {
+        const suffix = type.charAt(0).toUpperCase() + type.slice(1);
+        const selectAll = document.getElementById('selectAll' + suffix);
+        const grid = document.getElementById('fcpGrid' + suffix);
+        const checkboxes = grid.querySelectorAll('.fcp-checkbox');
+        
+        checkboxes.forEach(cb => {
+            const input = cb.querySelector('input');
+            input.checked = selectAll.checked;
+            cb.classList.toggle('selected', selectAll.checked);
+        });
+        
+        updateSummary();
+    }
+    
+    // Quick Date Selection
+    function setQuickDate(type, period) {
+        const today = new Date();
+        let startDate = new Date();
+        
+        const tabContent = document.getElementById('tab-' + type);
+        tabContent.querySelectorAll('.quick-date-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        switch(period) {
+            case '1m':
+                startDate.setMonth(today.getMonth() - 1);
+                break;
+            case '3m':
+                startDate.setMonth(today.getMonth() - 3);
+                break;
+            case '6m':
+                startDate.setMonth(today.getMonth() - 6);
+                break;
+            case '1y':
+                startDate.setFullYear(today.getFullYear() - 1);
+                break;
+            case 'ytd':
+                startDate = new Date(today.getFullYear(), 0, 1);
+                break;
+            case 'all':
+                startDate = new Date(2010, 0, 1);
+                break;
+        }
+        
+        const suffix = type.charAt(0).toUpperCase() + type.slice(1);
+        document.getElementById('startDate' + suffix).value = startDate.toISOString().split('T')[0];
+        document.getElementById('endDate' + suffix).value = today.toISOString().split('T')[0];
+        
+        updateSummary();
+    }
+    
+    // Update Summary
+    function updateSummary() {
+        ['ppt', 'pdf', 'csv'].forEach(type => {
+            const suffix = type.charAt(0).toUpperCase() + type.slice(1);
+            const grid = document.getElementById('fcpGrid' + suffix);
+            const selectedFcps = grid.querySelectorAll('input:checked').length;
+            
+            let sections = 0;
+            const contentCheckboxes = document.querySelectorAll(`input[name="content_${type}"]:checked, input[name="data_${type}"]:checked`);
+            sections = contentCheckboxes.length;
+            
+            let periodText = 'Période personnalisée';
+            const activeQuickBtn = document.querySelector(`#tab-${type} .quick-date-btn.active`);
+            if (activeQuickBtn) {
+                periodText = activeQuickBtn.textContent;
+            }
+            
+            let summaryText = `${selectedFcps} FCP sélectionné(s) â€¢ ${sections} section(s) â€¢ ${periodText}`;
+            
+            if (type === 'csv') {
+                const formatInput = document.querySelector('input[name="export_format"]:checked');
+                const format = formatInput ? formatInput.value.toUpperCase() : 'XLSX';
+                summaryText = `${selectedFcps} FCP sélectionné(s) â€¢ Format: ${format} â€¢ ${periodText}`;
+            }
+            
+            document.getElementById('summary' + suffix).textContent = summaryText;
+        });
+    }
+    
+    // Get export configuration
+    function getExportConfig(type) {
+        const suffix = type.charAt(0).toUpperCase() + type.slice(1);
+        const grid = document.getElementById('fcpGrid' + suffix);
+        const selectedFcps = Array.from(grid.querySelectorAll('input:checked')).map(cb => cb.value);
+        
+        const contentName = type === 'csv' ? 'data_' + type : 'content_' + type;
+        const selectedContent = Array.from(document.querySelectorAll(`input[name="${contentName}"]:checked`)).map(cb => cb.value);
+        
+        const startDate = document.getElementById('startDate' + suffix).value;
+        const endDate = document.getElementById('endDate' + suffix).value;
+        
+        let format = type;
+        if (type === 'csv') {
+            const formatInput = document.querySelector('input[name="export_format"]:checked');
+            format = formatInput ? formatInput.value : 'xlsx';
+        }
+        
+        let template = 'standard';
+        if (type === 'ppt') {
+            const templateInput = document.querySelector('input[name="ppt_template"]:checked');
+            template = templateInput ? templateInput.value : 'standard';
+        }
+        
+        return {
+            type: type,
+            format: format,
+            template: template,
+            fcps: selectedFcps,
+            content: selectedContent,
+            startDate: startDate,
+            endDate: endDate
+        };
+    }
+    
+    // Content labels mapping
+    const contentLabels = {
+        'vl': 'Valeurs Liquidatives',
+        'perf': 'Performances',
+        'composition': 'Composition',
+        'fiche': 'Fiche Signalétique',
+        'stats': 'Statistiques',
+        'returns': 'Rendements journaliers'
+    };
+    
+    const templateLabels = {
+        'standard': 'Standard',
+        'corporate': 'Corporate',
+        'minimal': 'Minimal',
+        'detailed': 'Détaillé'
+    };
+    
+    // Preview Export
+    let currentPreviewType = null;
+    
+    function previewExport(type) {
+        const config = getExportConfig(type);
+        
+        if (config.fcps.length === 0) {
+            alert('Veuillez sélectionner au moins un FCP');
+            return;
+        }
+        
+        if (config.content.length === 0) {
+            alert('Veuillez sélectionner au moins un contenu Ã  exporter');
+            return;
+        }
+        
+        currentPreviewType = type;
+        
+        // Build preview content
+        let previewHTML = `
+            <div class="preview-container">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="preview-section-card">
+                            <h6 class="preview-section-title">
+                                <i class="bi bi-file-earmark-${type === 'csv' ? 'spreadsheet' : type} me-2"></i>
+                                Format d'export
+                            </h6>
+                            <div class="preview-badge ${type}">
+                                ${type === 'csv' ? config.format.toUpperCase() : type.toUpperCase()}
+                            </div>
+                            ${type === 'ppt' ? `<p class="text-muted mt-2 mb-0">Modèle: ${templateLabels[config.template]}</p>` : ''}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="preview-section-card">
+                            <h6 class="preview-section-title">
+                                <i class="bi bi-calendar-range me-2"></i>
+                                Période sélectionnée
+                            </h6>
+                            <p class="mb-0">
+                                <strong>Du:</strong> ${formatDate(config.startDate)}<br>
+                                <strong>Au:</strong> ${formatDate(config.endDate)}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="preview-section-card mb-4">
+                    <h6 class="preview-section-title">
+                        <i class="bi bi-collection me-2"></i>
+                        FCP sélectionnés (${config.fcps.length})
+                    </h6>
+                    <div class="preview-fcp-list">
+                        ${config.fcps.map(fcp => `<span class="preview-fcp-badge">${fcp}</span>`).join('')}
+                    </div>
+                </div>
+                
+                <div class="preview-section-card">
+                    <h6 class="preview-section-title">
+                        <i class="bi bi-list-check me-2"></i>
+                        Contenu Ã  exporter (${config.content.length})
+                    </h6>
+                    <div class="preview-content-list">
+                        ${config.content.map(c => `
+                            <div class="preview-content-item">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                ${contentLabels[c] || c}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="preview-estimate mt-4">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="estimate-value">${config.fcps.length}</div>
+                            <div class="estimate-label">FCP</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="estimate-value">${config.content.length}</div>
+                            <div class="estimate-label">Sections</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="estimate-value">~${estimatePages(type, config)}</div>
+                            <div class="estimate-label">${type === 'csv' ? 'Lignes' : 'Pages'}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('previewContent').innerHTML = previewHTML;
+        document.getElementById('previewModalLabel').innerHTML = `
+            <i class="bi bi-eye me-2"></i>Aperçu de l'export ${type.toUpperCase()}
+        `;
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+        modal.show();
+    }
+    
+    function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    
+    function estimatePages(type, config) {
+        if (type === 'csv') {
+            return config.fcps.length * 250 + '+';
+        }
+        return config.fcps.length * config.content.length + (type === 'ppt' ? 2 : 1);
+    }
+    
+    // Confirm export from modal
+    document.getElementById('confirmExportBtn').addEventListener('click', function() {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('previewModal'));
+        modal.hide();
+        if (currentPreviewType) {
+            generateExport(currentPreviewType);
+        }
+    });
+    
+    // Generate Export
+    function generateExport(type) {
+        const btn = event.target.closest('.btn-export');
+        if (btn) btn.classList.add('loading');
+        
+        const config = getExportConfig(type);
+        
+        if (config.fcps.length === 0) {
+            alert('Veuillez sélectionner au moins un FCP');
+            if (btn) btn.classList.remove('loading');
+            return;
+        }
+        
+        console.log('Export config:', config);
+        
+        // Télécharger pour tous les formats
+        downloadExport(config, btn, type);
+    }
+    
+    // Download Export via API
+    async function downloadExport(config, btn, type) {
+        try {
+            // Déterminer l'URL selon le type
+            let apiUrl;
+            if (type === 'ppt') {
+                apiUrl = '{% url "fcp_app:api_export_ppt" %}';
+            } else if (type === 'pdf') {
+                apiUrl = '{% url "fcp_app:api_export_pdf" %}';
+            } else {
+                apiUrl = '{% url "fcp_app:api_export_data" %}';
+            }
+            
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(config)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Erreur lors de l\'export');
+            }
+            
+            // Récupérer le blob et créer un lien de téléchargement
+            const blob = await response.blob();
+            const contentDisposition = response.headers.get('Content-Disposition');
+            
+            // Déterminer l'extension selon le type
+            let ext = type;
+            if (type === 'ppt') ext = 'pptx';
+            let filename = `export_fcp.${ext}`;
+            
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                if (filenameMatch) {
+                    filename = filenameMatch[1];
+                }
+            }
+            
+            // Créer un lien temporaire et déclencher le téléchargement
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            // Afficher un message de succès
+            const formatName = type === 'ppt' ? 'PowerPoint' : type.toUpperCase();
+            showSuccessToast(`Export ${formatName} téléchargé avec succès!`);
+            
+        } catch (error) {
+            console.error('Export error:', error);
+            alert('Erreur lors de l\'export: ' + error.message);
+        } finally {
+            if (btn) btn.classList.remove('loading');
+        }
+    }
+    
+    // Get CSRF Token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Show success toast
+    function showSuccessToast(message) {
+        // Créer un toast Bootstrap
+        const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+        
+        const toastHTML = `
+            <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="bi bi-check-circle-fill me-2"></i>${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        `;
+        
+        toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+        const toastElement = toastContainer.lastElementChild;
+        const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+        toast.show();
+        
+        // Supprimer le toast après qu'il soit caché
+        toastElement.addEventListener('hidden.bs.toast', () => {
+            toastElement.remove();
+        });
+    }
+    
+    // Create toast container if not exists
+    function createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        container.style.zIndex = '1100';
+        document.body.appendChild(container);
+        return container;
+    }
+    
+    // Initialize on DOM ready
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeSelections();
+        updateSummary();
+        updateSelectAllState();
+        initializeFactsheet();
+    });
+    
+    // ==================== FACTSHEET FUNCTIONS ====================
+    
+    // Variable globale pour stocker les données FCP
+    let currentFcpData = null;
+    let performanceChart = null;
+    let allocationChart = null;
+    let maturiteChart = null;
+    
+    function initializeFactsheet() {
+        // Set default month to last month
+        setFactsheetMonth('last');
+        
+        // Update when FCP is selected
+        const fcpSelect = document.getElementById('fcpSelectFactsheet');
+        if (fcpSelect) {
+            fcpSelect.addEventListener('change', () => {
+                updateFactsheetSummary();
+                loadFactsheetData();
+            });
+        }
+        
+        // Update when month changes
+        const monthInput = document.getElementById('monthFactsheet');
+        if (monthInput) {
+            monthInput.addEventListener('change', () => {
+                updateFactsheetSummary();
+                loadFactsheetData();
+            });
+        }
+        
+        // Update footer date
+        const footerDate = document.getElementById('footerDate');
+        if (footerDate) {
+            const now = new Date();
+            footerDate.textContent = `Document généré le ${now.toLocaleDateString('fr-FR')}`;
+        }
+    }
+    
+    async function loadFactsheetData() {
+        const fcpSelect = document.getElementById('fcpSelectFactsheet');
+        const monthInput = document.getElementById('monthFactsheet');
+        const selectedFcp = fcpSelect ? fcpSelect.value : '';
+        const selectedMonth = monthInput ? monthInput.value : '';
+        
+        if (!selectedFcp) {
+            resetFactsheetDisplay();
+            return;
+        }
+        
+        try {
+            // Charger les données complètes du FCP avec le mois sélectionné
+            let url = `{% url 'fcp_app:api_fcp_full_data' %}?fcp=${encodeURIComponent(selectedFcp)}`;
+            if (selectedMonth) {
+                url += `&month=${encodeURIComponent(selectedMonth)}`;
+            }
+            
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Erreur lors du chargement des données');
+            
+            const data = await response.json();
+            currentFcpData = data;
+            
+            // Mettre Ã  jour l'affichage
+            updateFactsheetDisplay(data, selectedMonth);
+            
+        } catch (error) {
+            console.error('Erreur chargement factsheet:', error);
+        }
+    }
+    
+    function resetFactsheetDisplay() {
+        // Réinitialiser le type badge
+        const typeBadge = document.getElementById('fcpTypeBadge');
+        if (typeBadge) {
+            typeBadge.textContent = '--';
+            typeBadge.className = 'factsheet-type-badge';
+        }
+        
+        // Réinitialiser toutes les valeurs Ã  '--'
+        document.querySelectorAll('[id^="td_"], [id^="gl_"], [id^="info_"], [id^="risk_"], [id^="adj_"], [id^="contrib_"], [id^="attr_"], [id^="act_"], [id^="obl_"]').forEach(el => {
+            el.textContent = '--';
+        });
+        
+        // Réinitialiser l'échelle de risque
+        document.querySelectorAll('.risk-level').forEach(el => el.classList.remove('active'));
+    }
+    
+    function updateFactsheetDisplay(data, selectedMonth) {
+        // === Mettre Ã  jour le type de fond dans l'en-tête ===
+        if (data.fiche_signaletique) {
+            const fiche = data.fiche_signaletique;
+            const typeBadge = document.getElementById('fcpTypeBadge');
+            if (typeBadge && fiche.type_fond) {
+                typeBadge.textContent = fiche.type_fond;
+                typeBadge.className = 'factsheet-type-badge type-' + fiche.type_fond.toLowerCase().replace('é', 'e');
+            }
+            
+            // === Fiche Signalétique ===
+            setTextById('info_type', fiche.type_fond || '--');
+            setTextById('info_strategie', fiche.description || '--');
+            setTextById('info_horizon', fiche.horizon ? `${fiche.horizon} ans` : '--');
+            setTextById('info_benchmark', formatBenchmark(fiche));
+            setTextById('info_date_creation', fiche.date_creation || '--');
+            setTextById('info_depositaire', fiche.depositaire || 'CGF Gestion');
+            setTextById('info_frais_gestion', fiche.frais_gestion ? `${fiche.frais_gestion}%` : '--');
+            setTextById('info_frais_entree', fiche.frais_entree ? `${fiche.frais_entree}%` : '0%');
+            setTextById('info_frais_sortie', fiche.frais_sortie ? `${fiche.frais_sortie}%` : '0%');
+            
+            // Échelle de risque
+            if (fiche.echelle_risque) {
+                document.querySelectorAll('.risk-level').forEach(el => {
+                    el.classList.remove('active');
+                    if (parseInt(el.dataset.level) === fiche.echelle_risque) {
+                        el.classList.add('active');
+                    }
+                });
+            }
+        }
+        
+        // === VL et Actif Net ===
+        if (data.stats) {
+            setTextById('info_vl', formatNumber(data.stats.derniere_vl) + ' FCFA');
+            setTextById('info_actif_net', data.stats.actif_net ? formatLargeNumber(data.stats.actif_net) : '--');
+        }
+        
+        // === Performances To-Date ===
+        if (data.perf_calendaires) {
+            const pc = data.perf_calendaires;
+            // FCP
+            setTextById('td_fcp_wtd', formatPerf(pc.wtd), pc.wtd);
+            setTextById('td_fcp_mtd', formatPerf(pc.mtd), pc.mtd);
+            setTextById('td_fcp_qtd', formatPerf(pc.qtd), pc.qtd);
+            setTextById('td_fcp_std', formatPerf(pc.std), pc.std);
+            setTextById('td_fcp_ytd', formatPerf(pc.ytd), pc.ytd);
+            // Benchmark (pas encore disponible)
+            ['wtd', 'mtd', 'qtd', 'std', 'ytd'].forEach(period => {
+                setTextById(`td_bench_${period}`, '--');
+                setTextById(`td_diff_${period}`, '--');
+            });
+        }
+        
+        // === Performances Glissantes ===
+        if (data.perf_glissantes) {
+            const pg = data.perf_glissantes;
+            // FCP
+            setTextById('gl_fcp_1m', formatPerf(pg.perf_1m), pg.perf_1m);
+            setTextById('gl_fcp_3m', formatPerf(pg.perf_3m), pg.perf_3m);
+            setTextById('gl_fcp_6m', formatPerf(pg.perf_6m), pg.perf_6m);
+            setTextById('gl_fcp_1y', formatPerf(pg.perf_1y), pg.perf_1y);
+            setTextById('gl_fcp_3y', formatPerf(pg.perf_3y), pg.perf_3y);
+            setTextById('gl_fcp_5y', formatPerf(pg.perf_5y), pg.perf_5y);
+            setTextById('gl_fcp_orig', formatPerf(pg.origine), pg.origine);
+            // Benchmark (pas encore disponible)
+            ['1m', '3m', '6m', '1y', '3y', '5y', 'orig'].forEach(period => {
+                setTextById(`gl_bench_${period}`, '--');
+                setTextById(`gl_diff_${period}`, '--');
+            });
+        }
+        
+        // === Indicateurs de Risque ===
+        if (data.analyse_stats) {
+            const as = data.analyse_stats;
+            // Max Drawdown - on utilise la même valeur pour toutes les périodes actuellement
+            setTextById('risk_mdd_ytd', formatPerf(-as.max_drawdown), -as.max_drawdown);
+            setTextById('risk_mdd_1y', formatPerf(-as.max_drawdown), -as.max_drawdown);
+            setTextById('risk_mdd_3y', '--');
+            setTextById('risk_mdd_5y', '--');
+            setTextById('risk_mdd_orig', formatPerf(-as.max_drawdown), -as.max_drawdown);
+            
+            // Volatilité
+            setTextById('risk_vol_ytd', formatPerf(as.volatilite_ann), as.volatilite_ann);
+            setTextById('risk_vol_1y', formatPerf(as.volatilite_ann), as.volatilite_ann);
+            setTextById('risk_vol_3y', '--');
+            setTextById('risk_vol_5y', '--');
+            setTextById('risk_vol_orig', formatPerf(as.volatilite_ann), as.volatilite_ann);
+            
+            // VaR 95%
+            setTextById('risk_var_ytd', formatPerf(as.var_95), as.var_95);
+            setTextById('risk_var_1y', formatPerf(as.var_95), as.var_95);
+            setTextById('risk_var_3y', '--');
+            setTextById('risk_var_5y', '--');
+            setTextById('risk_var_orig', formatPerf(as.var_95), as.var_95);
+        }
+        
+        // Tracking Error
+        if (data.tracking_error) {
+            const te = data.tracking_error;
+            setTextById('risk_te_ytd', formatPerf(te.ytd), te.ytd);
+            setTextById('risk_te_1y', '--');
+            setTextById('risk_te_3y', '--');
+            setTextById('risk_te_5y', '--');
+            setTextById('risk_te_orig', formatPerf(te.origine), te.origine);
+        }
+        
+        // === Rendement Ajusté au Risque ===
+        if (data.analyse_stats) {
+            const as = data.analyse_stats;
+            // Beta (pas encore calculé)
+            setTextById('adj_beta_1y', '--');
+            setTextById('adj_beta_3y', '--');
+            setTextById('adj_beta_orig', '--');
+            // Ratio Information (pas encore calculé)
+            setTextById('adj_info_1y', '--');
+            setTextById('adj_info_3y', '--');
+            setTextById('adj_info_orig', '--');
+            // Sharpe
+            setTextById('adj_sharpe_1y', formatRatio(as.sharpe));
+            setTextById('adj_sharpe_3y', '--');
+            setTextById('adj_sharpe_orig', formatRatio(as.sharpe));
+            // Sortino
+            setTextById('adj_sortino_1y', formatRatio(as.sortino));
+            setTextById('adj_sortino_3y', '--');
+            setTextById('adj_sortino_orig', formatRatio(as.sortino));
+        }
+        
+        // === Générer le graphique de performance ===
+        if (data.vl_data && data.vl_data.length > 0) {
+            // Filtrer les données jusqu'au mois sélectionné si spécifié
+            let filteredData = data.vl_data;
+            if (selectedMonth) {
+                const [year, month] = selectedMonth.split('-');
+                const endDate = new Date(parseInt(year), parseInt(month), 0); // Dernier jour du mois
+                filteredData = data.vl_data.filter(vl => new Date(vl.date) <= endDate);
+            }
+            if (filteredData.length > 0) {
+                generatePerformanceChart(filteredData);
+            }
+        }
+        
+        // Mettre Ã  jour la date du footer
+        const footerDate = document.getElementById('footerDate');
+        if (footerDate && selectedMonth) {
+            const [year, month] = selectedMonth.split('-');
+            const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                               'Juillet', 'AoÃ»t', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            footerDate.textContent = `Données au ${monthNames[parseInt(month) - 1]} ${year}`;
+        }
+    }
+    
+    function formatBenchmark(fiche) {
+        if (!fiche) return '--';
+        let parts = [];
+        if (fiche.benchmark_oblig && parseFloat(fiche.benchmark_oblig) > 0) {
+            parts.push(`MBI ${fiche.benchmark_oblig}%`);
+        }
+        if (fiche.benchmark_brvmc && parseFloat(fiche.benchmark_brvmc) > 0) {
+            parts.push(`BRVM-C ${fiche.benchmark_brvmc}%`);
+        }
+        return parts.length > 0 ? parts.join(' + ') : '--';
+    }
+    
+    function setTextById(id, value, numValue = null) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.textContent = value;
+        }
+    }
+    
+    function formatNumber(num) {
+        if (num === null || num === undefined) return '--';
+        return parseFloat(num).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+    
+    function formatLargeNumber(num) {
+        if (num === null || num === undefined) return '--';
+        if (num >= 1e9) return (num / 1e9).toFixed(2) + ' Mds FCFA';
+        if (num >= 1e6) return (num / 1e6).toFixed(2) + ' M FCFA';
+        return formatNumber(num) + ' FCFA';
+    }
+    
+    function formatPerf(val) {
+        if (val === null || val === undefined) return '--';
+        const num = parseFloat(val);
+        const formatted = num.toFixed(2) + '%';
+        return num >= 0 ? '+' + formatted : formatted;
+    }
+    
+    function formatRatio(val) {
+        if (val === null || val === undefined) return '--';
+        return parseFloat(val).toFixed(2);
+    }
+    
+    function generatePerformanceChart(vlData) {
+        const ctx = document.getElementById('chartPerformanceBase100');
+        if (!ctx) return;
+        
+        // Détruire le graphique existant
+        if (performanceChart) {
+            performanceChart.destroy();
+        }
+        
+        // Calculer base 100
+        const firstValue = parseFloat(vlData[0].valeur);
+        const base100Data = vlData.map(vl => ({
+            x: vl.date,
+            y: (parseFloat(vl.valeur) / firstValue) * 100
+        }));
+        
+        performanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'FCP',
+                    data: base100Data,
+                    borderColor: '#004080',
+                    backgroundColor: 'rgba(0, 64, 128, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: { unit: 'month', displayFormats: { month: 'MMM yy' } },
+                        grid: { display: false },
+                        ticks: { font: { size: 9 } }
+                    },
+                    y: {
+                        grid: { color: '#eee' },
+                        ticks: { font: { size: 9 }, callback: v => v.toFixed(0) }
+                    }
+                }
+            }
+        });
+    }
+    
+    function setFactsheetMonth(period) {
+        const monthInput = document.getElementById('monthFactsheet');
+        const today = new Date();
+        
+        // Update quick month buttons
+        document.querySelectorAll('.quick-month-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        if (event && event.target && event.target.classList.contains('quick-month-btn')) {
+            event.target.classList.add('active');
+        }
+        
+        if (period === 'last') {
+            // Previous month
+            let year = today.getFullYear();
+            let month = today.getMonth(); // 0-indexed, so this gives us last month
+            if (month === 0) {
+                month = 12;
+                year--;
+            }
+            monthInput.value = `${year}-${String(month).padStart(2, '0')}`;
+        } else if (period === 'current') {
+            // Current month
+            monthInput.value = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+        }
+        
+        updateFactsheetSummary();
+        loadFactsheetData(); // Recharger les données avec le nouveau mois
+    }
+    
+    function updateFactsheetSummary() {
+        const fcpSelect = document.getElementById('fcpSelectFactsheet');
+        const monthInput = document.getElementById('monthFactsheet');
+        const summaryEl = document.getElementById('summaryFactsheet');
+        
+        const selectedFcp = fcpSelect ? fcpSelect.value : '';
+        const selectedMonth = monthInput ? monthInput.value : '';
+        
+        let monthText = 'Mois non sélectionné';
+        if (selectedMonth) {
+            const [year, month] = selectedMonth.split('-');
+            const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                               'Juillet', 'AoÃ»t', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+            monthText = `${monthNames[parseInt(month) - 1]} ${year}`;
+        }
+        
+        if (selectedFcp) {
+            summaryEl.textContent = `${selectedFcp} â€¢ ${monthText}`;
+        } else {
+            summaryEl.textContent = `Sélectionnez un FCP et un mois`;
+        }
+    }
+    
+    async function generateFactsheet() {
+        const btn = event.target.closest('.btn-generate-factsheet');
+        if (btn) btn.classList.add('loading');
+        
+        const fcpSelect = document.getElementById('fcpSelectFactsheet');
+        const monthInput = document.getElementById('monthFactsheet');
+        const commentaireInput = document.getElementById('commentaireFactsheet');
+        const disclaimerInput = document.getElementById('disclaimerFactsheet');
+        
+        const selectedFcp = fcpSelect ? fcpSelect.value : '';
+        const selectedMonth = monthInput ? monthInput.value : '';
+        const commentaire = commentaireInput ? commentaireInput.value : '';
+        const disclaimer = disclaimerInput ? disclaimerInput.textContent : '';
+        
+        if (!selectedFcp) {
+            alert('Veuillez sélectionner un FCP');
+            if (btn) btn.classList.remove('loading');
+            return;
+        }
+        
+        if (!selectedMonth) {
+            alert('Veuillez sélectionner un mois');
+            if (btn) btn.classList.remove('loading');
+            return;
+        }
+        
+        try {
+            const response = await fetch('{% url "fcp_app:api_export_factsheet" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    fcp: selectedFcp,
+                    month: selectedMonth,
+                    commentaire: commentaire,
+                    disclaimer: disclaimer
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Erreur lors de la génération du factsheet');
+            }
+            
+            // Download the PDF
+            const blob = await response.blob();
+            const contentDisposition = response.headers.get('Content-Disposition');
+            let filename = `factsheet_${selectedFcp.replace(/\s+/g, '_')}_${selectedMonth}.pdf`;
+            
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                if (filenameMatch) {
+                    filename = filenameMatch[1];
+                }
+            }
+            
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            showSuccessToast('Factsheet PDF généré avec succès!');
+            
+        } catch (error) {
+            console.error('Factsheet generation error:', error);
+            alert('Erreur lors de la génération du factsheet: ' + error.message);
+        } finally {
+            if (btn) btn.classList.remove('loading');
+        }
+    }
+</script>
+
+<style>
+    /* Preview Modal Styles */
+    .preview-container {
+        padding: 10px;
+    }
+    
+    .preview-section-card {
+        background: var(--bg-secondary, #f5f5f4);
+        border-radius: 12px;
+        padding: 20px;
+    }
+    
+    .preview-section-title {
+        color: var(--primary-color, #004080);
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .preview-badge {
+        display: inline-block;
+        padding: 8px 20px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 18px;
+    }
+    
+    .preview-badge.ppt {
+        background: linear-gradient(135deg, #D24726 0%, #B7472A 100%);
+        color: white;
+    }
+    
+    .preview-badge.pdf {
+        background: linear-gradient(135deg, #E53935 0%, #C62828 100%);
+        color: white;
+    }
+    
+    .preview-badge.csv {
+        background: linear-gradient(135deg, #217346 0%, #185C37 100%);
+        color: white;
+    }
+    
+    .preview-fcp-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .preview-fcp-badge {
+        background: var(--primary-light, #e6f0fa);
+        color: var(--primary-color, #004080);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+    }
+    
+    .preview-content-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+    }
+    
+    .preview-content-item {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        background: white;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    
+    .preview-estimate {
+        background: var(--primary-light, #e6f0fa);
+        border-radius: 12px;
+        padding: 20px;
+    }
+    
+    .estimate-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--primary-color, #004080);
+    }
+    
+    .estimate-label {
+        font-size: 13px;
+        color: var(--text-secondary, #555);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    #previewModal .modal-content {
+        border-radius: 16px;
+        border: none;
+    }
+    
+    #previewModal .modal-header {
+        background: var(--primary-color, #004080);
+        color: white;
+        border-radius: 16px 16px 0 0;
+    }
+    
+    #previewModal .modal-header .btn-close {
+        filter: brightness(0) invert(1);
+    }
+    
+    #previewModal .modal-footer {
+        border-top: 1px solid var(--border-color, #e0dedd);
+    }
+</style>
+{% endblock %}
+
