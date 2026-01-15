@@ -12,4 +12,8 @@ urlpatterns = [
     path('api/scatter-data/', views.api_scatter_data, name='api_scatter_data'),
     path('api/correlation-matrix/', views.api_correlation_matrix, name='api_correlation_matrix'),
     path('api/volatility-clustering/', views.api_volatility_clustering, name='api_volatility_clustering'),
+    path('api/rolling-metrics/', views.api_rolling_metrics, name='api_rolling_metrics'),
+    path('api/tail-risk/', views.api_tail_risk, name='api_tail_risk'),
+    path('api/calendar-data/', views.api_calendar_data, name='api_calendar_data'),
+    path('api/fcp-full-data/', views.api_fcp_full_data, name='api_fcp_full_data'),
 ]

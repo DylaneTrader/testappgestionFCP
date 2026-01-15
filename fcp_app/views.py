@@ -32,6 +32,7 @@ def valeurs_liquidatives(request):
     perf_calendaires = {}
     perf_glissantes = {}
     analyse_stats = {}
+    tracking_error = {}
     
     if vl_model:
         # Récupérer toutes les VL ordonnées par date
@@ -120,6 +121,34 @@ def valeurs_liquidatives(request):
                 'nb_vl': vl_queryset.count(),
             }
             
+            # Calculer la Tracking Error (volatilité annualisée) pour différentes périodes
+            def calc_tracking_error(start_date):
+                """Calcule la tracking error (volatilité annualisée) depuis une date de référence"""
+                if start_date is None:
+                    return None
+                period_vl = list(vl_queryset.filter(date__gte=start_date).values_list('valeur', flat=True))
+                if len(period_vl) < 2:
+                    return None
+                period_valeurs = [float(v) for v in period_vl]
+                period_rendements = [(period_valeurs[i] / period_valeurs[i-1] - 1) * 100 for i in range(1, len(period_valeurs))]
+                if len(period_rendements) < 2:
+                    return None
+                moyenne = sum(period_rendements) / len(period_rendements)
+                variance = sum((r - moyenne) ** 2 for r in period_rendements) / len(period_rendements)
+                ecart_type = variance ** 0.5
+                # Annualiser la volatilité
+                volatilite_ann = ecart_type * (252 ** 0.5)
+                return round(volatilite_ann, 2)
+            
+            tracking_error = {
+                'wtd': calc_tracking_error(start_of_week),
+                'mtd': calc_tracking_error(start_of_month),
+                'qtd': calc_tracking_error(start_of_quarter),
+                'std': calc_tracking_error(start_of_semester),
+                'ytd': calc_tracking_error(start_of_year),
+                'origine': calc_tracking_error(first_vl.date if first_vl else None),
+            }
+            
             # Calculer les statistiques pour l'onglet Analyse
             valeurs = [float(v) for v in vl_queryset.values_list('valeur', flat=True)]
             if len(valeurs) > 1:
@@ -168,6 +197,102 @@ def valeurs_liquidatives(request):
                 else:
                     sortino = 0
                 
+                # Skewness (asymétrie)
+                if ecart_type > 0:
+                    skewness = sum((r - moyenne_rdt) ** 3 for r in rendements) / (n * ecart_type ** 3)
+                else:
+                    skewness = 0
+                
+                # Kurtosis (aplatissement) - excess kurtosis (0 pour normal)
+                if ecart_type > 0:
+                    kurtosis = sum((r - moyenne_rdt) ** 4 for r in rendements) / (n * ecart_type ** 4) - 3
+                else:
+                    kurtosis = 0
+                
+                # VaR Historique (Value at Risk)
+                var_95 = rendements_sorted[int(n * 0.05)]  # 5ème percentile
+                var_99 = rendements_sorted[int(n * 0.01)]  # 1er percentile
+                
+                # CVaR / Expected Shortfall (moyenne des pertes au-delà de la VaR)
+                cvar_95_values = [r for r in rendements if r <= var_95]
+                cvar_99_values = [r for r in rendements if r <= var_99]
+                cvar_95 = sum(cvar_95_values) / len(cvar_95_values) if cvar_95_values else var_95
+                cvar_99 = sum(cvar_99_values) / len(cvar_99_values) if cvar_99_values else var_99
+                
+                # Calcul des drawdowns détaillés
+                drawdowns_data = []
+                dates_list = list(vl_queryset.values_list('date', flat=True))
+                peak = valeurs[0]
+                peak_date = dates_list[0]
+                current_dd_start = None
+                current_dd_peak = valeurs[0]
+                
+                underwater_data = []  # Pour le graphique underwater
+                
+                for i, v in enumerate(valeurs):
+                    if v > peak:
+                        # Nouveau pic atteint
+                        if current_dd_start is not None:
+                            # Fin du drawdown précédent
+                            dd_depth = (current_dd_peak - min(valeurs[current_dd_start:i])) / current_dd_peak * 100
+                            dd_trough_idx = current_dd_start + valeurs[current_dd_start:i].index(min(valeurs[current_dd_start:i]))
+                            drawdowns_data.append({
+                                'start_date': dates_list[current_dd_start].strftime('%Y-%m-%d'),
+                                'trough_date': dates_list[dd_trough_idx].strftime('%Y-%m-%d'),
+                                'end_date': dates_list[i].strftime('%Y-%m-%d'),
+                                'depth': round(dd_depth, 2),
+                                'duration': i - current_dd_start,
+                                'recovery': i - dd_trough_idx
+                            })
+                            current_dd_start = None
+                        peak = v
+                        peak_date = dates_list[i]
+                        current_dd_peak = v
+                    else:
+                        if current_dd_start is None and v < peak:
+                            current_dd_start = i - 1 if i > 0 else 0
+                            current_dd_peak = peak
+                    
+                    # Calculer le drawdown courant pour underwater chart
+                    dd_current = (peak - v) / peak * 100
+                    underwater_data.append({
+                        'date': dates_list[i].strftime('%Y-%m-%d'),
+                        'drawdown': round(-dd_current, 2)  # Négatif pour l'affichage
+                    })
+                
+                # Si on est encore en drawdown à la fin
+                if current_dd_start is not None:
+                    dd_depth = (current_dd_peak - min(valeurs[current_dd_start:])) / current_dd_peak * 100
+                    dd_trough_idx = current_dd_start + valeurs[current_dd_start:].index(min(valeurs[current_dd_start:]))
+                    drawdowns_data.append({
+                        'start_date': dates_list[current_dd_start].strftime('%Y-%m-%d'),
+                        'trough_date': dates_list[dd_trough_idx].strftime('%Y-%m-%d'),
+                        'end_date': None,  # Encore en cours
+                        'depth': round(dd_depth, 2),
+                        'duration': len(valeurs) - current_dd_start,
+                        'recovery': None  # Pas encore récupéré
+                    })
+                
+                # Trier les drawdowns par profondeur (les pires en premier)
+                drawdowns_data.sort(key=lambda x: x['depth'], reverse=True)
+                
+                # Histogramme des rendements (bins)
+                hist_min = min(rendements)
+                hist_max = max(rendements)
+                nb_bins = 30
+                bin_width = (hist_max - hist_min) / nb_bins if hist_max != hist_min else 1
+                histogram_data = []
+                for i in range(nb_bins):
+                    bin_start = hist_min + i * bin_width
+                    bin_end = bin_start + bin_width
+                    count = sum(1 for r in rendements if bin_start <= r < bin_end)
+                    histogram_data.append({
+                        'bin_start': round(bin_start, 3),
+                        'bin_end': round(bin_end, 3),
+                        'count': count,
+                        'frequency': round(count / n * 100, 2)
+                    })
+                
                 stats['volatilite'] = round(volatilite_ann, 2)
                 
                 analyse_stats = {
@@ -189,6 +314,18 @@ def valeurs_liquidatives(request):
                     'jours_positifs': jours_positifs,
                     'jours_negatifs': jours_negatifs,
                     'ratio_positif': round(jours_positifs / len(rendements) * 100, 1) if rendements else 0,
+                    # Distribution des rendements
+                    'skewness': round(skewness, 3),
+                    'kurtosis': round(kurtosis, 3),
+                    'var_95': round(var_95, 3),
+                    'var_99': round(var_99, 3),
+                    'cvar_95': round(cvar_95, 3),
+                    'cvar_99': round(cvar_99, 3),
+                    # Données pour graphiques (JSON)
+                    'histogram_data': histogram_data,
+                    'underwater_data': underwater_data,
+                    'drawdowns_data': drawdowns_data[:10],  # Top 10 drawdowns
+                    'rendements_list': [round(r, 4) for r in rendements],  # Pour histogramme JS
                 }
             else:
                 stats['volatilite'] = 0
@@ -230,6 +367,12 @@ def valeurs_liquidatives(request):
                     'selected': fcp_name == selected_fcp
                 })
     
+    # Extraire les données pour les graphiques (JSON)
+    histogram_data_json = json.dumps(analyse_stats.get('histogram_data', []))
+    underwater_data_json = json.dumps(analyse_stats.get('underwater_data', []))
+    drawdowns_data_json = json.dumps(analyse_stats.get('drawdowns_data', []))
+    rendements_list_json = json.dumps(analyse_stats.get('rendements_list', []))
+    
     context = {
         'page_title': 'Valeurs Liquidatives',
         'page_description': 'Suivi et historique des valeurs liquidatives des FCP',
@@ -240,7 +383,12 @@ def valeurs_liquidatives(request):
         'perf_calendaires': perf_calendaires,
         'perf_glissantes': perf_glissantes,
         'analyse_stats': analyse_stats,
+        'tracking_error': tracking_error,
         'all_fcp_stats_json': json.dumps(all_fcp_stats),
+        'histogram_data_json': histogram_data_json,
+        'underwater_data_json': underwater_data_json,
+        'drawdowns_data_json': drawdowns_data_json,
+        'rendements_list_json': rendements_list_json,
     }
     return render(request, 'fcp_app/valeurs_liquidatives.html', context)
 
@@ -373,6 +521,298 @@ def api_vl_data(request):
         })
     
     return JsonResponse({'data': data})
+
+
+def api_fcp_full_data(request):
+    """API pour récupérer toutes les données d'un FCP (pour mise à jour dynamique)"""
+    fcp_name = request.GET.get('fcp')
+    
+    if not fcp_name:
+        return JsonResponse({'error': 'FCP non spécifié'}, status=400)
+    
+    vl_model = get_vl_model(fcp_name)
+    if not vl_model:
+        return JsonResponse({'error': 'FCP non trouvé'}, status=404)
+    
+    vl_data = []
+    stats = {}
+    perf_calendaires = {}
+    perf_glissantes = {}
+    analyse_stats = {}
+    tracking_error = {}
+    
+    vl_queryset = vl_model.objects.all().order_by('date')
+    
+    # Convertir en liste pour JSON
+    for vl in vl_queryset:
+        vl_data.append({
+            'date': vl.date.strftime('%Y-%m-%d'),
+            'valeur': float(vl.valeur)
+        })
+    
+    # Calculer les statistiques
+    if vl_queryset.exists():
+        latest_vl = vl_queryset.last()
+        first_vl = vl_queryset.first()
+        today = latest_vl.date
+        
+        def calc_perf(vl_ref):
+            if vl_ref:
+                return round(((float(latest_vl.valeur) / float(vl_ref.valeur)) - 1) * 100, 2)
+            return None
+        
+        # VL pour différentes périodes GLISSANTES
+        vl_1d = vl_queryset.filter(date__lt=today).last()
+        vl_1m = vl_queryset.filter(date__lte=today - timedelta(days=30)).last()
+        vl_3m = vl_queryset.filter(date__lte=today - timedelta(days=90)).last()
+        vl_6m = vl_queryset.filter(date__lte=today - timedelta(days=180)).last()
+        vl_1y = vl_queryset.filter(date__lte=today - timedelta(days=365)).last()
+        vl_3y = vl_queryset.filter(date__lte=today - timedelta(days=365*3)).last()
+        vl_5y = vl_queryset.filter(date__lte=today - timedelta(days=365*5)).last()
+        
+        # Performances calendaires (To-Date)
+        start_of_week = today - timedelta(days=today.weekday())
+        vl_wtd = vl_queryset.filter(date__lt=start_of_week).last()
+        
+        start_of_month = today.replace(day=1)
+        vl_mtd = vl_queryset.filter(date__lt=start_of_month).last()
+        
+        quarter_month = ((today.month - 1) // 3) * 3 + 1
+        start_of_quarter = today.replace(month=quarter_month, day=1)
+        vl_qtd = vl_queryset.filter(date__lt=start_of_quarter).last()
+        
+        semester_month = 1 if today.month <= 6 else 7
+        start_of_semester = today.replace(month=semester_month, day=1)
+        vl_std = vl_queryset.filter(date__lt=start_of_semester).last()
+        
+        start_of_year = today.replace(month=1, day=1)
+        vl_ytd = vl_queryset.filter(date__lt=start_of_year).last()
+        
+        perf_calendaires = {
+            'wtd': calc_perf(vl_wtd),
+            'mtd': calc_perf(vl_mtd),
+            'qtd': calc_perf(vl_qtd),
+            'std': calc_perf(vl_std),
+            'ytd': calc_perf(vl_ytd),
+        }
+        
+        perf_glissantes = {
+            'perf_1m': calc_perf(vl_1m),
+            'perf_3m': calc_perf(vl_3m),
+            'perf_6m': calc_perf(vl_6m),
+            'perf_1y': calc_perf(vl_1y),
+            'perf_3y': calc_perf(vl_3y),
+            'perf_5y': calc_perf(vl_5y),
+            'origine': calc_perf(first_vl),
+        }
+        
+        stats = {
+            'derniere_vl': float(latest_vl.valeur),
+            'derniere_date': latest_vl.date.strftime('%d/%m/%Y'),
+            'premiere_vl': float(first_vl.valeur),
+            'premiere_date': first_vl.date.strftime('%d/%m/%Y'),
+            'var_1j': calc_perf(vl_1d) or 0,
+            'var_1m': calc_perf(vl_1m) or 0,
+            'var_1y': calc_perf(vl_1y) or 0,
+            'var_ytd': perf_calendaires['ytd'] or 0,
+            'var_origine': perf_glissantes['origine'] or 0,
+            'nb_vl': vl_queryset.count(),
+        }
+        
+        # Calculer la Tracking Error pour différentes périodes
+        def calc_tracking_error(start_date):
+            if start_date is None:
+                return None
+            period_vl = list(vl_queryset.filter(date__gte=start_date).values_list('valeur', flat=True))
+            if len(period_vl) < 2:
+                return None
+            period_valeurs = [float(v) for v in period_vl]
+            period_rendements = [(period_valeurs[i] / period_valeurs[i-1] - 1) * 100 for i in range(1, len(period_valeurs))]
+            if len(period_rendements) < 2:
+                return None
+            moyenne = sum(period_rendements) / len(period_rendements)
+            variance = sum((r - moyenne) ** 2 for r in period_rendements) / len(period_rendements)
+            ecart_type = variance ** 0.5
+            volatilite_ann = ecart_type * (252 ** 0.5)
+            return round(volatilite_ann, 2)
+        
+        tracking_error = {
+            'wtd': calc_tracking_error(start_of_week),
+            'mtd': calc_tracking_error(start_of_month),
+            'qtd': calc_tracking_error(start_of_quarter),
+            'std': calc_tracking_error(start_of_semester),
+            'ytd': calc_tracking_error(start_of_year),
+            'origine': calc_tracking_error(first_vl.date if first_vl else None),
+        }
+        
+        # Calculer les statistiques pour l'analyse
+        valeurs = [float(v) for v in vl_queryset.values_list('valeur', flat=True)]
+        if len(valeurs) > 1:
+            rendements = [(valeurs[i] / valeurs[i-1] - 1) * 100 for i in range(1, len(valeurs))]
+            
+            moyenne_rdt = sum(rendements) / len(rendements)
+            variance = sum((r - moyenne_rdt) ** 2 for r in rendements) / len(rendements)
+            ecart_type = variance ** 0.5
+            volatilite_ann = ecart_type * (252 ** 0.5)
+            
+            rendements_sorted = sorted(rendements)
+            n = len(rendements_sorted)
+            mediane = rendements_sorted[n // 2] if n % 2 == 1 else (rendements_sorted[n//2 - 1] + rendements_sorted[n//2]) / 2
+            
+            vl_min = min(valeurs)
+            vl_max = max(valeurs)
+            rdt_min = min(rendements)
+            rdt_max = max(rendements)
+            
+            jours_positifs = sum(1 for r in rendements if r > 0)
+            jours_negatifs = sum(1 for r in rendements if r < 0)
+            
+            # Drawdown max
+            peak = valeurs[0]
+            max_drawdown = 0
+            for v in valeurs:
+                if v > peak:
+                    peak = v
+                drawdown = (peak - v) / peak * 100
+                if drawdown > max_drawdown:
+                    max_drawdown = drawdown
+            
+            rf = 3.25 / 252
+            sharpe = ((moyenne_rdt - rf) / ecart_type * (252 ** 0.5)) if ecart_type > 0 else 0
+            
+            rendements_negatifs = [r for r in rendements if r < 0]
+            if rendements_negatifs:
+                downside_var = sum(r ** 2 for r in rendements_negatifs) / len(rendements_negatifs)
+                downside_std = downside_var ** 0.5
+                sortino = ((moyenne_rdt - rf) / downside_std * (252 ** 0.5)) if downside_std > 0 else 0
+            else:
+                sortino = 0
+            
+            # Skewness et Kurtosis
+            if ecart_type > 0:
+                skewness = sum((r - moyenne_rdt) ** 3 for r in rendements) / (n * ecart_type ** 3)
+                kurtosis = sum((r - moyenne_rdt) ** 4 for r in rendements) / (n * ecart_type ** 4) - 3
+            else:
+                skewness = 0
+                kurtosis = 0
+            
+            # VaR et CVaR
+            var_95 = rendements_sorted[int(n * 0.05)]
+            var_99 = rendements_sorted[int(n * 0.01)]
+            cvar_95_values = [r for r in rendements if r <= var_95]
+            cvar_99_values = [r for r in rendements if r <= var_99]
+            cvar_95 = sum(cvar_95_values) / len(cvar_95_values) if cvar_95_values else var_95
+            cvar_99 = sum(cvar_99_values) / len(cvar_99_values) if cvar_99_values else var_99
+            
+            # Drawdowns détaillés
+            drawdowns_data = []
+            dates_list = list(vl_queryset.values_list('date', flat=True))
+            peak = valeurs[0]
+            current_dd_start = None
+            current_dd_peak = valeurs[0]
+            underwater_data = []
+            
+            for i, v in enumerate(valeurs):
+                if v > peak:
+                    if current_dd_start is not None:
+                        dd_depth = (current_dd_peak - min(valeurs[current_dd_start:i])) / current_dd_peak * 100
+                        dd_trough_idx = current_dd_start + valeurs[current_dd_start:i].index(min(valeurs[current_dd_start:i]))
+                        drawdowns_data.append({
+                            'start_date': dates_list[current_dd_start].strftime('%Y-%m-%d'),
+                            'trough_date': dates_list[dd_trough_idx].strftime('%Y-%m-%d'),
+                            'end_date': dates_list[i].strftime('%Y-%m-%d'),
+                            'depth': round(dd_depth, 2),
+                            'duration': i - current_dd_start,
+                            'recovery': i - dd_trough_idx
+                        })
+                        current_dd_start = None
+                    peak = v
+                    current_dd_peak = v
+                else:
+                    if current_dd_start is None and v < peak:
+                        current_dd_start = i - 1 if i > 0 else 0
+                        current_dd_peak = peak
+                
+                dd_current = (peak - v) / peak * 100
+                underwater_data.append({
+                    'date': dates_list[i].strftime('%Y-%m-%d'),
+                    'drawdown': round(-dd_current, 2)
+                })
+            
+            if current_dd_start is not None:
+                dd_depth = (current_dd_peak - min(valeurs[current_dd_start:])) / current_dd_peak * 100
+                dd_trough_idx = current_dd_start + valeurs[current_dd_start:].index(min(valeurs[current_dd_start:]))
+                drawdowns_data.append({
+                    'start_date': dates_list[current_dd_start].strftime('%Y-%m-%d'),
+                    'trough_date': dates_list[dd_trough_idx].strftime('%Y-%m-%d'),
+                    'end_date': None,
+                    'depth': round(dd_depth, 2),
+                    'duration': len(valeurs) - current_dd_start,
+                    'recovery': None
+                })
+            
+            drawdowns_data.sort(key=lambda x: x['depth'], reverse=True)
+            
+            # Histogramme
+            hist_min = min(rendements)
+            hist_max = max(rendements)
+            nb_bins = 30
+            bin_width = (hist_max - hist_min) / nb_bins if hist_max != hist_min else 1
+            histogram_data = []
+            for i in range(nb_bins):
+                bin_start = hist_min + i * bin_width
+                bin_end = bin_start + bin_width
+                count = sum(1 for r in rendements if bin_start <= r < bin_end)
+                histogram_data.append({
+                    'bin_start': round(bin_start, 3),
+                    'bin_end': round(bin_end, 3),
+                    'count': count,
+                    'frequency': round(count / n * 100, 2)
+                })
+            
+            stats['volatilite'] = round(volatilite_ann, 2)
+            
+            analyse_stats = {
+                'nb_observations': len(rendements),
+                'rendement_moyen': round(moyenne_rdt, 4),
+                'rendement_moyen_ann': round(moyenne_rdt * 252, 2),
+                'mediane': round(mediane, 4),
+                'ecart_type': round(ecart_type, 4),
+                'volatilite_ann': round(volatilite_ann, 2),
+                'vl_min': round(vl_min, 2),
+                'vl_max': round(vl_max, 2),
+                'rdt_min': round(rdt_min, 2),
+                'rdt_max': round(rdt_max, 2),
+                'max_drawdown': round(max_drawdown, 2),
+                'sharpe': round(sharpe, 2),
+                'sortino': round(sortino, 2),
+                'jours_positifs': jours_positifs,
+                'jours_negatifs': jours_negatifs,
+                'ratio_positif': round(jours_positifs / len(rendements) * 100, 1) if rendements else 0,
+                'skewness': round(skewness, 3),
+                'kurtosis': round(kurtosis, 3),
+                'var_95': round(var_95, 3),
+                'var_99': round(var_99, 3),
+                'cvar_95': round(cvar_95, 3),
+                'cvar_99': round(cvar_99, 3),
+                'histogram_data': histogram_data,
+                'underwater_data': underwater_data,
+                'drawdowns_data': drawdowns_data[:10],
+                'rendements_list': [round(r, 4) for r in rendements],
+            }
+        else:
+            stats['volatilite'] = 0
+            tracking_error = {}
+    
+    return JsonResponse({
+        'fcp_name': fcp_name,
+        'vl_data': vl_data,
+        'stats': stats,
+        'perf_calendaires': perf_calendaires,
+        'perf_glissantes': perf_glissantes,
+        'analyse_stats': analyse_stats,
+        'tracking_error': tracking_error
+    })
 
 
 def composition(request):
@@ -654,4 +1094,371 @@ def api_volatility_clustering(request):
             'high': round(threshold_high, 2)
         },
         'total_observations': len(volatilites)
+    })
+
+
+def api_rolling_metrics(request):
+    """API pour les métriques glissantes (Sharpe et Beta)"""
+    fcp_name = request.GET.get('fcp')
+    window = int(request.GET.get('window', 20))
+    benchmark = request.GET.get('benchmark', 'FCP ACTIONS PERFORMANCES')
+    
+    # Limiter la fenêtre entre 10 et 60
+    window = max(10, min(60, window))
+    
+    if not fcp_name:
+        return JsonResponse({'error': 'FCP non spécifié'}, status=400)
+    
+    vl_model = get_vl_model(fcp_name)
+    if not vl_model:
+        return JsonResponse({'error': 'FCP non trouvé'}, status=404)
+    
+    vl_queryset = vl_model.objects.all().order_by('date')
+    
+    if not vl_queryset.exists() or vl_queryset.count() < window + 10:
+        return JsonResponse({'error': 'Données insuffisantes'}, status=400)
+    
+    # Calculer les rendements quotidiens du FCP
+    vl_list = list(vl_queryset.values('date', 'valeur'))
+    rendements = []
+    dates = []
+    
+    for i in range(1, len(vl_list)):
+        ret = (float(vl_list[i]['valeur']) / float(vl_list[i-1]['valeur']) - 1) * 100
+        rendements.append(ret)
+        dates.append(vl_list[i]['date'])
+    
+    # Calculer les rendements du benchmark
+    benchmark_returns = {}
+    benchmark_model = get_vl_model(benchmark)
+    if benchmark_model and benchmark != fcp_name:
+        bench_vl = list(benchmark_model.objects.all().order_by('date').values('date', 'valeur'))
+        for i in range(1, len(bench_vl)):
+            ret = (float(bench_vl[i]['valeur']) / float(bench_vl[i-1]['valeur']) - 1) * 100
+            benchmark_returns[bench_vl[i]['date']] = ret
+    
+    # Taux sans risque journalier (3.25% annuel)
+    rf_daily = 3.25 / 252
+    
+    # Calculer les métriques glissantes
+    rolling_sharpe = []
+    rolling_beta = []
+    rolling_dates = []
+    
+    for i in range(window - 1, len(rendements)):
+        window_returns = rendements[i - window + 1:i + 1]
+        window_dates_list = dates[i - window + 1:i + 1]
+        
+        # Sharpe Ratio glissant
+        mean_ret = sum(window_returns) / len(window_returns)
+        variance = sum((r - mean_ret) ** 2 for r in window_returns) / len(window_returns)
+        std_ret = variance ** 0.5
+        
+        if std_ret > 0:
+            sharpe = ((mean_ret - rf_daily) / std_ret) * (252 ** 0.5)
+        else:
+            sharpe = 0
+        
+        rolling_sharpe.append(round(sharpe, 3))
+        rolling_dates.append(dates[i].strftime('%Y-%m-%d'))
+        
+        # Beta glissant (si benchmark disponible)
+        if benchmark_returns:
+            bench_window = [benchmark_returns.get(d, 0) for d in window_dates_list]
+            
+            # Vérifier qu'on a assez de données benchmark
+            if sum(1 for b in bench_window if b != 0) > window * 0.5:
+                mean_bench = sum(bench_window) / len(bench_window)
+                
+                # Covariance et variance du benchmark
+                covariance = sum((window_returns[k] - mean_ret) * (bench_window[k] - mean_bench) 
+                                for k in range(len(window_returns))) / len(window_returns)
+                var_bench = sum((b - mean_bench) ** 2 for b in bench_window) / len(bench_window)
+                
+                if var_bench > 0:
+                    beta = covariance / var_bench
+                else:
+                    beta = 1
+                
+                rolling_beta.append(round(beta, 3))
+            else:
+                rolling_beta.append(None)
+        else:
+            rolling_beta.append(None)
+    
+    return JsonResponse({
+        'fcp_name': fcp_name,
+        'window': window,
+        'benchmark': benchmark if benchmark_returns else None,
+        'dates': rolling_dates,
+        'sharpe': rolling_sharpe,
+        'beta': rolling_beta,
+        'current_sharpe': rolling_sharpe[-1] if rolling_sharpe else None,
+        'current_beta': rolling_beta[-1] if rolling_beta and rolling_beta[-1] is not None else None
+    })
+
+
+def api_tail_risk(request):
+    """API pour l'analyse du Tail Risk (événements extrêmes)"""
+    fcp_name = request.GET.get('fcp')
+    
+    if not fcp_name:
+        return JsonResponse({'error': 'FCP non spécifié'}, status=400)
+    
+    vl_model = get_vl_model(fcp_name)
+    if not vl_model:
+        return JsonResponse({'error': 'FCP non trouvé'}, status=404)
+    
+    vl_queryset = vl_model.objects.all().order_by('date')
+    
+    if not vl_queryset.exists() or vl_queryset.count() < 30:
+        return JsonResponse({'error': 'Données insuffisantes'}, status=400)
+    
+    # Calculer les rendements quotidiens
+    vl_list = list(vl_queryset.values('date', 'valeur'))
+    rendements = []
+    dates = []
+    
+    for i in range(1, len(vl_list)):
+        ret = (float(vl_list[i]['valeur']) / float(vl_list[i-1]['valeur']) - 1) * 100
+        rendements.append(ret)
+        dates.append(vl_list[i]['date'].strftime('%Y-%m-%d'))
+    
+    # Calculer moyenne et écart-type
+    n = len(rendements)
+    mean_ret = sum(rendements) / n
+    variance = sum((r - mean_ret) ** 2 for r in rendements) / n
+    std_ret = variance ** 0.5
+    
+    # Seuils sigma
+    sigma_1 = mean_ret - std_ret
+    sigma_2 = mean_ret - 2 * std_ret
+    sigma_3 = mean_ret - 3 * std_ret
+    
+    # Compteurs d'événements extrêmes (pertes)
+    losses_1_sigma = []  # Pertes > 1σ
+    losses_2_sigma = []  # Pertes > 2σ
+    losses_3_sigma = []  # Pertes > 3σ
+    
+    for i, ret in enumerate(rendements):
+        if ret < sigma_1:
+            losses_1_sigma.append({'date': dates[i], 'return': round(ret, 3)})
+            if ret < sigma_2:
+                losses_2_sigma.append({'date': dates[i], 'return': round(ret, 3)})
+                if ret < sigma_3:
+                    losses_3_sigma.append({'date': dates[i], 'return': round(ret, 3)})
+    
+    # Statistiques
+    total_days = len(rendements)
+    
+    # Distribution théorique vs réelle (règle empirique: 68-95-99.7)
+    theoretical_1_sigma = 15.87  # % attendu au-delà de 1σ (en dessous de la moyenne)
+    theoretical_2_sigma = 2.28   # % attendu au-delà de 2σ
+    theoretical_3_sigma = 0.13   # % attendu au-delà de 3σ
+    
+    actual_1_sigma = (len(losses_1_sigma) / total_days) * 100
+    actual_2_sigma = (len(losses_2_sigma) / total_days) * 100
+    actual_3_sigma = (len(losses_3_sigma) / total_days) * 100
+    
+    # Top 10 pires jours
+    worst_days = sorted(zip(dates, rendements), key=lambda x: x[1])[:10]
+    worst_days_list = [{'date': d, 'return': round(r, 3)} for d, r in worst_days]
+    
+    # Top 10 meilleurs jours
+    best_days = sorted(zip(dates, rendements), key=lambda x: x[1], reverse=True)[:10]
+    best_days_list = [{'date': d, 'return': round(r, 3)} for d, r in best_days]
+    
+    # Calculer le rapport gain/perte des événements extrêmes
+    extreme_losses = [r for r in rendements if r < sigma_2]
+    extreme_gains = [r for r in rendements if r > mean_ret + 2 * std_ret]
+    
+    avg_extreme_loss = sum(extreme_losses) / len(extreme_losses) if extreme_losses else 0
+    avg_extreme_gain = sum(extreme_gains) / len(extreme_gains) if extreme_gains else 0
+    
+    return JsonResponse({
+        'fcp_name': fcp_name,
+        'total_days': total_days,
+        'statistics': {
+            'mean': round(mean_ret, 4),
+            'std': round(std_ret, 4),
+            'sigma_1_threshold': round(sigma_1, 4),
+            'sigma_2_threshold': round(sigma_2, 4),
+            'sigma_3_threshold': round(sigma_3, 4)
+        },
+        'tail_analysis': {
+            '1_sigma': {
+                'count': len(losses_1_sigma),
+                'frequency': round(actual_1_sigma, 2),
+                'expected': theoretical_1_sigma,
+                'ratio': round(actual_1_sigma / theoretical_1_sigma, 2) if theoretical_1_sigma > 0 else 0,
+                'events': losses_1_sigma[-20:]  # 20 derniers événements
+            },
+            '2_sigma': {
+                'count': len(losses_2_sigma),
+                'frequency': round(actual_2_sigma, 2),
+                'expected': theoretical_2_sigma,
+                'ratio': round(actual_2_sigma / theoretical_2_sigma, 2) if theoretical_2_sigma > 0 else 0,
+                'events': losses_2_sigma[-10:]  # 10 derniers événements
+            },
+            '3_sigma': {
+                'count': len(losses_3_sigma),
+                'frequency': round(actual_3_sigma, 2),
+                'expected': theoretical_3_sigma,
+                'ratio': round(actual_3_sigma / theoretical_3_sigma, 2) if theoretical_3_sigma > 0 else 0,
+                'events': losses_3_sigma  # Tous les événements (rares)
+            }
+        },
+        'worst_days': worst_days_list,
+        'best_days': best_days_list,
+        'extreme_stats': {
+            'avg_extreme_loss': round(avg_extreme_loss, 3),
+            'avg_extreme_gain': round(avg_extreme_gain, 3),
+            'extreme_losses_count': len(extreme_losses),
+            'extreme_gains_count': len(extreme_gains)
+        }
+    })
+
+
+def api_calendar_data(request):
+    """API pour les données du calendrier de performance"""
+    fcp_name = request.GET.get('fcp')
+    
+    if not fcp_name:
+        return JsonResponse({'error': 'FCP non spécifié'}, status=400)
+    
+    vl_model = get_vl_model(fcp_name)
+    if not vl_model:
+        return JsonResponse({'error': 'FCP non trouvé'}, status=404)
+    
+    vl_queryset = vl_model.objects.all().order_by('date')
+    
+    if not vl_queryset.exists() or vl_queryset.count() < 30:
+        return JsonResponse({'error': 'Données insuffisantes'}, status=400)
+    
+    # Calculer les rendements quotidiens
+    vl_list = list(vl_queryset.values('date', 'valeur'))
+    daily_returns = {}
+    
+    for i in range(1, len(vl_list)):
+        date = vl_list[i]['date']
+        ret = (float(vl_list[i]['valeur']) / float(vl_list[i-1]['valeur']) - 1) * 100
+        daily_returns[date] = ret
+    
+    # 1. Heatmap mensuelle (performance par mois)
+    monthly_data = {}
+    monthly_vl_start = {}
+    
+    for vl in vl_list:
+        date = vl['date']
+        year = date.year
+        month = date.month
+        key = f"{year}-{month:02d}"
+        
+        if key not in monthly_vl_start:
+            monthly_vl_start[key] = float(vl['valeur'])
+        monthly_data[key] = float(vl['valeur'])
+    
+    # Calculer les rendements mensuels
+    monthly_returns = {}
+    prev_month_end = None
+    for key in sorted(monthly_data.keys()):
+        if prev_month_end is not None:
+            monthly_returns[key] = ((monthly_data[key] / prev_month_end) - 1) * 100
+        prev_month_end = monthly_data[key]
+    
+    # Format heatmap
+    heatmap_data = []
+    for key, ret in monthly_returns.items():
+        year, month = key.split('-')
+        heatmap_data.append({
+            'year': int(year),
+            'month': int(month),
+            'return': round(ret, 2)
+        })
+    
+    # 2. Performance par jour de la semaine
+    weekday_stats = {i: [] for i in range(5)}  # 0=Lundi, 4=Vendredi
+    weekday_names = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
+    
+    for date, ret in daily_returns.items():
+        weekday = date.weekday()
+        if weekday < 5:  # Exclure weekends
+            weekday_stats[weekday].append(ret)
+    
+    weekday_analysis = []
+    for i in range(5):
+        if weekday_stats[i]:
+            returns = weekday_stats[i]
+            mean = sum(returns) / len(returns)
+            positive = sum(1 for r in returns if r > 0)
+            negative = sum(1 for r in returns if r < 0)
+            weekday_analysis.append({
+                'day': weekday_names[i],
+                'dayIndex': i,
+                'mean': round(mean, 4),
+                'count': len(returns),
+                'positive': positive,
+                'negative': negative,
+                'win_rate': round(positive / len(returns) * 100, 1),
+                'best': round(max(returns), 2),
+                'worst': round(min(returns), 2)
+            })
+    
+    # 3. Saisonnalité - Performance par mois (historique tous les mois)
+    month_stats = {i: [] for i in range(1, 13)}
+    month_names = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                   'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    
+    for key, ret in monthly_returns.items():
+        month = int(key.split('-')[1])
+        month_stats[month].append(ret)
+    
+    seasonality = []
+    for month in range(1, 13):
+        if month_stats[month]:
+            returns = month_stats[month]
+            mean = sum(returns) / len(returns)
+            positive = sum(1 for r in returns if r > 0)
+            seasonality.append({
+                'month': month_names[month - 1],
+                'monthIndex': month,
+                'mean': round(mean, 2),
+                'count': len(returns),
+                'positive': positive,
+                'negative': len(returns) - positive,
+                'win_rate': round(positive / len(returns) * 100, 1),
+                'best': round(max(returns), 2),
+                'worst': round(min(returns), 2)
+            })
+    
+    # Trier pour trouver les meilleurs/pires mois
+    sorted_seasonality = sorted(seasonality, key=lambda x: x['mean'], reverse=True)
+    best_months = sorted_seasonality[:3]
+    worst_months = sorted_seasonality[-3:]
+    
+    # 4. Données pour heatmap quotidienne (dernières 52 semaines)
+    from datetime import timedelta
+    if vl_list:
+        last_date = vl_list[-1]['date']
+        start_date = last_date - timedelta(days=365)
+        
+        daily_heatmap = []
+        for date, ret in daily_returns.items():
+            if date >= start_date:
+                daily_heatmap.append({
+                    'date': date.strftime('%Y-%m-%d'),
+                    'weekday': date.weekday(),
+                    'week': date.isocalendar()[1],
+                    'year': date.year,
+                    'return': round(ret, 3)
+                })
+    
+    return JsonResponse({
+        'fcp_name': fcp_name,
+        'monthly_heatmap': heatmap_data,
+        'weekday_analysis': weekday_analysis,
+        'seasonality': seasonality,
+        'best_months': best_months,
+        'worst_months': worst_months,
+        'daily_heatmap': daily_heatmap
     })

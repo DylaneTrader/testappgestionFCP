@@ -278,6 +278,11 @@
             <i class="bi bi-shield-exclamation me-2"></i>Risque
         </button>
     </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendar" type="button" role="tab">
+            <i class="bi bi-calendar3 me-2"></i>Calendrier
+        </button>
+    </li>
 </ul>
 
 <!-- Tab Content -->
@@ -327,15 +332,6 @@
                         <button class="filter-pill" data-period="5y">5A</button>
                         <button class="filter-pill" data-period="all">Tout</button>
                     </div>
-                    
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-calendar3 me-1"></i>Personnalisé
-                        </button>
-                        <button class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-download me-1"></i>Exporter
-                        </button>
-                    </div>
                 </div>
                 
                 <!-- Chart -->
@@ -361,17 +357,19 @@
         <div class="row mb-4">
             <div class="col-md-3 col-sm-6 mb-3">
                 <div class="metric-card">
-                    <div class="metric-label">Dernière VL ({{ stats.derniere_date|default:"--" }})</div>
+                    <div class="metric-label">Dernière VL (<span id="metricDerniereDate">{{ stats.derniere_date|default:"--" }}</span>)</div>
                     <div class="metric-value" id="metricDerniereVL">{{ stats.derniere_vl|floatformat:2|default:"--" }} <small style="font-size: 14px;">XOF</small></div>
-                    <div class="metric-change {% if stats.var_1j >= 0 %}positive{% else %}negative{% endif %}" id="metricVar1J">
-                        <i class="bi bi-arrow-{% if stats.var_1j >= 0 %}up{% else %}down{% endif %}"></i> {% if stats.var_1j >= 0 %}+{% endif %}{{ stats.var_1j|default:"0" }}% (1j)
+                    <div class="metric-change" id="metricVar1JContainer">
+                        <span id="metricVar1J" class="{% if stats.var_1j >= 0 %}positive{% else %}negative{% endif %}">
+                            <i class="bi bi-arrow-{% if stats.var_1j >= 0 %}up{% else %}down{% endif %}"></i> {% if stats.var_1j >= 0 %}+{% endif %}{{ stats.var_1j|default:"0" }}% (1j)
+                        </span>
                     </div>
                 </div>
             </div>
             <div class="col-md-3 col-sm-6 mb-3">
                 <div class="metric-card">
                     <div class="metric-label">Rendement YTD</div>
-                    <div class="metric-value {% if stats.var_ytd >= 0 %}text-success{% else %}text-danger{% endif %}" id="metricYTD">{% if stats.var_ytd >= 0 %}+{% endif %}{{ stats.var_ytd|default:"0" }}%</div>
+                    <div class="metric-value" id="metricYTD">{% if stats.var_ytd >= 0 %}+{% endif %}{{ stats.var_ytd|default:"0" }}%</div>
                     <div class="metric-change">
                         Depuis début d'année
                     </div>
@@ -379,10 +377,10 @@
             </div>
             <div class="col-md-3 col-sm-6 mb-3">
                 <div class="metric-card">
-                    <div class="metric-label">Rendement 1 an</div>
-                    <div class="metric-value {% if stats.var_1y >= 0 %}text-success{% else %}text-danger{% endif %}" id="metricVar1Y">{% if stats.var_1y >= 0 %}+{% endif %}{{ stats.var_1y|default:"0" }}%</div>
+                    <div class="metric-label">Rendement Annualisé</div>
+                    <div class="metric-value" id="metricRendementAnn">{% if analyse_stats.rendement_moyen_ann >= 0 %}+{% endif %}{{ analyse_stats.rendement_moyen_ann|default:"0" }}%</div>
                     <div class="metric-change">
-                        Sur 12 mois glissants
+                        Moyenne quotidienne × 252
                     </div>
                 </div>
             </div>
@@ -473,7 +471,7 @@
                     </div>
                     <div class="text-muted small" id="scatterDateNote">
                         <i class="bi bi-info-circle me-1"></i>
-                        Données au <strong>{{ stats.derniere_date }}</strong> (dernière date en base)
+                        Données au <strong id="overviewDerniereDate">{{ stats.derniere_date }}</strong> (dernière date en base)
                     </div>
                 </div>
             </div>
@@ -491,7 +489,7 @@
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                             <h5 class="card-title mb-0">
                                 <i class="bi bi-trophy me-2" style="color: var(--primary-color);"></i>
-                                Performances - <span style="color: var(--primary-color);">{{ selected_fcp }}</span>
+                                Performances - <span id="perfFcpTitle" style="color: var(--primary-color);">{{ selected_fcp }}</span>
                             </h5>
                             <div class="d-flex align-items-center gap-2">
                                 <label class="text-muted small me-2">Sélectionner un FCP :</label>
@@ -528,7 +526,7 @@
                                 <tr>
                                     <td class="px-4 py-3"><span class="badge bg-secondary">WTD</span></td>
                                     <td class="px-4 py-3 text-muted">Week-to-Date</td>
-                                    <td class="px-4 py-3 text-end">
+                                    <td class="px-4 py-3 text-end" id="perf-wtd">
                                         {% if perf_calendaires.wtd != None %}
                                         <span class="fw-bold {% if perf_calendaires.wtd >= 0 %}text-success{% else %}text-danger{% endif %}">
                                             {% if perf_calendaires.wtd >= 0 %}+{% endif %}{{ perf_calendaires.wtd }}%
@@ -539,7 +537,7 @@
                                 <tr>
                                     <td class="px-4 py-3"><span class="badge bg-secondary">MTD</span></td>
                                     <td class="px-4 py-3 text-muted">Month-to-Date</td>
-                                    <td class="px-4 py-3 text-end">
+                                    <td class="px-4 py-3 text-end" id="perf-mtd">
                                         {% if perf_calendaires.mtd != None %}
                                         <span class="fw-bold {% if perf_calendaires.mtd >= 0 %}text-success{% else %}text-danger{% endif %}">
                                             {% if perf_calendaires.mtd >= 0 %}+{% endif %}{{ perf_calendaires.mtd }}%
@@ -550,7 +548,7 @@
                                 <tr>
                                     <td class="px-4 py-3"><span class="badge bg-secondary">QTD</span></td>
                                     <td class="px-4 py-3 text-muted">Quarter-to-Date</td>
-                                    <td class="px-4 py-3 text-end">
+                                    <td class="px-4 py-3 text-end" id="perf-qtd">
                                         {% if perf_calendaires.qtd != None %}
                                         <span class="fw-bold {% if perf_calendaires.qtd >= 0 %}text-success{% else %}text-danger{% endif %}">
                                             {% if perf_calendaires.qtd >= 0 %}+{% endif %}{{ perf_calendaires.qtd }}%
@@ -561,7 +559,7 @@
                                 <tr>
                                     <td class="px-4 py-3"><span class="badge bg-secondary">STD</span></td>
                                     <td class="px-4 py-3 text-muted">Semester-to-Date</td>
-                                    <td class="px-4 py-3 text-end">
+                                    <td class="px-4 py-3 text-end" id="perf-std">
                                         {% if perf_calendaires.std != None %}
                                         <span class="fw-bold {% if perf_calendaires.std >= 0 %}text-success{% else %}text-danger{% endif %}">
                                             {% if perf_calendaires.std >= 0 %}+{% endif %}{{ perf_calendaires.std }}%
@@ -572,7 +570,7 @@
                                 <tr>
                                     <td class="px-4 py-3"><span class="badge" style="background: var(--primary-color);">YTD</span></td>
                                     <td class="px-4 py-3 text-muted">Year-to-Date</td>
-                                    <td class="px-4 py-3 text-end">
+                                    <td class="px-4 py-3 text-end" id="perf-ytd">
                                         {% if perf_calendaires.ytd != None %}
                                         <span class="fw-bold {% if perf_calendaires.ytd >= 0 %}text-success{% else %}text-danger{% endif %}" style="font-size: 1.1em;">
                                             {% if perf_calendaires.ytd >= 0 %}+{% endif %}{{ perf_calendaires.ytd }}%
@@ -608,7 +606,7 @@
                                 <tr>
                                     <td class="px-4 py-3"><span class="badge bg-info">1M</span></td>
                                     <td class="px-4 py-3 text-muted">1 Mois</td>
-                                    <td class="px-4 py-3 text-end">
+                                    <td class="px-4 py-3 text-end" id="perf-1m">
                                         {% if perf_glissantes.perf_1m != None %}
                                         <span class="fw-bold {% if perf_glissantes.perf_1m >= 0 %}text-success{% else %}text-danger{% endif %}">
                                             {% if perf_glissantes.perf_1m >= 0 %}+{% endif %}{{ perf_glissantes.perf_1m }}%
@@ -619,7 +617,7 @@
                                 <tr>
                                     <td class="px-4 py-3"><span class="badge bg-info">3M</span></td>
                                     <td class="px-4 py-3 text-muted">3 Mois</td>
-                                    <td class="px-4 py-3 text-end">
+                                    <td class="px-4 py-3 text-end" id="perf-3m">
                                         {% if perf_glissantes.perf_3m != None %}
                                         <span class="fw-bold {% if perf_glissantes.perf_3m >= 0 %}text-success{% else %}text-danger{% endif %}">
                                             {% if perf_glissantes.perf_3m >= 0 %}+{% endif %}{{ perf_glissantes.perf_3m }}%
@@ -630,7 +628,7 @@
                                 <tr>
                                     <td class="px-4 py-3"><span class="badge bg-info">6M</span></td>
                                     <td class="px-4 py-3 text-muted">6 Mois</td>
-                                    <td class="px-4 py-3 text-end">
+                                    <td class="px-4 py-3 text-end" id="perf-6m">
                                         {% if perf_glissantes.perf_6m != None %}
                                         <span class="fw-bold {% if perf_glissantes.perf_6m >= 0 %}text-success{% else %}text-danger{% endif %}">
                                             {% if perf_glissantes.perf_6m >= 0 %}+{% endif %}{{ perf_glissantes.perf_6m }}%
@@ -641,7 +639,7 @@
                                 <tr>
                                     <td class="px-4 py-3"><span class="badge bg-info">1A</span></td>
                                     <td class="px-4 py-3 text-muted">1 An</td>
-                                    <td class="px-4 py-3 text-end">
+                                    <td class="px-4 py-3 text-end" id="perf-1y">
                                         {% if perf_glissantes.perf_1y != None %}
                                         <span class="fw-bold {% if perf_glissantes.perf_1y >= 0 %}text-success{% else %}text-danger{% endif %}">
                                             {% if perf_glissantes.perf_1y >= 0 %}+{% endif %}{{ perf_glissantes.perf_1y }}%
@@ -652,7 +650,7 @@
                                 <tr>
                                     <td class="px-4 py-3"><span class="badge bg-info">3A</span></td>
                                     <td class="px-4 py-3 text-muted">3 Ans</td>
-                                    <td class="px-4 py-3 text-end">
+                                    <td class="px-4 py-3 text-end" id="perf-3y">
                                         {% if perf_glissantes.perf_3y != None %}
                                         <span class="fw-bold {% if perf_glissantes.perf_3y >= 0 %}text-success{% else %}text-danger{% endif %}">
                                             {% if perf_glissantes.perf_3y >= 0 %}+{% endif %}{{ perf_glissantes.perf_3y }}%
@@ -663,7 +661,7 @@
                                 <tr>
                                     <td class="px-4 py-3"><span class="badge bg-info">5A</span></td>
                                     <td class="px-4 py-3 text-muted">5 Ans</td>
-                                    <td class="px-4 py-3 text-end">
+                                    <td class="px-4 py-3 text-end" id="perf-5y">
                                         {% if perf_glissantes.perf_5y != None %}
                                         <span class="fw-bold {% if perf_glissantes.perf_5y >= 0 %}text-success{% else %}text-danger{% endif %}">
                                             {% if perf_glissantes.perf_5y >= 0 %}+{% endif %}{{ perf_glissantes.perf_5y }}%
@@ -674,7 +672,7 @@
                                 <tr style="background: rgba(0, 64, 128, 0.05);">
                                     <td class="px-4 py-3"><span class="badge" style="background: var(--primary-color);">Origine</span></td>
                                     <td class="px-4 py-3 text-muted">Depuis la création</td>
-                                    <td class="px-4 py-3 text-end">
+                                    <td class="px-4 py-3 text-end" id="perf-origine">
                                         {% if perf_glissantes.origine != None %}
                                         <span class="fw-bold {% if perf_glissantes.origine >= 0 %}text-success{% else %}text-danger{% endif %}" style="font-size: 1.1em;">
                                             {% if perf_glissantes.origine >= 0 %}+{% endif %}{{ perf_glissantes.origine }}%
@@ -693,7 +691,7 @@
                 <div class="alert alert-light border d-flex align-items-center" role="alert">
                     <i class="bi bi-info-circle me-2" style="color: var(--primary-color);"></i>
                     <div>
-                        <small>Données calculées au <strong>{{ stats.derniere_date }}</strong> (dernière VL en base). 
+                        <small>Données calculées au <strong id="perf-derniere-date">{{ stats.derniere_date }}</strong> (dernière VL en base). 
                         Les performances passées ne préjugent pas des performances futures.</small>
                     </div>
                 </div>
@@ -706,7 +704,7 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <h5 class="card-title mb-0">
-                    <i class="bi bi-table me-2"></i>Historique des Valeurs Liquidatives - {{ selected_fcp }}
+                    <i class="bi bi-table me-2"></i>Historique des Valeurs Liquidatives - <span id="historyFcpTitle">{{ selected_fcp }}</span>
                 </h5>
                 <div class="d-flex gap-2 align-items-center flex-wrap">
                     <select class="select-custom" id="historyFcpSelector" style="min-width: 200px;">
@@ -714,9 +712,6 @@
                         <option value="{{ fcp_name }}" {% if fcp_name == selected_fcp %}selected{% endif %}>{{ fcp_name }}</option>
                         {% endfor %}
                     </select>
-                    <button class="btn btn-sm btn-outline-secondary" id="exportCsvBtn">
-                        <i class="bi bi-download me-1"></i>Exporter CSV
-                    </button>
                 </div>
             </div>
             <div class="card-body p-0">
@@ -724,20 +719,22 @@
                 <div class="history-stats d-flex justify-content-around flex-wrap py-3 px-4 border-bottom" style="background: var(--bg-secondary);">
                     <div class="text-center px-3">
                         <div class="text-muted small text-uppercase">Nb. Observations</div>
-                        <div class="fw-bold fs-5" style="color: var(--primary-color);">{{ stats.nb_vl|default:"0" }}</div>
+                        <div class="fw-bold fs-5" id="history-nb-obs" style="color: var(--primary-color);">{{ stats.nb_vl|default:"0" }}</div>
                     </div>
                     <div class="text-center px-3">
                         <div class="text-muted small text-uppercase">Première Date</div>
-                        <div class="fw-bold">{{ stats.premiere_date|default:"--" }}</div>
+                        <div class="fw-bold" id="history-premiere-date">{{ stats.premiere_date|default:"--" }}</div>
                     </div>
                     <div class="text-center px-3">
                         <div class="text-muted small text-uppercase">Dernière Date</div>
-                        <div class="fw-bold">{{ stats.derniere_date|default:"--" }}</div>
+                        <div class="fw-bold" id="history-derniere-date">{{ stats.derniere_date|default:"--" }}</div>
                     </div>
                     <div class="text-center px-3">
                         <div class="text-muted small text-uppercase">Perf. Origine</div>
-                        <div class="fw-bold {% if stats.var_origine >= 0 %}text-success{% else %}text-danger{% endif %}">
-                            {% if stats.var_origine >= 0 %}+{% endif %}{{ stats.var_origine|default:"0" }}%
+                        <div class="fw-bold" id="history-perf-origine">
+                            <span class="{% if stats.var_origine >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                {% if stats.var_origine >= 0 %}+{% endif %}{{ stats.var_origine|default:"0" }}%
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -803,7 +800,7 @@
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                             <h5 class="card-title mb-0">
                                 <i class="bi bi-bar-chart-line me-2" style="color: var(--primary-color);"></i>
-                                Analyse - <span style="color: var(--primary-color);">{{ selected_fcp }}</span>
+                                Analyse - <span id="analyseFcpTitle" style="color: var(--primary-color);">{{ selected_fcp }}</span>
                             </h5>
                             <div class="d-flex align-items-center gap-2">
                                 <label class="text-muted small me-2">Sélectionner un FCP :</label>
@@ -834,19 +831,19 @@
                                     <td class="px-4 py-3">
                                         <i class="bi bi-hash me-2 text-muted"></i>Nombre d'observations
                                     </td>
-                                    <td class="px-4 py-3 text-end fw-bold">{{ analyse_stats.nb_observations|default:"--" }}</td>
+                                    <td class="px-4 py-3 text-end fw-bold" id="analyse-nb-obs">{{ analyse_stats.nb_observations|default:"--" }}</td>
                                 </tr>
                                 <tr>
                                     <td class="px-4 py-3">
                                         <i class="bi bi-graph-up me-2 text-muted"></i>Rendement moyen quotidien
                                     </td>
-                                    <td class="px-4 py-3 text-end fw-bold">{{ analyse_stats.rendement_moyen|default:"--" }}%</td>
+                                    <td class="px-4 py-3 text-end fw-bold" id="analyse-rdt-moyen">{{ analyse_stats.rendement_moyen|default:"--" }}%</td>
                                 </tr>
                                 <tr>
                                     <td class="px-4 py-3">
                                         <i class="bi bi-graph-up-arrow me-2 text-muted"></i>Rendement annualisé
                                     </td>
-                                    <td class="px-4 py-3 text-end">
+                                    <td class="px-4 py-3 text-end" id="analyse-rdt-ann">
                                         <span class="fw-bold {% if analyse_stats.rendement_moyen_ann >= 0 %}text-success{% else %}text-danger{% endif %}">
                                             {% if analyse_stats.rendement_moyen_ann >= 0 %}+{% endif %}{{ analyse_stats.rendement_moyen_ann|default:"--" }}%
                                         </span>
@@ -856,43 +853,43 @@
                                     <td class="px-4 py-3">
                                         <i class="bi bi-distribute-vertical me-2 text-muted"></i>Médiane
                                     </td>
-                                    <td class="px-4 py-3 text-end fw-bold">{{ analyse_stats.mediane|default:"--" }}%</td>
+                                    <td class="px-4 py-3 text-end fw-bold" id="analyse-mediane">{{ analyse_stats.mediane|default:"--" }}%</td>
                                 </tr>
                                 <tr>
                                     <td class="px-4 py-3">
                                         <i class="bi bi-bar-chart me-2 text-muted"></i>Écart-type quotidien
                                     </td>
-                                    <td class="px-4 py-3 text-end fw-bold">{{ analyse_stats.ecart_type|default:"--" }}%</td>
+                                    <td class="px-4 py-3 text-end fw-bold" id="analyse-ecart-type">{{ analyse_stats.ecart_type|default:"--" }}%</td>
                                 </tr>
                                 <tr>
                                     <td class="px-4 py-3">
                                         <i class="bi bi-activity me-2 text-muted"></i>Volatilité annualisée
                                     </td>
-                                    <td class="px-4 py-3 text-end fw-bold" style="color: var(--primary-color);">{{ analyse_stats.volatilite_ann|default:"--" }}%</td>
+                                    <td class="px-4 py-3 text-end fw-bold" id="analyse-volatilite" style="color: var(--primary-color);">{{ analyse_stats.volatilite_ann|default:"--" }}%</td>
                                 </tr>
                                 <tr class="table-light">
                                     <td class="px-4 py-3">
                                         <i class="bi bi-arrow-down-circle me-2 text-danger"></i>VL Minimum
                                     </td>
-                                    <td class="px-4 py-3 text-end fw-bold">{{ analyse_stats.vl_min|default:"--" }} XOF</td>
+                                    <td class="px-4 py-3 text-end fw-bold" id="analyse-vl-min">{{ analyse_stats.vl_min|default:"--" }} XOF</td>
                                 </tr>
                                 <tr class="table-light">
                                     <td class="px-4 py-3">
                                         <i class="bi bi-arrow-up-circle me-2 text-success"></i>VL Maximum
                                     </td>
-                                    <td class="px-4 py-3 text-end fw-bold">{{ analyse_stats.vl_max|default:"--" }} XOF</td>
+                                    <td class="px-4 py-3 text-end fw-bold" id="analyse-vl-max">{{ analyse_stats.vl_max|default:"--" }} XOF</td>
                                 </tr>
                                 <tr>
                                     <td class="px-4 py-3">
                                         <i class="bi bi-chevron-double-down me-2 text-danger"></i>Pire rendement quotidien
                                     </td>
-                                    <td class="px-4 py-3 text-end fw-bold text-danger">{{ analyse_stats.rdt_min|default:"--" }}%</td>
+                                    <td class="px-4 py-3 text-end fw-bold text-danger" id="analyse-rdt-min">{{ analyse_stats.rdt_min|default:"--" }}%</td>
                                 </tr>
                                 <tr>
                                     <td class="px-4 py-3">
                                         <i class="bi bi-chevron-double-up me-2 text-success"></i>Meilleur rendement quotidien
                                     </td>
-                                    <td class="px-4 py-3 text-end fw-bold text-success">+{{ analyse_stats.rdt_max|default:"--" }}%</td>
+                                    <td class="px-4 py-3 text-end fw-bold text-success" id="analyse-rdt-max">+{{ analyse_stats.rdt_max|default:"--" }}%</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -916,10 +913,10 @@
                                 <span class="text-muted">
                                     <i class="bi bi-graph-down-arrow me-2"></i>Drawdown Maximum
                                 </span>
-                                <span class="fw-bold text-danger fs-5">-{{ analyse_stats.max_drawdown|default:"--" }}%</span>
+                                <span class="fw-bold text-danger fs-5" id="analyse-max-drawdown">-{{ analyse_stats.max_drawdown|default:"--" }}%</span>
                             </div>
                             <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-danger" role="progressbar" 
+                                <div class="progress-bar bg-danger" role="progressbar" id="analyse-drawdown-bar"
                                      style="width: {{ analyse_stats.max_drawdown|default:0 }}%"></div>
                             </div>
                             <small class="text-muted">Perte maximale depuis un pic historique</small>
@@ -933,7 +930,7 @@
                                     <span class="fw-medium">Ratio de Sharpe</span>
                                     <br><small class="text-muted">Rendement ajusté du risque (rf=3,25%)</small>
                                 </div>
-                                <span class="fs-4 fw-bold {% if analyse_stats.sharpe >= 1 %}text-success{% elif analyse_stats.sharpe >= 0 %}text-warning{% else %}text-danger{% endif %}">
+                                <span class="fs-4 fw-bold" id="analyse-sharpe">
                                     {{ analyse_stats.sharpe|default:"--" }}
                                 </span>
                             </div>
@@ -947,7 +944,7 @@
                                     <span class="fw-medium">Ratio de Sortino</span>
                                     <br><small class="text-muted">Rendement ajusté du risque baissier</small>
                                 </div>
-                                <span class="fs-4 fw-bold {% if analyse_stats.sortino >= 1 %}text-success{% elif analyse_stats.sortino >= 0 %}text-warning{% else %}text-danger{% endif %}">
+                                <span class="fs-4 fw-bold" id="analyse-sortino">
                                     {{ analyse_stats.sortino|default:"--" }}
                                 </span>
                             </div>
@@ -957,19 +954,51 @@
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="text-muted">Distribution des jours</span>
-                                <span class="fw-bold">{{ analyse_stats.ratio_positif|default:"--" }}% positifs</span>
+                                <span class="fw-bold" id="analyse-ratio-positif">{{ analyse_stats.ratio_positif|default:"--" }}% positifs</span>
                             </div>
-                            <div class="progress" style="height: 24px;">
-                                <div class="progress-bar bg-success" role="progressbar" 
+                            <div class="progress" style="height: 24px;" id="analyse-jours-progress">
+                                <div class="progress-bar bg-success" role="progressbar" id="analyse-jours-positifs-bar"
                                      style="width: {{ analyse_stats.ratio_positif|default:50 }}%"
                                      title="{{ analyse_stats.jours_positifs }} jours positifs">
-                                    <small>{{ analyse_stats.jours_positifs|default:"--" }} <i class="bi bi-arrow-up"></i></small>
+                                    <small><span id="analyse-jours-positifs">{{ analyse_stats.jours_positifs|default:"--" }}</span> <i class="bi bi-arrow-up"></i></small>
                                 </div>
-                                <div class="progress-bar bg-danger" role="progressbar" 
+                                <div class="progress-bar bg-danger" role="progressbar" id="analyse-jours-negatifs-bar"
                                      style="width: {% widthratio analyse_stats.jours_negatifs analyse_stats.nb_observations 100 %}%"
                                      title="{{ analyse_stats.jours_negatifs }} jours négatifs">
-                                    <small>{{ analyse_stats.jours_negatifs|default:"--" }} <i class="bi bi-arrow-down"></i></small>
+                                    <small><span id="analyse-jours-negatifs">{{ analyse_stats.jours_negatifs|default:"--" }}</span> <i class="bi bi-arrow-down"></i></small>
                                 </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tracking Error Table -->
+                        <div class="mt-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-graph-up-arrow me-2" style="color: var(--primary-color);"></i>
+                                <span class="fw-medium">Tracking Error (Volatilité annualisée)</span>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered mb-0" style="font-size: 0.85rem;">
+                                    <thead style="background: var(--bg-secondary);">
+                                        <tr class="text-center">
+                                            <th class="py-2">WTD</th>
+                                            <th class="py-2">MTD</th>
+                                            <th class="py-2">QTD</th>
+                                            <th class="py-2">STD</th>
+                                            <th class="py-2">YTD</th>
+                                            <th class="py-2">Origine</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="text-center">
+                                            <td class="py-2 fw-bold" id="tracking-error-wtd">{{ tracking_error.wtd|default:"--" }}%</td>
+                                            <td class="py-2 fw-bold" id="tracking-error-mtd">{{ tracking_error.mtd|default:"--" }}%</td>
+                                            <td class="py-2 fw-bold" id="tracking-error-qtd">{{ tracking_error.qtd|default:"--" }}%</td>
+                                            <td class="py-2 fw-bold" id="tracking-error-std">{{ tracking_error.std|default:"--" }}%</td>
+                                            <td class="py-2 fw-bold" id="tracking-error-ytd">{{ tracking_error.ytd|default:"--" }}%</td>
+                                            <td class="py-2 fw-bold" id="tracking-error-origine" style="color: var(--primary-color);">{{ tracking_error.origine|default:"--" }}%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                         
@@ -981,6 +1010,174 @@
                                 <span class="text-warning">● 0-1</span> = Acceptable |
                                 <span class="text-danger">● &lt; 0</span> = À éviter
                             </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Distribution des Rendements -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-bar-chart me-2"></i>Distribution des Rendements
+                        </h5>
+                        <small class="text-muted">Histogramme et test de normalité</small>
+                    </div>
+                    <div class="card-body">
+                        <div style="height: 200px;">
+                            <canvas id="histogramChart"></canvas>
+                        </div>
+                        <!-- Statistiques de distribution -->
+                        <div class="row mt-3 text-center">
+                            <div class="col-6">
+                                <div class="p-2 rounded" style="background: var(--bg-secondary);">
+                                    <div class="text-muted small">Skewness (Asymétrie)</div>
+                                    <div class="fw-bold fs-5" id="analyse-skewness">
+                                        {{ analyse_stats.skewness|default:"--" }}
+                                    </div>
+                                    <small class="text-muted" id="analyse-skewness-desc">{% if analyse_stats.skewness > 0.5 %}Queue droite{% elif analyse_stats.skewness < -0.5 %}Queue gauche{% else %}≈ Symétrique{% endif %}</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-2 rounded" style="background: var(--bg-secondary);">
+                                    <div class="text-muted small">Kurtosis (Excès)</div>
+                                    <div class="fw-bold fs-5" id="analyse-kurtosis">
+                                        {{ analyse_stats.kurtosis|default:"--" }}
+                                    </div>
+                                    <small class="text-muted" id="analyse-kurtosis-desc">{% if analyse_stats.kurtosis > 1 %}Queues épaisses{% elif analyse_stats.kurtosis < -1 %}Queues fines{% else %}≈ Normal{% endif %}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-light border-0 mt-3 mb-0 small">
+                            <i class="bi bi-info-circle me-1"></i>
+                            <strong>Normalité :</strong> Skewness ≈ 0 et Kurtosis ≈ 0 indiquent une distribution normale.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- VaR et CVaR -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Value at Risk (VaR)
+                        </h5>
+                        <small class="text-muted">Mesures de risque extrême - Méthode historique</small>
+                    </div>
+                    <div class="card-body">
+                        <!-- VaR 95% -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <span class="fw-medium">VaR 95%</span>
+                                    <br><small class="text-muted">Perte max dans 95% des cas (1 jour)</small>
+                                </div>
+                                <span class="fs-4 fw-bold text-danger" id="analyse-var95">{{ analyse_stats.var_95|default:"--" }}%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 95%;"></div>
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 5%;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- VaR 99% -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <span class="fw-medium">VaR 99%</span>
+                                    <br><small class="text-muted">Perte max dans 99% des cas (1 jour)</small>
+                                </div>
+                                <span class="fs-4 fw-bold text-danger" id="analyse-var99">{{ analyse_stats.var_99|default:"--" }}%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 99%;"></div>
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 1%;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- CVaR / Expected Shortfall -->
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="p-3 rounded text-center" style="background: rgba(220, 53, 69, 0.1); border: 1px solid rgba(220, 53, 69, 0.3);">
+                                    <div class="text-muted small">CVaR 95%</div>
+                                    <div class="fw-bold fs-5 text-danger" id="analyse-cvar95">{{ analyse_stats.cvar_95|default:"--" }}%</div>
+                                    <small class="text-muted">Expected Shortfall</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 rounded text-center" style="background: rgba(220, 53, 69, 0.15); border: 1px solid rgba(220, 53, 69, 0.4);">
+                                    <div class="text-muted small">CVaR 99%</div>
+                                    <div class="fw-bold fs-5 text-danger" id="analyse-cvar99">{{ analyse_stats.cvar_99|default:"--" }}%</div>
+                                    <small class="text-muted">Expected Shortfall</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-light border-0 mt-3 mb-0 small">
+                            <i class="bi bi-info-circle me-1"></i>
+                            <strong>CVaR</strong> = Perte moyenne quand on dépasse la VaR (plus conservateur).
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Underwater Chart (Drawdowns dans le temps) -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-water me-2"></i>Underwater Chart - Évolution des Drawdowns
+                        </h5>
+                        <small class="text-muted">Visualisation des périodes de perte par rapport aux pics historiques</small>
+                    </div>
+                    <div class="card-body">
+                        <div style="height: 250px;">
+                            <canvas id="underwaterChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Top Drawdowns -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-graph-down-arrow me-2"></i>Top 5 des Pires Drawdowns
+                            </h5>
+                            <small class="text-muted">Analyse détaillée des périodes de baisse</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="text-muted small">Seuil minimum :</label>
+                            <select class="select-custom" id="drawdownThreshold" style="width: auto;">
+                                <option value="0">Tous</option>
+                                <option value="1">≥ 1%</option>
+                                <option value="2" selected>≥ 2%</option>
+                                <option value="5">≥ 5%</option>
+                                <option value="10">≥ 10%</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="drawdownsTable">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-3">#</th>
+                                        <th class="px-4 py-3">Début</th>
+                                        <th class="px-4 py-3">Point bas</th>
+                                        <th class="px-4 py-3">Fin</th>
+                                        <th class="px-4 py-3 text-end">Profondeur</th>
+                                        <th class="px-4 py-3 text-center">Durée (jours)</th>
+                                        <th class="px-4 py-3 text-center">Recovery (jours)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="drawdownsTableBody">
+                                    <!-- Rempli par JavaScript -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -1059,7 +1256,7 @@
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                             <h5 class="card-title mb-0">
                                 <i class="bi bi-shield-exclamation me-2" style="color: var(--primary-color);"></i>
-                                Analyse du Risque - <span style="color: var(--primary-color);">{{ selected_fcp }}</span>
+                                Analyse du Risque - <span id="riskFcpTitle" style="color: var(--primary-color);">{{ selected_fcp }}</span>
                             </h5>
                             <div class="d-flex align-items-center gap-3 flex-wrap">
                                 <div class="d-flex align-items-center gap-2">
@@ -1176,6 +1373,103 @@
                 </div>
             </div>
             
+            <!-- Rolling Metrics Section -->
+            <div class="col-12 mt-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-graph-up-arrow me-2"></i>Métriques Glissantes
+                            </h5>
+                            <small class="text-muted">Sharpe Ratio et Beta glissants</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 flex-wrap">
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="text-muted small">Fenêtre :</label>
+                                <input type="range" class="form-range" id="rollingMetricsWindow" min="10" max="60" value="20" style="width: 100px;">
+                                <span class="badge bg-primary" id="rollingWindowValue">20</span>
+                                <small class="text-muted">jours</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <!-- Sharpe Ratio Glissant -->
+                            <div class="col-md-6">
+                                <div class="mb-2 d-flex justify-content-between">
+                                    <span class="fw-bold">Sharpe Ratio Glissant</span>
+                                    <span class="badge bg-primary" id="currentSharpeValue">--</span>
+                                </div>
+                                <div style="height: 200px;">
+                                    <canvas id="rollingSharpeChart"></canvas>
+                                </div>
+                            </div>
+                            <!-- Beta Glissant -->
+                            <div class="col-md-6">
+                                <div class="mb-2 d-flex justify-content-between">
+                                    <span class="fw-bold">Beta Glissant <small class="text-muted">(vs FCP Actions Performances)</small></span>
+                                    <span class="badge bg-secondary" id="currentBetaValue">--</span>
+                                </div>
+                                <div style="height: 200px;">
+                                    <canvas id="rollingBetaChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tail Risk Analysis Section -->
+            <div class="col-12 mt-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Analyse du Tail Risk
+                        </h5>
+                        <small class="text-muted">Événements extrêmes et fréquence des pertes</small>
+                    </div>
+                    <div class="card-body" id="tailRiskContainer">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Chargement...</span>
+                            </div>
+                            <p class="text-muted mt-2">Analyse des événements extrêmes...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pires et Meilleurs Jours -->
+            <div class="col-md-6 mt-4">
+                <div class="card h-100">
+                    <div class="card-header" style="background: rgba(220, 53, 69, 0.1);">
+                        <h5 class="card-title mb-0 text-danger">
+                            <i class="bi bi-arrow-down-circle me-2"></i>Top 10 Pires Jours
+                        </h5>
+                    </div>
+                    <div class="card-body" id="worstDaysContainer">
+                        <div class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-danger" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mt-4">
+                <div class="card h-100">
+                    <div class="card-header" style="background: rgba(40, 167, 69, 0.1);">
+                        <h5 class="card-title mb-0 text-success">
+                            <i class="bi bi-arrow-up-circle me-2"></i>Top 10 Meilleurs Jours
+                        </h5>
+                    </div>
+                    <div class="card-body" id="bestDaysContainer">
+                        <div class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Note -->
             <div class="col-12">
                 <div class="alert alert-light border d-flex align-items-center" role="alert">
@@ -1184,6 +1478,149 @@
                         <small>
                             <strong>Clustering de volatilité :</strong> Classification des régimes basée sur les percentiles 33% et 66% de la volatilité glissante.
                             La <strong>matrice de transition</strong> indique la probabilité de passer d'un régime à un autre le jour suivant.
+                            <br><strong>Tail Risk :</strong> Analyse des événements extrêmes au-delà de 1, 2 et 3 écarts-types par rapport à la distribution normale attendue.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Calendrier Tab -->
+    <div class="tab-pane fade" id="calendar" role="tabpanel">
+        <div class="row g-4">
+            <!-- Header -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-calendar3 me-2" style="color: var(--primary-color);"></i>
+                                Calendrier de Performance - <span id="calendarFcpTitle" style="color: var(--primary-color);">{{ selected_fcp }}</span>
+                            </h5>
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="text-muted small">FCP :</label>
+                                <select class="select-custom" id="calendarFcpSelector" style="min-width: 220px;">
+                                    {% for fcp_name in fcp_list %}
+                                    <option value="{{ fcp_name }}" {% if fcp_name == selected_fcp %}selected{% endif %}>{{ fcp_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Heatmap Mensuelle -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-grid-3x3-gap me-2"></i>Heatmap des Performances Mensuelles
+                        </h5>
+                        <small class="text-muted">Performance mensuelle par année (style GitHub contributions)</small>
+                    </div>
+                    <div class="card-body">
+                        <div id="monthlyHeatmapContainer" style="overflow-x: auto;">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Chargement...</span>
+                                </div>
+                                <p class="text-muted mt-2">Génération de la heatmap...</p>
+                            </div>
+                        </div>
+                        <!-- Légende -->
+                        <div class="d-flex justify-content-center gap-3 mt-3 flex-wrap">
+                            <small class="text-muted">Moins</small>
+                            <div style="width: 16px; height: 16px; background: #dc3545; border-radius: 3px;"></div>
+                            <div style="width: 16px; height: 16px; background: #ffc107; border-radius: 3px;"></div>
+                            <div style="width: 16px; height: 16px; background: #e9ecef; border-radius: 3px;"></div>
+                            <div style="width: 16px; height: 16px; background: #90EE90; border-radius: 3px;"></div>
+                            <div style="width: 16px; height: 16px; background: #28a745; border-radius: 3px;"></div>
+                            <small class="text-muted">Plus</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Performance par Jour de la Semaine -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-calendar-week me-2"></i>Performance par Jour de la Semaine
+                        </h5>
+                        <small class="text-muted">Statistiques historiques par jour</small>
+                    </div>
+                    <div class="card-body">
+                        <div style="height: 250px;">
+                            <canvas id="weekdayChart"></canvas>
+                        </div>
+                        <div class="table-responsive mt-3" id="weekdayStatsContainer">
+                            <div class="text-center py-4">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Saisonnalité Mensuelle -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-snow me-2"></i>Saisonnalité Mensuelle
+                        </h5>
+                        <small class="text-muted">Performance moyenne historique par mois</small>
+                    </div>
+                    <div class="card-body">
+                        <div style="height: 250px;">
+                            <canvas id="seasonalityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Meilleurs et Pires Mois -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header" style="background: rgba(40, 167, 69, 0.1);">
+                        <h5 class="card-title mb-0 text-success">
+                            <i class="bi bi-trophy me-2"></i>Meilleurs Mois Historiques
+                        </h5>
+                    </div>
+                    <div class="card-body" id="bestMonthsContainer">
+                        <div class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header" style="background: rgba(220, 53, 69, 0.1);">
+                        <h5 class="card-title mb-0 text-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Pires Mois Historiques
+                        </h5>
+                    </div>
+                    <div class="card-body" id="worstMonthsContainer">
+                        <div class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-danger" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Note -->
+            <div class="col-12">
+                <div class="alert alert-light border d-flex align-items-center" role="alert">
+                    <i class="bi bi-info-circle me-2" style="color: var(--primary-color);"></i>
+                    <div>
+                        <small>
+                            <strong>Heatmap :</strong> Visualisation des performances mensuelles colorées selon l'intensité du rendement.
+                            <strong>Saisonnalité :</strong> Moyenne historique des performances pour identifier les tendances saisonnières récurrentes.
                         </small>
                     </div>
                 </div>
@@ -1199,10 +1636,16 @@
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Données VL depuis Django
-    const vlDataRaw = {{ vl_data_json|safe }};
-    const allFcpStats = {{ all_fcp_stats_json|safe }};
-    const selectedFcp = "{{ selected_fcp }}";
+    // Données VL depuis Django (variables modifiables)
+    let vlDataRaw = {{ vl_data_json|safe }};
+    let allFcpStats = {{ all_fcp_stats_json|safe }};
+    let selectedFcp = "{{ selected_fcp }}";
+    
+    // Données pour l'analyse (variables modifiables)
+    let histogramData = {{ histogram_data_json|safe }};
+    let underwaterData = {{ underwater_data_json|safe }};
+    let drawdownsData = {{ drawdowns_data_json|safe }};
+    let rendementsList = {{ rendements_list_json|safe }};
     
     // Fonction pour filtrer les données par période
     function filterDataByPeriod(data, period) {
@@ -1484,22 +1927,401 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // FCP Selector Change Handler
+    // ========== FONCTION POUR CHARGER LES DONNÉES FCP VIA AJAX ==========
+    function loadFcpData(fcpName) {
+        // Afficher un indicateur de chargement
+        document.body.style.cursor = 'wait';
+        
+        fetch(`/api/fcp-full-data/?fcp=${encodeURIComponent(fcpName)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Erreur:', data.error);
+                    document.body.style.cursor = 'default';
+                    return;
+                }
+                
+                // Mettre à jour les variables globales
+                vlDataRaw = data.vl_data;
+                selectedFcp = data.fcp_name;
+                histogramData = data.analyse_stats?.histogram_data || [];
+                underwaterData = data.analyse_stats?.underwater_data || [];
+                drawdownsData = data.analyse_stats?.drawdowns_data || [];
+                rendementsList = data.analyse_stats?.rendements_list || [];
+                
+                // Mettre à jour le graphique VL
+                const activePeriod = document.querySelector('#periodFilters .filter-pill.active')?.dataset.period || '1y';
+                const filteredData = filterDataByPeriod(vlDataRaw, activePeriod);
+                vlChart.data.labels = filteredData.labels;
+                vlChart.data.datasets[0].data = filteredData.values;
+                vlChart.data.datasets[0].label = fcpName;
+                vlChart.update();
+                
+                // Mettre à jour les données de l'historique et recalculer le tableau
+                historyData = [...vlDataRaw].reverse();
+                historyCurrentPage = 1;
+                if (typeof renderHistoryTable === 'function') {
+                    renderHistoryTable();
+                }
+                
+                // Mettre à jour les statistiques de la carte
+                updateStatsCard(data.stats, data.perf_calendaires, data.perf_glissantes, data.analyse_stats);
+                
+                // Mettre à jour l'onglet Performance
+                console.log('Données reçues:', { perf_calendaires: data.perf_calendaires, perf_glissantes: data.perf_glissantes });
+                updatePerformanceTab(data.perf_calendaires, data.perf_glissantes, fcpName, data.stats);
+                
+                // Mettre à jour les statistiques de l'onglet Historique
+                updateHistoryStats(data.stats, data.perf_glissantes);
+                
+                // Mettre à jour le scatter chart (point sélectionné)
+                updateScatterChartSelection(fcpName);
+                
+                // Mettre à jour tous les sélecteurs FCP
+                syncAllFcpSelectors(fcpName);
+                
+                // Mettre à jour l'onglet Analyse avec les nouvelles statistiques
+                updateAnalysisTab(data.analyse_stats, data.tracking_error);
+                
+                document.body.style.cursor = 'default';
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                document.body.style.cursor = 'default';
+            });
+    }
+    
+    // Fonction pour synchroniser tous les sélecteurs FCP
+    function syncAllFcpSelectors(fcpName) {
+        const selectors = ['fcpSelector', 'perfFcpSelector', 'analyseFcpSelector', 'historyFcpSelector', 'riskFcpSelector', 'calendarFcpSelector'];
+        selectors.forEach(id => {
+            const selector = document.getElementById(id);
+            if (selector) {
+                selector.value = fcpName;
+            }
+        });
+        
+        // Mettre à jour tous les titres dynamiques
+        const titles = ['analyseFcpTitle', 'historyFcpTitle', 'riskFcpTitle', 'calendarFcpTitle', 'perfFcpTitle'];
+        titles.forEach(id => {
+            const titleEl = document.getElementById(id);
+            if (titleEl) {
+                titleEl.textContent = fcpName;
+            }
+        });
+    }
+    
+    // Fonction pour mettre à jour la carte de statistiques
+    function updateStatsCard(stats, perfCal, perfGliss, analyseStats) {
+        // Mettre à jour la légende du graphique
+        const legendFcpName = document.getElementById('legendFcpName');
+        if (legendFcpName) {
+            legendFcpName.textContent = selectedFcp;
+        }
+        
+        // Mettre à jour la date dans le label de la dernière VL
+        const metricDerniereDate = document.getElementById('metricDerniereDate');
+        if (metricDerniereDate && stats.derniere_date) {
+            metricDerniereDate.textContent = stats.derniere_date;
+        }
+        
+        // Mettre à jour la dernière VL
+        const metricDerniereVL = document.getElementById('metricDerniereVL');
+        if (metricDerniereVL && stats.derniere_vl !== undefined) {
+            metricDerniereVL.innerHTML = `${parseFloat(stats.derniere_vl).toFixed(2)} <small style="font-size: 14px;">XOF</small>`;
+        }
+        
+        // Mettre à jour la variation 1 jour
+        const metricVar1J = document.getElementById('metricVar1J');
+        if (metricVar1J && stats.var_1j !== undefined) {
+            const var1j = stats.var_1j || 0;
+            const sign = var1j >= 0 ? '+' : '';
+            const colorClass = var1j >= 0 ? 'positive' : 'negative';
+            const arrowDir = var1j >= 0 ? 'up' : 'down';
+            metricVar1J.className = colorClass;
+            metricVar1J.innerHTML = `<i class="bi bi-arrow-${arrowDir}"></i> ${sign}${var1j}% (1j)`;
+        }
+        
+        // Mettre à jour le rendement YTD
+        const metricYTD = document.getElementById('metricYTD');
+        if (metricYTD && stats.var_ytd !== undefined) {
+            const varYtd = stats.var_ytd || 0;
+            const sign = varYtd >= 0 ? '+' : '';
+            const colorClass = varYtd >= 0 ? 'text-success' : 'text-danger';
+            metricYTD.textContent = `${sign}${varYtd}%`;
+            metricYTD.className = `metric-value ${colorClass}`;
+        }
+        
+        // Mettre à jour le rendement annualisé
+        const metricRendementAnn = document.getElementById('metricRendementAnn');
+        if (metricRendementAnn && analyseStats && analyseStats.rendement_moyen_ann !== undefined) {
+            const rendAnn = analyseStats.rendement_moyen_ann || 0;
+            const sign = rendAnn >= 0 ? '+' : '';
+            const colorClass = rendAnn >= 0 ? 'text-success' : 'text-danger';
+            metricRendementAnn.textContent = `${sign}${rendAnn}%`;
+            metricRendementAnn.className = `metric-value ${colorClass}`;
+        }
+        
+        // Mettre à jour la volatilité
+        const metricVolatilite = document.getElementById('metricVolatilite');
+        if (metricVolatilite && stats.volatilite !== undefined) {
+            metricVolatilite.textContent = `${stats.volatilite}%`;
+        }
+        
+        // Mettre à jour la carte résumé du scatter chart
+        const scatterSelectedFcp = document.getElementById('scatterSelectedFcp');
+        if (scatterSelectedFcp) {
+            scatterSelectedFcp.textContent = selectedFcp;
+        }
+        
+        const scatterRendement = document.getElementById('scatterRendement');
+        if (scatterRendement && stats.var_origine !== undefined) {
+            const varOrigine = stats.var_origine || 0;
+            const sign = varOrigine >= 0 ? '+' : '';
+            scatterRendement.textContent = `${sign}${varOrigine}%`;
+            scatterRendement.style.color = varOrigine >= 0 ? 'var(--success-color)' : 'var(--danger-color)';
+        }
+        
+        const scatterVolatilite = document.getElementById('scatterVolatilite');
+        if (scatterVolatilite && stats.volatilite !== undefined) {
+            scatterVolatilite.textContent = `${stats.volatilite}%`;
+        }
+        
+        // Calculer et mettre à jour le ratio rendement/risque
+        const scatterRatio = document.getElementById('scatterRatio');
+        if (scatterRatio && stats.var_origine !== undefined && stats.volatilite !== undefined && stats.volatilite > 0) {
+            const ratio = (stats.var_origine / stats.volatilite).toFixed(2);
+            scatterRatio.textContent = ratio;
+        }
+        
+        // Mettre à jour la date en bas du scatter
+        const overviewDerniereDate = document.getElementById('overviewDerniereDate');
+        if (overviewDerniereDate && stats.derniere_date) {
+            overviewDerniereDate.textContent = stats.derniere_date;
+        }
+    }
+    
+    // Fonction pour mettre à jour la sélection dans le scatter chart
+    function updateScatterChartSelection(fcpName) {
+        if (scatterChart && scatterChart.data && scatterChart.data.datasets) {
+            scatterChart.data.datasets.forEach(ds => {
+                const isSelected = ds.label === fcpName;
+                ds.pointRadius = isSelected ? 14 : 8;
+                ds.pointHoverRadius = isSelected ? 16 : 10;
+                ds.borderColor = isSelected ? '#fff' : 'rgba(255,255,255,0.5)';
+                ds.borderWidth = isSelected ? 3 : 1;
+            });
+            scatterChart.update();
+        }
+    }
+    
+    // Fonction pour mettre à jour l'onglet Analyse
+    function updateAnalysisTab(analyseStats, trackingError) {
+        // Fonction helper pour formater les valeurs
+        const formatValue = (val, suffix = '') => val !== null && val !== undefined ? val + suffix : '--' + suffix;
+        const formatColoredValue = (val, suffix = '', inverse = false) => {
+            if (val === null || val === undefined) return '--' + suffix;
+            const isPositive = inverse ? val < 0 : val >= 0;
+            const colorClass = isPositive ? 'text-success' : 'text-danger';
+            const sign = val >= 0 ? '+' : '';
+            return `<span class="${colorClass}">${sign}${val}${suffix}</span>`;
+        };
+        
+        // Statistiques descriptives
+        document.getElementById('analyse-nb-obs').textContent = formatValue(analyseStats.nb_observations);
+        document.getElementById('analyse-rdt-moyen').textContent = formatValue(analyseStats.rendement_moyen, '%');
+        document.getElementById('analyse-rdt-ann').innerHTML = formatColoredValue(analyseStats.rendement_moyen_ann, '%');
+        document.getElementById('analyse-mediane').textContent = formatValue(analyseStats.mediane, '%');
+        document.getElementById('analyse-ecart-type').textContent = formatValue(analyseStats.ecart_type, '%');
+        document.getElementById('analyse-volatilite').textContent = formatValue(analyseStats.volatilite_ann, '%');
+        document.getElementById('analyse-vl-min').textContent = formatValue(analyseStats.vl_min, ' XOF');
+        document.getElementById('analyse-vl-max').textContent = formatValue(analyseStats.vl_max, ' XOF');
+        document.getElementById('analyse-rdt-min').textContent = formatValue(analyseStats.rdt_min, '%');
+        document.getElementById('analyse-rdt-max').textContent = '+' + formatValue(analyseStats.rdt_max, '%');
+        
+        // Profil de risque
+        const maxDD = analyseStats.max_drawdown || 0;
+        document.getElementById('analyse-max-drawdown').textContent = '-' + formatValue(maxDD, '%');
+        document.getElementById('analyse-drawdown-bar').style.width = Math.min(maxDD, 100) + '%';
+        
+        // Sharpe et Sortino avec couleurs
+        const sharpe = analyseStats.sharpe;
+        const sortino = analyseStats.sortino;
+        const sharpeEl = document.getElementById('analyse-sharpe');
+        const sortinoEl = document.getElementById('analyse-sortino');
+        
+        const getRatioColor = (val) => {
+            if (val === null || val === undefined) return '';
+            if (val >= 1) return 'text-success';
+            if (val >= 0) return 'text-warning';
+            return 'text-danger';
+        };
+        
+        sharpeEl.textContent = formatValue(sharpe);
+        sharpeEl.className = 'fs-4 fw-bold ' + getRatioColor(sharpe);
+        sortinoEl.textContent = formatValue(sortino);
+        sortinoEl.className = 'fs-4 fw-bold ' + getRatioColor(sortino);
+        
+        // Jours positifs/négatifs
+        const joursPos = analyseStats.jours_positifs || 0;
+        const joursNeg = analyseStats.jours_negatifs || 0;
+        const ratioPos = analyseStats.ratio_positif || 50;
+        const nbObs = analyseStats.nb_observations || 1;
+        
+        document.getElementById('analyse-ratio-positif').textContent = ratioPos + '% positifs';
+        document.getElementById('analyse-jours-positifs').textContent = joursPos;
+        document.getElementById('analyse-jours-negatifs').textContent = joursNeg;
+        document.getElementById('analyse-jours-positifs-bar').style.width = ratioPos + '%';
+        document.getElementById('analyse-jours-negatifs-bar').style.width = (100 - ratioPos) + '%';
+        
+        // Skewness et Kurtosis
+        const skew = analyseStats.skewness;
+        const kurt = analyseStats.kurtosis;
+        const skewEl = document.getElementById('analyse-skewness');
+        const kurtEl = document.getElementById('analyse-kurtosis');
+        
+        skewEl.textContent = formatValue(skew);
+        skewEl.className = 'fw-bold fs-5 ' + (skew > 0 ? 'text-success' : skew < 0 ? 'text-danger' : '');
+        kurtEl.textContent = formatValue(kurt);
+        kurtEl.className = 'fw-bold fs-5 ' + (kurt > 0 ? 'text-warning' : 'text-info');
+        
+        document.getElementById('analyse-skewness-desc').textContent = 
+            skew > 0.5 ? 'Queue droite' : skew < -0.5 ? 'Queue gauche' : '≈ Symétrique';
+        document.getElementById('analyse-kurtosis-desc').textContent = 
+            kurt > 1 ? 'Queues épaisses' : kurt < -1 ? 'Queues fines' : '≈ Normal';
+        
+        // VaR et CVaR
+        document.getElementById('analyse-var95').textContent = formatValue(analyseStats.var_95, '%');
+        document.getElementById('analyse-var99').textContent = formatValue(analyseStats.var_99, '%');
+        document.getElementById('analyse-cvar95').textContent = formatValue(analyseStats.cvar_95, '%');
+        document.getElementById('analyse-cvar99').textContent = formatValue(analyseStats.cvar_99, '%');
+        
+        // Tracking Error
+        if (trackingError) {
+            document.getElementById('tracking-error-wtd').textContent = formatValue(trackingError.wtd, '%');
+            document.getElementById('tracking-error-mtd').textContent = formatValue(trackingError.mtd, '%');
+            document.getElementById('tracking-error-qtd').textContent = formatValue(trackingError.qtd, '%');
+            document.getElementById('tracking-error-std').textContent = formatValue(trackingError.std, '%');
+            document.getElementById('tracking-error-ytd').textContent = formatValue(trackingError.ytd, '%');
+            document.getElementById('tracking-error-origine').textContent = formatValue(trackingError.origine, '%');
+        }
+        
+        // Re-render les graphiques de l'analyse si les données ont changé
+        if (histogramData.length > 0) {
+            renderHistogramChart();
+        }
+        if (underwaterData.length > 0) {
+            renderUnderwaterChart();
+        }
+        if (drawdownsData.length > 0) {
+            renderDrawdownsTable();
+        }
+    }
+    
+    // Fonction pour mettre à jour l'onglet Performance
+    function updatePerformanceTab(perfCal, perfGliss, fcpName, stats) {
+        console.log('updatePerformanceTab appelée avec:', { perfCal, perfGliss, fcpName, stats });
+        
+        // Mettre à jour le titre
+        const perfTitle = document.getElementById('perfFcpTitle');
+        if (perfTitle) {
+            perfTitle.textContent = fcpName;
+        }
+        
+        // Mettre à jour la date
+        const dateEl = document.getElementById('perf-derniere-date');
+        if (dateEl && stats && stats.derniere_date) {
+            dateEl.textContent = stats.derniere_date;
+        }
+        
+        // Fonction helper pour formater une valeur de performance
+        const formatPerfValue = (value, isBig = false) => {
+            if (value === null || value === undefined) {
+                return '<span class="text-muted">N/A</span>';
+            }
+            const sign = value >= 0 ? '+' : '';
+            const colorClass = value >= 0 ? 'text-success' : 'text-danger';
+            const sizeStyle = isBig ? ' style="font-size: 1.1em;"' : '';
+            return `<span class="fw-bold ${colorClass}"${sizeStyle}>${sign}${value}%</span>`;
+        };
+        
+        // Mettre à jour les performances calendaires
+        if (perfCal) {
+            const calFields = ['wtd', 'mtd', 'qtd', 'std', 'ytd'];
+            calFields.forEach(field => {
+                const el = document.getElementById(`perf-${field}`);
+                if (el) {
+                    const isBig = field === 'ytd';
+                    el.innerHTML = formatPerfValue(perfCal[field], isBig);
+                }
+            });
+        }
+        
+        // Mettre à jour les performances glissantes
+        if (perfGliss) {
+            const glissFields = ['1m', '3m', '6m', '1y', '3y', '5y'];
+            glissFields.forEach(field => {
+                const el = document.getElementById(`perf-${field}`);
+                if (el) {
+                    el.innerHTML = formatPerfValue(perfGliss[`perf_${field}`]);
+                }
+            });
+            
+            // Mettre à jour l'origine
+            const origineEl = document.getElementById('perf-origine');
+            if (origineEl) {
+                origineEl.innerHTML = formatPerfValue(perfGliss.origine, true);
+            }
+        }
+    }
+    
+    // Fonction pour mettre à jour les statistiques de l'onglet Historique
+    function updateHistoryStats(stats, perfGliss) {
+        // Nb. Observations
+        const nbObsEl = document.getElementById('history-nb-obs');
+        if (nbObsEl && stats) {
+            nbObsEl.textContent = stats.nb_vl || '0';
+        }
+        
+        // Première Date
+        const premiereDateEl = document.getElementById('history-premiere-date');
+        if (premiereDateEl && stats) {
+            premiereDateEl.textContent = stats.premiere_date || '--';
+        }
+        
+        // Dernière Date
+        const derniereDateEl = document.getElementById('history-derniere-date');
+        if (derniereDateEl && stats) {
+            derniereDateEl.textContent = stats.derniere_date || '--';
+        }
+        
+        // Perf. Origine
+        const perfOrigineEl = document.getElementById('history-perf-origine');
+        if (perfOrigineEl && stats) {
+            const varOrigine = stats.var_origine;
+            if (varOrigine !== null && varOrigine !== undefined) {
+                const sign = varOrigine >= 0 ? '+' : '';
+                const colorClass = varOrigine >= 0 ? 'text-success' : 'text-danger';
+                perfOrigineEl.innerHTML = `<span class="${colorClass}">${sign}${varOrigine}%</span>`;
+            } else {
+                perfOrigineEl.innerHTML = '<span class="text-muted">--</span>';
+            }
+        }
+    }
+    
+    // FCP Selector Change Handler (Vue d'ensemble)
     document.getElementById('fcpSelector').addEventListener('change', function() {
-        const selectedFcp = this.value;
-        window.location.href = '?fcp=' + encodeURIComponent(selectedFcp);
+        loadFcpData(this.value);
     });
     
     // Performances FCP Selector
     document.getElementById('perfFcpSelector')?.addEventListener('change', function() {
-        const selectedFcp = this.value;
-        window.location.href = '?fcp=' + encodeURIComponent(selectedFcp);
+        loadFcpData(this.value);
     });
     
     // Analyse FCP Selector
     document.getElementById('analyseFcpSelector')?.addEventListener('change', function() {
-        const selectedFcp = this.value;
-        window.location.href = '?fcp=' + encodeURIComponent(selectedFcp);
+        loadFcpData(this.value);
     });
     
     // Benchmark Toggle
@@ -1674,10 +2496,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // History FCP Selector
+    // History FCP Selector - utilise AJAX aussi
     document.getElementById('historyFcpSelector')?.addEventListener('change', function() {
-        const selectedFcp = this.value;
-        window.location.href = '?fcp=' + encodeURIComponent(selectedFcp);
+        loadFcpData(this.value);
+        // Réinitialiser la pagination
+        historyCurrentPage = 1;
     });
     
     // Export CSV
@@ -1705,6 +2528,231 @@ document.addEventListener('DOMContentLoaded', function() {
     // Also render if history tab is already visible (e.g., direct navigation)
     if (document.getElementById('history')?.classList.contains('show')) {
         renderHistoryTable();
+    }
+    
+    // ====================================
+    // GRAPHIQUES D'ANALYSE - Distribution et Drawdowns
+    // ====================================
+    
+    let histogramChart = null;
+    let underwaterChart = null;
+    
+    // Histogramme des rendements
+    function renderHistogramChart() {
+        const ctx = document.getElementById('histogramChart');
+        if (!ctx || !histogramData || histogramData.length === 0) return;
+        
+        if (histogramChart) {
+            histogramChart.destroy();
+        }
+        
+        const labels = histogramData.map(d => d.bin_start.toFixed(2) + '%');
+        const counts = histogramData.map(d => d.count);
+        
+        // Calculer les couleurs (rouge pour négatifs, vert pour positifs)
+        const colors = histogramData.map(d => {
+            if (d.bin_end <= 0) return 'rgba(220, 53, 69, 0.7)';
+            if (d.bin_start >= 0) return 'rgba(40, 167, 69, 0.7)';
+            return 'rgba(108, 117, 125, 0.7)';
+        });
+        
+        histogramChart = new Chart(ctx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Fréquence',
+                    data: counts,
+                    backgroundColor: colors,
+                    borderColor: colors.map(c => c.replace('0.7', '1')),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                const idx = context[0].dataIndex;
+                                return `${histogramData[idx].bin_start.toFixed(2)}% à ${histogramData[idx].bin_end.toFixed(2)}%`;
+                            },
+                            label: function(context) {
+                                const idx = context.dataIndex;
+                                return [`${context.raw} jours (${histogramData[idx].frequency}%)`];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        grid: { display: false },
+                        ticks: {
+                            maxTicksLimit: 10,
+                            font: { size: 9 }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Rendement quotidien (%)',
+                            font: { size: 10 }
+                        }
+                    },
+                    y: {
+                        display: true,
+                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        title: {
+                            display: true,
+                            text: 'Nombre de jours',
+                            font: { size: 10 }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Underwater Chart
+    function renderUnderwaterChart() {
+        const ctx = document.getElementById('underwaterChart');
+        if (!ctx || !underwaterData || underwaterData.length === 0) return;
+        
+        if (underwaterChart) {
+            underwaterChart.destroy();
+        }
+        
+        underwaterChart = new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: underwaterData.map(d => d.date),
+                datasets: [{
+                    label: 'Drawdown',
+                    data: underwaterData.map(d => d.drawdown),
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.3)',
+                    borderWidth: 1.5,
+                    fill: true,
+                    tension: 0.1,
+                    pointRadius: 0,
+                    pointHoverRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                const date = new Date(context[0].label);
+                                return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+                            },
+                            label: function(context) {
+                                return `Drawdown: ${context.raw.toFixed(2)}%`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'category',
+                        grid: { display: false },
+                        ticks: {
+                            maxTicksLimit: 12,
+                            callback: function(value) {
+                                const date = new Date(this.getLabelForValue(value));
+                                return date.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+                            }
+                        }
+                    },
+                    y: {
+                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        max: 0,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toFixed(0) + '%';
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Drawdown (%)',
+                            font: { size: 11 }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Table des drawdowns
+    function renderDrawdownsTable(threshold = 2) {
+        const tbody = document.getElementById('drawdownsTableBody');
+        if (!tbody || !drawdownsData) return;
+        
+        // Filtrer par seuil
+        const filtered = drawdownsData.filter(d => d.depth >= threshold).slice(0, 5);
+        
+        if (filtered.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">
+                        Aucun drawdown supérieur à ${threshold}%
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tbody.innerHTML = '';
+        filtered.forEach((dd, index) => {
+            const startDate = new Date(dd.start_date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+            const troughDate = new Date(dd.trough_date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+            const endDate = dd.end_date ? new Date(dd.end_date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : '<span class="badge bg-warning">En cours</span>';
+            const recovery = dd.recovery !== null ? dd.recovery : '<span class="text-muted">--</span>';
+            
+            // Couleur selon la profondeur
+            let depthClass = 'text-warning';
+            if (dd.depth >= 10) depthClass = 'text-danger fw-bold';
+            else if (dd.depth >= 5) depthClass = 'text-danger';
+            
+            tbody.innerHTML += `
+                <tr>
+                    <td class="px-4 py-3 fw-bold">${index + 1}</td>
+                    <td class="px-4 py-3">${startDate}</td>
+                    <td class="px-4 py-3">${troughDate}</td>
+                    <td class="px-4 py-3">${endDate}</td>
+                    <td class="px-4 py-3 text-end ${depthClass}">-${dd.depth}%</td>
+                    <td class="px-4 py-3 text-center">${dd.duration}</td>
+                    <td class="px-4 py-3 text-center">${recovery}</td>
+                </tr>
+            `;
+        });
+    }
+    
+    // Event listener pour le filtre de seuil
+    document.getElementById('drawdownThreshold')?.addEventListener('change', function() {
+        renderDrawdownsTable(parseFloat(this.value));
+    });
+    
+    // Charger les graphiques quand l'onglet Analyse est affiché
+    document.querySelector('button[data-bs-target="#analysis"]')?.addEventListener('shown.bs.tab', function() {
+        setTimeout(() => {
+            renderHistogramChart();
+            renderUnderwaterChart();
+            renderDrawdownsTable(parseFloat(document.getElementById('drawdownThreshold')?.value || 2));
+        }, 100);
+    });
+    
+    // Si l'onglet est déjà visible
+    if (document.getElementById('analysis')?.classList.contains('show')) {
+        setTimeout(() => {
+            renderHistogramChart();
+            renderUnderwaterChart();
+            renderDrawdownsTable(2);
+        }, 100);
     }
     
     // ====================================
@@ -2053,8 +3101,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Risk FCP Selector
     document.getElementById('riskFcpSelector')?.addEventListener('change', function() {
         const selectedFcp = this.value;
+        // Mettre à jour le titre dynamiquement
+        document.getElementById('riskFcpTitle').textContent = selectedFcp;
         const window = document.getElementById('volatilityWindow').value;
         loadVolatilityClustering(selectedFcp, window);
+        loadRollingMetrics(selectedFcp, document.getElementById('rollingMetricsWindow').value);
+        loadTailRisk(selectedFcp);
     });
     
     // Volatility Window Slider
@@ -2067,12 +3119,672 @@ document.addEventListener('DOMContentLoaded', function() {
         loadVolatilityClustering(fcpName, this.value);
     });
     
+    // Rolling Metrics Window Slider
+    document.getElementById('rollingMetricsWindow')?.addEventListener('input', function() {
+        document.getElementById('rollingWindowValue').textContent = this.value;
+    });
+    
+    document.getElementById('rollingMetricsWindow')?.addEventListener('change', function() {
+        const fcpName = document.getElementById('riskFcpSelector').value;
+        loadRollingMetrics(fcpName, this.value);
+    });
+    
     // Charger les données quand l'onglet Risque est affiché
     document.querySelector('button[data-bs-target="#risk"]')?.addEventListener('shown.bs.tab', function() {
         const fcpName = document.getElementById('riskFcpSelector').value;
         const window = document.getElementById('volatilityWindow').value;
         loadVolatilityClustering(fcpName, window);
+        loadRollingMetrics(fcpName, document.getElementById('rollingMetricsWindow').value);
+        loadTailRisk(fcpName);
     });
+    
+    // Charger les données quand l'onglet Calendrier est affiché
+    document.querySelector('button[data-bs-target="#calendar"]')?.addEventListener('shown.bs.tab', function() {
+        const fcpName = document.getElementById('calendarFcpSelector').value;
+        loadCalendarData(fcpName);
+    });
+    
+    // Calendar FCP Selector
+    document.getElementById('calendarFcpSelector')?.addEventListener('change', function() {
+        // Mettre à jour le titre dynamiquement
+        document.getElementById('calendarFcpTitle').textContent = this.value;
+        loadCalendarData(this.value);
+    });
+    
+    // ========== ROLLING METRICS FUNCTIONS ==========
+    let rollingSharpeChart = null;
+    let rollingBetaChart = null;
+    
+    function loadRollingMetrics(fcpName, window) {
+        fetch(`/api/rolling-metrics/?fcp=${encodeURIComponent(fcpName)}&window=${window}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Erreur rolling metrics:', data.error);
+                    return;
+                }
+                
+                renderRollingSharpeChart(data.dates, data.sharpe);
+                renderRollingBetaChart(data.dates, data.beta);
+                
+                // Mettre à jour les valeurs actuelles
+                document.getElementById('currentSharpeValue').textContent = 
+                    data.current_sharpe !== null ? data.current_sharpe.toFixed(2) : '--';
+                document.getElementById('currentBetaValue').textContent = 
+                    data.current_beta !== null ? data.current_beta.toFixed(2) : '--';
+            })
+            .catch(error => console.error('Erreur:', error));
+    }
+    
+    function renderRollingSharpeChart(dates, sharpeValues) {
+        const ctx = document.getElementById('rollingSharpeChart');
+        if (!ctx) return;
+        
+        if (rollingSharpeChart) {
+            rollingSharpeChart.destroy();
+        }
+        
+        rollingSharpeChart = new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Sharpe Ratio',
+                    data: sharpeValues,
+                    borderColor: '#004080',
+                    backgroundColor: 'rgba(0, 64, 128, 0.1)',
+                    borderWidth: 1.5,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    pointHoverRadius: 4
+                }, {
+                    label: 'Seuil 0',
+                    data: dates.map(() => 0),
+                    borderColor: 'rgba(220, 53, 69, 0.5)',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                const date = new Date(context[0].label);
+                                return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+                            },
+                            label: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    return 'Sharpe: ' + context.raw.toFixed(2);
+                                }
+                                return null;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        grid: { display: false },
+                        ticks: {
+                            maxTicksLimit: 6,
+                            callback: function(value) {
+                                const date = new Date(this.getLabelForValue(value));
+                                return date.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+                            }
+                        }
+                    },
+                    y: {
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                    }
+                }
+            }
+        });
+    }
+    
+    function renderRollingBetaChart(dates, betaValues) {
+        const ctx = document.getElementById('rollingBetaChart');
+        if (!ctx) return;
+        
+        if (rollingBetaChart) {
+            rollingBetaChart.destroy();
+        }
+        
+        // Filtrer les valeurs null
+        const filteredData = dates.map((d, i) => ({
+            date: d,
+            beta: betaValues[i]
+        })).filter(d => d.beta !== null);
+        
+        if (filteredData.length === 0) {
+            ctx.parentElement.innerHTML = '<div class="text-center text-muted py-4"><i class="bi bi-info-circle me-2"></i>Données de benchmark insuffisantes</div>';
+            return;
+        }
+        
+        rollingBetaChart = new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: filteredData.map(d => d.date),
+                datasets: [{
+                    label: 'Beta',
+                    data: filteredData.map(d => d.beta),
+                    borderColor: '#6c757d',
+                    backgroundColor: 'rgba(108, 117, 125, 0.1)',
+                    borderWidth: 1.5,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    pointHoverRadius: 4
+                }, {
+                    label: 'Beta = 1',
+                    data: filteredData.map(() => 1),
+                    borderColor: 'rgba(0, 64, 128, 0.5)',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                const date = new Date(context[0].label);
+                                return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+                            },
+                            label: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    return 'Beta: ' + context.raw.toFixed(2);
+                                }
+                                return null;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        grid: { display: false },
+                        ticks: {
+                            maxTicksLimit: 6,
+                            callback: function(value) {
+                                const date = new Date(this.getLabelForValue(value));
+                                return date.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+                            }
+                        }
+                    },
+                    y: {
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                    }
+                }
+            }
+        });
+    }
+    
+    // ========== TAIL RISK FUNCTIONS ==========
+    function loadTailRisk(fcpName) {
+        fetch(`/api/tail-risk/?fcp=${encodeURIComponent(fcpName)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Erreur tail risk:', data.error);
+                    return;
+                }
+                
+                renderTailRiskAnalysis(data);
+                renderWorstDays(data.worst_days);
+                renderBestDays(data.best_days);
+            })
+            .catch(error => console.error('Erreur:', error));
+    }
+    
+    function renderTailRiskAnalysis(data) {
+        const container = document.getElementById('tailRiskContainer');
+        const tail = data.tail_analysis;
+        const stats = data.statistics;
+        
+        let html = `
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="p-3 rounded" style="background: var(--bg-secondary);">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="text-muted small">Moyenne quotidienne</div>
+                                <div class="fw-bold">${(stats.mean).toFixed(4)}%</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-muted small">Écart-type (σ)</div>
+                                <div class="fw-bold">${stats.std.toFixed(4)}%</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-muted small">Jours analysés</div>
+                                <div class="fw-bold">${data.total_days}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 1 Sigma -->
+                <div class="col-md-4">
+                    <div class="p-3 rounded h-100" style="background: rgba(255, 193, 7, 0.1); border-left: 4px solid #ffc107;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold" style="color: #856404;">
+                                <i class="bi bi-exclamation-circle me-2"></i>Pertes > 1σ
+                            </span>
+                            <span class="badge bg-warning text-dark">${tail['1_sigma'].count}</span>
+                        </div>
+                        <div class="small">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Seuil :</span>
+                                <span class="fw-bold">${stats.sigma_1_threshold.toFixed(3)}%</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Fréquence réelle :</span>
+                                <span class="fw-bold">${tail['1_sigma'].frequency}%</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Fréquence attendue :</span>
+                                <span class="fw-bold">${tail['1_sigma'].expected}%</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Ratio :</span>
+                                <span class="fw-bold ${tail['1_sigma'].ratio > 1.2 ? 'text-danger' : tail['1_sigma'].ratio < 0.8 ? 'text-success' : ''}">${tail['1_sigma'].ratio}x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 2 Sigma -->
+                <div class="col-md-4">
+                    <div class="p-3 rounded h-100" style="background: rgba(255, 127, 80, 0.1); border-left: 4px solid #ff7f50;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold" style="color: #d35400;">
+                                <i class="bi bi-exclamation-triangle me-2"></i>Pertes > 2σ
+                            </span>
+                            <span class="badge" style="background: #ff7f50;">${tail['2_sigma'].count}</span>
+                        </div>
+                        <div class="small">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Seuil :</span>
+                                <span class="fw-bold">${stats.sigma_2_threshold.toFixed(3)}%</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Fréquence réelle :</span>
+                                <span class="fw-bold">${tail['2_sigma'].frequency}%</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Fréquence attendue :</span>
+                                <span class="fw-bold">${tail['2_sigma'].expected}%</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Ratio :</span>
+                                <span class="fw-bold ${tail['2_sigma'].ratio > 1.5 ? 'text-danger' : tail['2_sigma'].ratio < 0.7 ? 'text-success' : ''}">${tail['2_sigma'].ratio}x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 3 Sigma -->
+                <div class="col-md-4">
+                    <div class="p-3 rounded h-100" style="background: rgba(220, 53, 69, 0.1); border-left: 4px solid #dc3545;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-bold text-danger">
+                                <i class="bi bi-lightning me-2"></i>Pertes > 3σ (Black Swan)
+                            </span>
+                            <span class="badge bg-danger">${tail['3_sigma'].count}</span>
+                        </div>
+                        <div class="small">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Seuil :</span>
+                                <span class="fw-bold">${stats.sigma_3_threshold.toFixed(3)}%</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Fréquence réelle :</span>
+                                <span class="fw-bold">${tail['3_sigma'].frequency}%</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="text-muted">Fréquence attendue :</span>
+                                <span class="fw-bold">${tail['3_sigma'].expected}%</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span class="text-muted">Ratio :</span>
+                                <span class="fw-bold ${tail['3_sigma'].ratio > 2 ? 'text-danger' : ''}">${tail['3_sigma'].ratio}x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+    }
+    
+    function renderWorstDays(worstDays) {
+        const container = document.getElementById('worstDaysContainer');
+        
+        let html = '<div class="list-group list-group-flush">';
+        worstDays.forEach((day, index) => {
+            const date = new Date(day.date);
+            const formattedDate = date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+            html += `
+                <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                    <div>
+                        <span class="badge bg-danger me-2">${index + 1}</span>
+                        <span class="small">${formattedDate}</span>
+                    </div>
+                    <span class="fw-bold text-danger">${day.return.toFixed(2)}%</span>
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        container.innerHTML = html;
+    }
+    
+    function renderBestDays(bestDays) {
+        const container = document.getElementById('bestDaysContainer');
+        
+        let html = '<div class="list-group list-group-flush">';
+        bestDays.forEach((day, index) => {
+            const date = new Date(day.date);
+            const formattedDate = date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+            html += `
+                <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                    <div>
+                        <span class="badge bg-success me-2">${index + 1}</span>
+                        <span class="small">${formattedDate}</span>
+                    </div>
+                    <span class="fw-bold text-success">+${day.return.toFixed(2)}%</span>
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        container.innerHTML = html;
+    }
+    
+    // ========== CALENDAR FUNCTIONS ==========
+    let weekdayChart = null;
+    let seasonalityChart = null;
+    
+    function loadCalendarData(fcpName) {
+        fetch(`/api/calendar-data/?fcp=${encodeURIComponent(fcpName)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Erreur calendar data:', data.error);
+                    return;
+                }
+                
+                renderMonthlyHeatmap(data.monthly_heatmap);
+                renderWeekdayChart(data.weekday_analysis);
+                renderWeekdayStats(data.weekday_analysis);
+                renderSeasonalityChart(data.seasonality);
+                renderBestMonths(data.best_months);
+                renderWorstMonths(data.worst_months);
+            })
+            .catch(error => console.error('Erreur:', error));
+    }
+    
+    function renderMonthlyHeatmap(heatmapData) {
+        const container = document.getElementById('monthlyHeatmapContainer');
+        
+        if (!heatmapData || heatmapData.length === 0) {
+            container.innerHTML = '<div class="text-center text-muted py-4">Données insuffisantes</div>';
+            return;
+        }
+        
+        // Grouper par année
+        const years = [...new Set(heatmapData.map(d => d.year))].sort();
+        const monthNames = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+        
+        // Trouver min/max pour l'échelle de couleurs
+        const returns = heatmapData.map(d => d.return);
+        const maxReturn = Math.max(...returns);
+        const minReturn = Math.min(...returns);
+        
+        function getColor(value) {
+            if (value > 3) return '#28a745';  // Vert foncé
+            if (value > 1) return '#90EE90';  // Vert clair
+            if (value > -1) return '#e9ecef'; // Gris
+            if (value > -3) return '#ffc107'; // Jaune/Orange
+            return '#dc3545';                  // Rouge
+        }
+        
+        let html = '<table class="table table-sm table-bordered mb-0" style="font-size: 12px;">';
+        html += '<thead><tr><th style="background: var(--bg-secondary);">Année</th>';
+        monthNames.forEach(month => {
+            html += `<th class="text-center" style="background: var(--bg-secondary); width: 60px;">${month}</th>`;
+        });
+        html += '<th class="text-center" style="background: var(--bg-secondary);">Total</th></tr></thead><tbody>';
+        
+        years.forEach(year => {
+            html += `<tr><td class="fw-bold" style="background: var(--bg-secondary);">${year}</td>`;
+            let yearTotal = 0;
+            let yearCount = 0;
+            
+            for (let month = 1; month <= 12; month++) {
+                const item = heatmapData.find(d => d.year === year && d.month === month);
+                if (item) {
+                    const color = getColor(item.return);
+                    yearTotal += item.return;
+                    yearCount++;
+                    html += `<td class="text-center" style="background: ${color}; color: ${Math.abs(item.return) > 2 ? 'white' : 'inherit'};" title="${monthNames[month-1]} ${year}: ${item.return.toFixed(2)}%">${item.return.toFixed(1)}%</td>`;
+                } else {
+                    html += '<td class="text-center text-muted">-</td>';
+                }
+            }
+            
+            // Total annuel (somme des rendements mensuels)
+            const yearTotalColor = yearTotal > 0 ? '#28a745' : '#dc3545';
+            html += `<td class="text-center fw-bold" style="background: ${yearTotalColor}20; color: ${yearTotalColor};">${yearTotal.toFixed(1)}%</td>`;
+            html += '</tr>';
+        });
+        
+        html += '</tbody></table>';
+        
+        container.innerHTML = html;
+    }
+    
+    function renderWeekdayChart(weekdayData) {
+        const ctx = document.getElementById('weekdayChart');
+        if (!ctx) return;
+        
+        if (weekdayChart) {
+            weekdayChart.destroy();
+        }
+        
+        const colors = weekdayData.map(d => d.mean >= 0 ? '#28a745' : '#dc3545');
+        
+        weekdayChart = new Chart(ctx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: weekdayData.map(d => d.day),
+                datasets: [{
+                    label: 'Performance moyenne',
+                    data: weekdayData.map(d => d.mean),
+                    backgroundColor: colors.map(c => c + '80'),
+                    borderColor: colors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const d = weekdayData[context.dataIndex];
+                                return [
+                                    `Moyenne: ${d.mean.toFixed(4)}%`,
+                                    `Win rate: ${d.win_rate}%`,
+                                    `Observations: ${d.count}`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                        ticks: {
+                            callback: function(value) {
+                                return value.toFixed(3) + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
+    
+    function renderWeekdayStats(weekdayData) {
+        const container = document.getElementById('weekdayStatsContainer');
+        
+        let html = '<table class="table table-sm table-bordered mb-0" style="font-size: 11px;">';
+        html += `<thead><tr>
+            <th>Jour</th>
+            <th class="text-center">Win Rate</th>
+            <th class="text-center">Meilleur</th>
+            <th class="text-center">Pire</th>
+        </tr></thead><tbody>`;
+        
+        weekdayData.forEach(d => {
+            const winRateColor = d.win_rate >= 50 ? '#28a745' : '#dc3545';
+            html += `<tr>
+                <td class="fw-bold">${d.day}</td>
+                <td class="text-center" style="color: ${winRateColor};">${d.win_rate}%</td>
+                <td class="text-center text-success">+${d.best.toFixed(2)}%</td>
+                <td class="text-center text-danger">${d.worst.toFixed(2)}%</td>
+            </tr>`;
+        });
+        
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }
+    
+    function renderSeasonalityChart(seasonalityData) {
+        const ctx = document.getElementById('seasonalityChart');
+        if (!ctx) return;
+        
+        if (seasonalityChart) {
+            seasonalityChart.destroy();
+        }
+        
+        const colors = seasonalityData.map(d => d.mean >= 0 ? '#28a745' : '#dc3545');
+        
+        seasonalityChart = new Chart(ctx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: seasonalityData.map(d => d.month.substring(0, 3)),
+                datasets: [{
+                    label: 'Performance moyenne',
+                    data: seasonalityData.map(d => d.mean),
+                    backgroundColor: colors.map(c => c + '80'),
+                    borderColor: colors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                return seasonalityData[context[0].dataIndex].month;
+                            },
+                            label: function(context) {
+                                const d = seasonalityData[context.dataIndex];
+                                return [
+                                    `Moyenne: ${d.mean.toFixed(2)}%`,
+                                    `Win rate: ${d.win_rate}%`,
+                                    `Années: ${d.count}`,
+                                    `Best: +${d.best.toFixed(2)}%`,
+                                    `Worst: ${d.worst.toFixed(2)}%`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                        ticks: {
+                            callback: function(value) {
+                                return value.toFixed(1) + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
+    
+    function renderBestMonths(bestMonths) {
+        const container = document.getElementById('bestMonthsContainer');
+        
+        let html = '<div class="list-group list-group-flush">';
+        bestMonths.forEach((month, index) => {
+            html += `
+                <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                    <div>
+                        <span class="badge bg-success me-2">${index + 1}</span>
+                        <span class="fw-bold">${month.month}</span>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold text-success">+${month.mean.toFixed(2)}%</div>
+                        <small class="text-muted">Win rate: ${month.win_rate}%</small>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        container.innerHTML = html;
+    }
+    
+    function renderWorstMonths(worstMonths) {
+        const container = document.getElementById('worstMonthsContainer');
+        
+        let html = '<div class="list-group list-group-flush">';
+        worstMonths.forEach((month, index) => {
+            html += `
+                <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
+                    <div>
+                        <span class="badge bg-danger me-2">${index + 1}</span>
+                        <span class="fw-bold">${month.month}</span>
+                    </div>
+                    <div class="text-end">
+                        <div class="fw-bold text-danger">${month.mean.toFixed(2)}%</div>
+                        <small class="text-muted">Win rate: ${month.win_rate}%</small>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        container.innerHTML = html;
+    }
 });
 </script>
 {% endblock %}
