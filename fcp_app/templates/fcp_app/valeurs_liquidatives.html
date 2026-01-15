@@ -259,6 +259,11 @@
         </button>
     </li>
     <li class="nav-item" role="presentation">
+        <button class="nav-link" id="performances-tab" data-bs-toggle="tab" data-bs-target="#performances" type="button" role="tab">
+            <i class="bi bi-trophy me-2"></i>Performances
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
         <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab">
             <i class="bi bi-table me-2"></i>Historique
         </button>
@@ -266,6 +271,11 @@
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis" type="button" role="tab">
             <i class="bi bi-bar-chart-line me-2"></i>Analyse
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="risk-tab" data-bs-toggle="tab" data-bs-target="#risk" type="button" role="tab">
+            <i class="bi bi-shield-exclamation me-2"></i>Risque
         </button>
     </li>
 </ul>
@@ -471,6 +481,226 @@
         
     </div>
     
+    <!-- Performances Tab -->
+    <div class="tab-pane fade" id="performances" role="tabpanel">
+        <div class="row g-4">
+            <!-- Sélecteur FCP -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-trophy me-2" style="color: var(--primary-color);"></i>
+                                Performances - <span style="color: var(--primary-color);">{{ selected_fcp }}</span>
+                            </h5>
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="text-muted small me-2">Sélectionner un FCP :</label>
+                                <select class="select-custom" id="perfFcpSelector" style="min-width: 220px;">
+                                    {% for fcp_name in fcp_list %}
+                                    <option value="{{ fcp_name }}" {% if fcp_name == selected_fcp %}selected{% endif %}>{{ fcp_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Performances Calendaires -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-calendar3 me-2"></i>Performances Calendaires
+                        </h5>
+                        <small class="text-muted">Depuis le début de chaque période</small>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-3">Période</th>
+                                    <th class="px-4 py-3">Description</th>
+                                    <th class="px-4 py-3 text-end">Performance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="px-4 py-3"><span class="badge bg-secondary">WTD</span></td>
+                                    <td class="px-4 py-3 text-muted">Week-to-Date</td>
+                                    <td class="px-4 py-3 text-end">
+                                        {% if perf_calendaires.wtd != None %}
+                                        <span class="fw-bold {% if perf_calendaires.wtd >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if perf_calendaires.wtd >= 0 %}+{% endif %}{{ perf_calendaires.wtd }}%
+                                        </span>
+                                        {% else %}<span class="text-muted">N/A</span>{% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3"><span class="badge bg-secondary">MTD</span></td>
+                                    <td class="px-4 py-3 text-muted">Month-to-Date</td>
+                                    <td class="px-4 py-3 text-end">
+                                        {% if perf_calendaires.mtd != None %}
+                                        <span class="fw-bold {% if perf_calendaires.mtd >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if perf_calendaires.mtd >= 0 %}+{% endif %}{{ perf_calendaires.mtd }}%
+                                        </span>
+                                        {% else %}<span class="text-muted">N/A</span>{% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3"><span class="badge bg-secondary">QTD</span></td>
+                                    <td class="px-4 py-3 text-muted">Quarter-to-Date</td>
+                                    <td class="px-4 py-3 text-end">
+                                        {% if perf_calendaires.qtd != None %}
+                                        <span class="fw-bold {% if perf_calendaires.qtd >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if perf_calendaires.qtd >= 0 %}+{% endif %}{{ perf_calendaires.qtd }}%
+                                        </span>
+                                        {% else %}<span class="text-muted">N/A</span>{% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3"><span class="badge bg-secondary">STD</span></td>
+                                    <td class="px-4 py-3 text-muted">Semester-to-Date</td>
+                                    <td class="px-4 py-3 text-end">
+                                        {% if perf_calendaires.std != None %}
+                                        <span class="fw-bold {% if perf_calendaires.std >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if perf_calendaires.std >= 0 %}+{% endif %}{{ perf_calendaires.std }}%
+                                        </span>
+                                        {% else %}<span class="text-muted">N/A</span>{% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3"><span class="badge" style="background: var(--primary-color);">YTD</span></td>
+                                    <td class="px-4 py-3 text-muted">Year-to-Date</td>
+                                    <td class="px-4 py-3 text-end">
+                                        {% if perf_calendaires.ytd != None %}
+                                        <span class="fw-bold {% if perf_calendaires.ytd >= 0 %}text-success{% else %}text-danger{% endif %}" style="font-size: 1.1em;">
+                                            {% if perf_calendaires.ytd >= 0 %}+{% endif %}{{ perf_calendaires.ytd }}%
+                                        </span>
+                                        {% else %}<span class="text-muted">N/A</span>{% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Performances Glissantes -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-arrow-repeat me-2"></i>Performances Glissantes
+                        </h5>
+                        <small class="text-muted">Sur les X derniers mois/années</small>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-3">Période</th>
+                                    <th class="px-4 py-3">Description</th>
+                                    <th class="px-4 py-3 text-end">Performance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="px-4 py-3"><span class="badge bg-info">1M</span></td>
+                                    <td class="px-4 py-3 text-muted">1 Mois</td>
+                                    <td class="px-4 py-3 text-end">
+                                        {% if perf_glissantes.perf_1m != None %}
+                                        <span class="fw-bold {% if perf_glissantes.perf_1m >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if perf_glissantes.perf_1m >= 0 %}+{% endif %}{{ perf_glissantes.perf_1m }}%
+                                        </span>
+                                        {% else %}<span class="text-muted">N/A</span>{% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3"><span class="badge bg-info">3M</span></td>
+                                    <td class="px-4 py-3 text-muted">3 Mois</td>
+                                    <td class="px-4 py-3 text-end">
+                                        {% if perf_glissantes.perf_3m != None %}
+                                        <span class="fw-bold {% if perf_glissantes.perf_3m >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if perf_glissantes.perf_3m >= 0 %}+{% endif %}{{ perf_glissantes.perf_3m }}%
+                                        </span>
+                                        {% else %}<span class="text-muted">N/A</span>{% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3"><span class="badge bg-info">6M</span></td>
+                                    <td class="px-4 py-3 text-muted">6 Mois</td>
+                                    <td class="px-4 py-3 text-end">
+                                        {% if perf_glissantes.perf_6m != None %}
+                                        <span class="fw-bold {% if perf_glissantes.perf_6m >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if perf_glissantes.perf_6m >= 0 %}+{% endif %}{{ perf_glissantes.perf_6m }}%
+                                        </span>
+                                        {% else %}<span class="text-muted">N/A</span>{% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3"><span class="badge bg-info">1A</span></td>
+                                    <td class="px-4 py-3 text-muted">1 An</td>
+                                    <td class="px-4 py-3 text-end">
+                                        {% if perf_glissantes.perf_1y != None %}
+                                        <span class="fw-bold {% if perf_glissantes.perf_1y >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if perf_glissantes.perf_1y >= 0 %}+{% endif %}{{ perf_glissantes.perf_1y }}%
+                                        </span>
+                                        {% else %}<span class="text-muted">N/A</span>{% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3"><span class="badge bg-info">3A</span></td>
+                                    <td class="px-4 py-3 text-muted">3 Ans</td>
+                                    <td class="px-4 py-3 text-end">
+                                        {% if perf_glissantes.perf_3y != None %}
+                                        <span class="fw-bold {% if perf_glissantes.perf_3y >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if perf_glissantes.perf_3y >= 0 %}+{% endif %}{{ perf_glissantes.perf_3y }}%
+                                        </span>
+                                        {% else %}<span class="text-muted">N/A</span>{% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3"><span class="badge bg-info">5A</span></td>
+                                    <td class="px-4 py-3 text-muted">5 Ans</td>
+                                    <td class="px-4 py-3 text-end">
+                                        {% if perf_glissantes.perf_5y != None %}
+                                        <span class="fw-bold {% if perf_glissantes.perf_5y >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if perf_glissantes.perf_5y >= 0 %}+{% endif %}{{ perf_glissantes.perf_5y }}%
+                                        </span>
+                                        {% else %}<span class="text-muted">N/A</span>{% endif %}
+                                    </td>
+                                </tr>
+                                <tr style="background: rgba(0, 64, 128, 0.05);">
+                                    <td class="px-4 py-3"><span class="badge" style="background: var(--primary-color);">Origine</span></td>
+                                    <td class="px-4 py-3 text-muted">Depuis la création</td>
+                                    <td class="px-4 py-3 text-end">
+                                        {% if perf_glissantes.origine != None %}
+                                        <span class="fw-bold {% if perf_glissantes.origine >= 0 %}text-success{% else %}text-danger{% endif %}" style="font-size: 1.1em;">
+                                            {% if perf_glissantes.origine >= 0 %}+{% endif %}{{ perf_glissantes.origine }}%
+                                        </span>
+                                        {% else %}<span class="text-muted">N/A</span>{% endif %}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Note -->
+            <div class="col-12">
+                <div class="alert alert-light border d-flex align-items-center" role="alert">
+                    <i class="bi bi-info-circle me-2" style="color: var(--primary-color);"></i>
+                    <div>
+                        <small>Données calculées au <strong>{{ stats.derniere_date }}</strong> (dernière VL en base). 
+                        Les performances passées ne préjugent pas des performances futures.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Historique Tab -->
     <div class="tab-pane fade" id="history" role="tabpanel">
         <div class="card">
@@ -565,19 +795,397 @@
     
     <!-- Analyse Tab -->
     <div class="tab-pane fade" id="analysis" role="tabpanel">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="bi bi-bar-chart-line me-2"></i>Analyse Avancée
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="bi bi-graph-up-arrow"></i>
+        <div class="row g-4">
+            <!-- Header -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-bar-chart-line me-2" style="color: var(--primary-color);"></i>
+                                Analyse - <span style="color: var(--primary-color);">{{ selected_fcp }}</span>
+                            </h5>
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="text-muted small me-2">Sélectionner un FCP :</label>
+                                <select class="select-custom" id="analyseFcpSelector" style="min-width: 220px;">
+                                    {% for fcp_name in fcp_list %}
+                                    <option value="{{ fcp_name }}" {% if fcp_name == selected_fcp %}selected{% endif %}>{{ fcp_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <h3>Analyse à venir</h3>
-                    <p>Les outils d'analyse avancée seront disponibles dans cette section.</p>
+                </div>
+            </div>
+            
+            <!-- Statistiques Descriptives -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-calculator me-2"></i>Statistiques Descriptives
+                        </h5>
+                        <small class="text-muted">Analyse des rendements quotidiens</small>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0">
+                            <tbody>
+                                <tr>
+                                    <td class="px-4 py-3">
+                                        <i class="bi bi-hash me-2 text-muted"></i>Nombre d'observations
+                                    </td>
+                                    <td class="px-4 py-3 text-end fw-bold">{{ analyse_stats.nb_observations|default:"--" }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3">
+                                        <i class="bi bi-graph-up me-2 text-muted"></i>Rendement moyen quotidien
+                                    </td>
+                                    <td class="px-4 py-3 text-end fw-bold">{{ analyse_stats.rendement_moyen|default:"--" }}%</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3">
+                                        <i class="bi bi-graph-up-arrow me-2 text-muted"></i>Rendement annualisé
+                                    </td>
+                                    <td class="px-4 py-3 text-end">
+                                        <span class="fw-bold {% if analyse_stats.rendement_moyen_ann >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                            {% if analyse_stats.rendement_moyen_ann >= 0 %}+{% endif %}{{ analyse_stats.rendement_moyen_ann|default:"--" }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3">
+                                        <i class="bi bi-distribute-vertical me-2 text-muted"></i>Médiane
+                                    </td>
+                                    <td class="px-4 py-3 text-end fw-bold">{{ analyse_stats.mediane|default:"--" }}%</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3">
+                                        <i class="bi bi-bar-chart me-2 text-muted"></i>Écart-type quotidien
+                                    </td>
+                                    <td class="px-4 py-3 text-end fw-bold">{{ analyse_stats.ecart_type|default:"--" }}%</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3">
+                                        <i class="bi bi-activity me-2 text-muted"></i>Volatilité annualisée
+                                    </td>
+                                    <td class="px-4 py-3 text-end fw-bold" style="color: var(--primary-color);">{{ analyse_stats.volatilite_ann|default:"--" }}%</td>
+                                </tr>
+                                <tr class="table-light">
+                                    <td class="px-4 py-3">
+                                        <i class="bi bi-arrow-down-circle me-2 text-danger"></i>VL Minimum
+                                    </td>
+                                    <td class="px-4 py-3 text-end fw-bold">{{ analyse_stats.vl_min|default:"--" }} XOF</td>
+                                </tr>
+                                <tr class="table-light">
+                                    <td class="px-4 py-3">
+                                        <i class="bi bi-arrow-up-circle me-2 text-success"></i>VL Maximum
+                                    </td>
+                                    <td class="px-4 py-3 text-end fw-bold">{{ analyse_stats.vl_max|default:"--" }} XOF</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3">
+                                        <i class="bi bi-chevron-double-down me-2 text-danger"></i>Pire rendement quotidien
+                                    </td>
+                                    <td class="px-4 py-3 text-end fw-bold text-danger">{{ analyse_stats.rdt_min|default:"--" }}%</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3">
+                                        <i class="bi bi-chevron-double-up me-2 text-success"></i>Meilleur rendement quotidien
+                                    </td>
+                                    <td class="px-4 py-3 text-end fw-bold text-success">+{{ analyse_stats.rdt_max|default:"--" }}%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Profil de Risque -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-shield-exclamation me-2"></i>Profil de Risque
+                        </h5>
+                        <small class="text-muted">Indicateurs de risque et ratios</small>
+                    </div>
+                    <div class="card-body">
+                        <!-- Drawdown Max -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">
+                                    <i class="bi bi-graph-down-arrow me-2"></i>Drawdown Maximum
+                                </span>
+                                <span class="fw-bold text-danger fs-5">-{{ analyse_stats.max_drawdown|default:"--" }}%</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-danger" role="progressbar" 
+                                     style="width: {{ analyse_stats.max_drawdown|default:0 }}%"></div>
+                            </div>
+                            <small class="text-muted">Perte maximale depuis un pic historique</small>
+                        </div>
+                        
+                        <!-- Ratio de Sharpe -->
+                        <div class="mb-4 p-3 rounded" style="background: var(--bg-secondary);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-trophy me-2" style="color: var(--primary-color);"></i>
+                                    <span class="fw-medium">Ratio de Sharpe</span>
+                                    <br><small class="text-muted">Rendement ajusté du risque (rf=3,25%)</small>
+                                </div>
+                                <span class="fs-4 fw-bold {% if analyse_stats.sharpe >= 1 %}text-success{% elif analyse_stats.sharpe >= 0 %}text-warning{% else %}text-danger{% endif %}">
+                                    {{ analyse_stats.sharpe|default:"--" }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Ratio de Sortino -->
+                        <div class="mb-4 p-3 rounded" style="background: var(--bg-secondary);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-shield-check me-2" style="color: var(--primary-color);"></i>
+                                    <span class="fw-medium">Ratio de Sortino</span>
+                                    <br><small class="text-muted">Rendement ajusté du risque baissier</small>
+                                </div>
+                                <span class="fs-4 fw-bold {% if analyse_stats.sortino >= 1 %}text-success{% elif analyse_stats.sortino >= 0 %}text-warning{% else %}text-danger{% endif %}">
+                                    {{ analyse_stats.sortino|default:"--" }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Jours Positifs/Négatifs -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">Distribution des jours</span>
+                                <span class="fw-bold">{{ analyse_stats.ratio_positif|default:"--" }}% positifs</span>
+                            </div>
+                            <div class="progress" style="height: 24px;">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     style="width: {{ analyse_stats.ratio_positif|default:50 }}%"
+                                     title="{{ analyse_stats.jours_positifs }} jours positifs">
+                                    <small>{{ analyse_stats.jours_positifs|default:"--" }} <i class="bi bi-arrow-up"></i></small>
+                                </div>
+                                <div class="progress-bar bg-danger" role="progressbar" 
+                                     style="width: {% widthratio analyse_stats.jours_negatifs analyse_stats.nb_observations 100 %}%"
+                                     title="{{ analyse_stats.jours_negatifs }} jours négatifs">
+                                    <small>{{ analyse_stats.jours_negatifs|default:"--" }} <i class="bi bi-arrow-down"></i></small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Légende interprétation -->
+                        <div class="alert alert-light border-0 mb-0 mt-4">
+                            <small>
+                                <strong>Interprétation des ratios :</strong><br>
+                                <span class="text-success">● &gt; 1</span> = Excellent |
+                                <span class="text-warning">● 0-1</span> = Acceptable |
+                                <span class="text-danger">● &lt; 0</span> = À éviter
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Note -->
+            <div class="col-12">
+                <div class="alert alert-light border d-flex align-items-center" role="alert">
+                    <i class="bi bi-info-circle me-2" style="color: var(--primary-color);"></i>
+                    <div>
+                        <small>Analyse basée sur les données du <strong>{{ stats.premiere_date }}</strong> au <strong>{{ stats.derniere_date }}</strong>. 
+                        Taux sans risque utilisé : 3,25% annuel.</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Matrice de Corrélation -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-grid-3x3 me-2"></i>Matrice de Corrélation
+                            </h5>
+                            <small class="text-muted">Corrélation des rendements entre FCP</small>
+                        </div>
+                        <div class="filter-pills" id="correlationPeriodFilters">
+                            <button class="filter-pill" data-period="wtd">WTD</button>
+                            <button class="filter-pill" data-period="mtd">MTD</button>
+                            <button class="filter-pill" data-period="qtd">QTD</button>
+                            <button class="filter-pill" data-period="std">STD</button>
+                            <button class="filter-pill" data-period="ytd">YTD</button>
+                            <button class="filter-pill active" data-period="origin">Origine</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <small class="text-muted"><span id="correlationObsCount">--</span> observations communes</small>
+                        </div>
+                        <div class="table-responsive" id="correlationTableContainer">
+                            <div class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Chargement...</span>
+                                </div>
+                                <p class="text-muted mt-2">Calcul de la matrice de corrélation...</p>
+                            </div>
+                        </div>
+                        <!-- Légende -->
+                        <div class="d-flex justify-content-center gap-4 mt-3 flex-wrap">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 20px; height: 20px; background: #28a745; border-radius: 4px;"></div>
+                                <small class="text-muted">Corrélation positive forte (> 0.7)</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 20px; height: 20px; background: #ffc107; border-radius: 4px;"></div>
+                                <small class="text-muted">Corrélation modérée (0.3 - 0.7)</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 20px; height: 20px; background: #dc3545; border-radius: 4px;"></div>
+                                <small class="text-muted">Corrélation négative (< 0)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Risque Tab -->
+    <div class="tab-pane fade" id="risk" role="tabpanel">
+        <div class="row g-4">
+            <!-- Header -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-shield-exclamation me-2" style="color: var(--primary-color);"></i>
+                                Analyse du Risque - <span style="color: var(--primary-color);">{{ selected_fcp }}</span>
+                            </h5>
+                            <div class="d-flex align-items-center gap-3 flex-wrap">
+                                <div class="d-flex align-items-center gap-2">
+                                    <label class="text-muted small">FCP :</label>
+                                    <select class="select-custom" id="riskFcpSelector" style="min-width: 220px;">
+                                        {% for fcp_name in fcp_list %}
+                                        <option value="{{ fcp_name }}" {% if fcp_name == selected_fcp %}selected{% endif %}>{{ fcp_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <label class="text-muted small">Fenêtre :</label>
+                                    <input type="range" class="form-range" id="volatilityWindow" min="5" max="30" value="20" style="width: 100px;">
+                                    <span class="badge bg-primary" id="windowValue">20</span>
+                                    <small class="text-muted">jours</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Graphique Volatilité Glissante -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-activity me-2"></i>Volatilité Glissante et Régimes
+                        </h5>
+                        <small class="text-muted">Clustering en 3 régimes : Faible, Intermédiaire, Élevé</small>
+                    </div>
+                    <div class="card-body">
+                        <div id="volatilityChartContainer" style="height: 350px;">
+                            <div class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Chargement...</span>
+                                </div>
+                                <p class="text-muted mt-2">Calcul du clustering de volatilité...</p>
+                            </div>
+                        </div>
+                        <canvas id="volatilityChart" style="display: none;"></canvas>
+                        <!-- Légende régimes -->
+                        <div class="d-flex justify-content-center gap-4 mt-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 16px; height: 16px; background: #28a745; border-radius: 50%;"></div>
+                                <small>Régime Faible</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 16px; height: 16px; background: #ffc107; border-radius: 50%;"></div>
+                                <small>Régime Intermédiaire</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 16px; height: 16px; background: #dc3545; border-radius: 50%;"></div>
+                                <small>Régime Élevé</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistiques des Régimes et Matrice de Transition -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-pie-chart me-2"></i>Statistiques des Régimes
+                        </h5>
+                        <small class="text-muted">Distribution de la volatilité par régime</small>
+                    </div>
+                    <div class="card-body" id="regimeStatsContainer">
+                        <div class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-arrow-left-right me-2"></i>Matrice de Transition
+                        </h5>
+                        <small class="text-muted">Probabilité de passage entre régimes (%)</small>
+                    </div>
+                    <div class="card-body" id="transitionMatrixContainer">
+                        <div class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Régime actuel -->
+            <div class="col-12">
+                <div class="card" id="currentRegimeCard">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div id="currentRegimeBadge" class="px-4 py-2 rounded-pill text-white fw-bold" style="background: #6c757d;">
+                                    --
+                                </div>
+                                <div>
+                                    <div class="text-muted small">Régime actuel</div>
+                                    <div class="fw-bold" id="currentVolatilityValue">Volatilité: --</div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="text-muted small">Seuils de classification</div>
+                                <div id="thresholdsInfo">Faible ≤ -- | Intermédiaire ≤ -- | Élevé > --</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Note -->
+            <div class="col-12">
+                <div class="alert alert-light border d-flex align-items-center" role="alert">
+                    <i class="bi bi-info-circle me-2" style="color: var(--primary-color);"></i>
+                    <div>
+                        <small>
+                            <strong>Clustering de volatilité :</strong> Classification des régimes basée sur les percentiles 33% et 66% de la volatilité glissante.
+                            La <strong>matrice de transition</strong> indique la probabilité de passer d'un régime à un autre le jour suivant.
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>
@@ -882,6 +1490,18 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = '?fcp=' + encodeURIComponent(selectedFcp);
     });
     
+    // Performances FCP Selector
+    document.getElementById('perfFcpSelector')?.addEventListener('change', function() {
+        const selectedFcp = this.value;
+        window.location.href = '?fcp=' + encodeURIComponent(selectedFcp);
+    });
+    
+    // Analyse FCP Selector
+    document.getElementById('analyseFcpSelector')?.addEventListener('change', function() {
+        const selectedFcp = this.value;
+        window.location.href = '?fcp=' + encodeURIComponent(selectedFcp);
+    });
+    
     // Benchmark Toggle
     document.getElementById('showBenchmark').addEventListener('change', function() {
         if (this.checked) {
@@ -1086,6 +1706,373 @@ document.addEventListener('DOMContentLoaded', function() {
     if (document.getElementById('history')?.classList.contains('show')) {
         renderHistoryTable();
     }
+    
+    // ====================================
+    // MATRICE DE CORRELATION
+    // ====================================
+    
+    function loadCorrelationMatrix(period = 'origin') {
+        const container = document.getElementById('correlationTableContainer');
+        container.innerHTML = `
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+                <p class="text-muted mt-2">Calcul de la matrice de corrélation...</p>
+            </div>
+        `;
+        
+        fetch('/api/correlation-matrix/?period=' + period)
+            .then(response => response.json())
+            .then(data => {
+                if (data.fcp_names && data.fcp_names.length > 0 && data.matrix.length > 0) {
+                    document.getElementById('correlationObsCount').textContent = data.nb_observations;
+                    renderCorrelationTable(data.fcp_names, data.matrix);
+                } else {
+                    container.innerHTML = `
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-exclamation-circle fs-1 d-block mb-2"></i>
+                            <p>Données insuffisantes pour calculer la matrice de corrélation sur cette période.</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                container.innerHTML = `
+                    <div class="text-center py-4 text-danger">
+                        <i class="bi bi-x-circle fs-1 d-block mb-2"></i>
+                        <p>Erreur lors du chargement de la matrice de corrélation.</p>
+                    </div>
+                `;
+            });
+    }
+    
+    function renderCorrelationTable(fcpNames, matrix) {
+        const container = document.getElementById('correlationTableContainer');
+        
+        // Créer des noms courts pour les FCP
+        const shortNames = fcpNames.map(name => {
+            // Extraire les mots clés du nom
+            const words = name.replace('FCP ', '').split(' ');
+            if (words.length > 2) {
+                return words.slice(0, 2).map(w => w.substring(0, 4)).join(' ');
+            }
+            return words.map(w => w.substring(0, 6)).join(' ');
+        });
+        
+        let html = '<table class="table table-sm table-bordered mb-0" style="font-size: 11px;">';
+        
+        // En-tête
+        html += '<thead><tr><th style="background: var(--bg-secondary);"></th>';
+        shortNames.forEach((name, i) => {
+            html += `<th class="text-center" style="background: var(--bg-secondary); writing-mode: vertical-rl; transform: rotate(180deg); height: 100px; white-space: nowrap;" title="${fcpNames[i]}">${name}</th>`;
+        });
+        html += '</tr></thead>';
+        
+        // Corps
+        html += '<tbody>';
+        matrix.forEach((row, i) => {
+            html += `<tr><td class="fw-bold text-nowrap" style="background: var(--bg-secondary);" title="${fcpNames[i]}">${shortNames[i]}</td>`;
+            row.forEach((corr, j) => {
+                let bgColor, textColor;
+                if (i === j) {
+                    bgColor = '#004080';
+                    textColor = 'white';
+                } else if (corr >= 0.7) {
+                    bgColor = `rgba(40, 167, 69, ${0.3 + corr * 0.7})`;
+                    textColor = corr > 0.85 ? 'white' : 'black';
+                } else if (corr >= 0.3) {
+                    bgColor = `rgba(255, 193, 7, ${0.3 + corr * 0.5})`;
+                    textColor = 'black';
+                } else if (corr >= 0) {
+                    bgColor = `rgba(200, 200, 200, ${0.2 + corr})`;
+                    textColor = 'black';
+                } else {
+                    bgColor = `rgba(220, 53, 69, ${0.3 + Math.abs(corr) * 0.7})`;
+                    textColor = Math.abs(corr) > 0.5 ? 'white' : 'black';
+                }
+                html += `<td class="text-center" style="background: ${bgColor}; color: ${textColor};">${corr.toFixed(2)}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</tbody></table>';
+        
+        container.innerHTML = html;
+    }
+    
+    // Correlation Period Filter Click Handler
+    document.querySelectorAll('#correlationPeriodFilters .filter-pill').forEach(pill => {
+        pill.addEventListener('click', function() {
+            document.querySelectorAll('#correlationPeriodFilters .filter-pill').forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            loadCorrelationMatrix(this.dataset.period);
+        });
+    });
+    
+    // Charger la matrice quand l'onglet Analyse est affiché
+    document.querySelector('button[data-bs-target="#analysis"]')?.addEventListener('shown.bs.tab', function() {
+        const activePeriod = document.querySelector('#correlationPeriodFilters .filter-pill.active')?.dataset.period || 'origin';
+        loadCorrelationMatrix(activePeriod);
+    });
+    
+    // ====================================
+    // ONGLET RISQUE - CLUSTERING VOLATILITE
+    // ====================================
+    
+    let volatilityChart = null;
+    
+    function loadVolatilityClustering(fcpName, window) {
+        // Afficher les loaders
+        document.getElementById('volatilityChartContainer').innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+                <p class="text-muted mt-2">Calcul du clustering de volatilité...</p>
+            </div>
+        `;
+        document.getElementById('regimeStatsContainer').innerHTML = '<div class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary" role="status"></div></div>';
+        document.getElementById('transitionMatrixContainer').innerHTML = '<div class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary" role="status"></div></div>';
+        
+        fetch(`/api/volatility-clustering/?fcp=${encodeURIComponent(fcpName)}&window=${window}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('volatilityChartContainer').innerHTML = `
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-exclamation-circle fs-1 d-block mb-2"></i>
+                            <p>${data.error}</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                renderVolatilityChart(data.chart_data);
+                renderRegimeStats(data.regime_stats);
+                renderTransitionMatrix(data.transition_matrix);
+                updateCurrentRegime(data.current_regime, data.current_volatility, data.thresholds);
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                document.getElementById('volatilityChartContainer').innerHTML = `
+                    <div class="text-center py-4 text-danger">
+                        <i class="bi bi-x-circle fs-1 d-block mb-2"></i>
+                        <p>Erreur lors du chargement des données.</p>
+                    </div>
+                `;
+            });
+    }
+    
+    function renderVolatilityChart(chartData) {
+        const container = document.getElementById('volatilityChartContainer');
+        container.innerHTML = '<canvas id="volatilityChart"></canvas>';
+        
+        const ctx = document.getElementById('volatilityChart').getContext('2d');
+        
+        const regimeColors = {
+            0: '#28a745',  // Faible - Vert
+            1: '#ffc107',  // Intermédiaire - Jaune
+            2: '#dc3545'   // Élevé - Rouge
+        };
+        
+        // Créer les données avec couleurs par segment
+        const labels = chartData.map(d => d.date);
+        const values = chartData.map(d => d.volatility);
+        const colors = chartData.map(d => regimeColors[d.regime]);
+        
+        if (volatilityChart) {
+            volatilityChart.destroy();
+        }
+        
+        volatilityChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Volatilité glissante (%)',
+                    data: values,
+                    borderColor: '#004080',
+                    backgroundColor: 'rgba(0, 64, 128, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.1,
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    segment: {
+                        borderColor: ctx => {
+                            const idx = ctx.p0DataIndex;
+                            return regimeColors[chartData[idx]?.regime] || '#004080';
+                        },
+                        backgroundColor: ctx => {
+                            const idx = ctx.p0DataIndex;
+                            const color = regimeColors[chartData[idx]?.regime] || '#004080';
+                            return color.replace(')', ', 0.1)').replace('rgb', 'rgba');
+                        }
+                    }
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(context) {
+                                const date = new Date(context[0].label);
+                                return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+                            },
+                            label: function(context) {
+                                const regime = chartData[context.dataIndex]?.regime;
+                                const regimeNames = {0: 'Faible', 1: 'Intermédiaire', 2: 'Élevé'};
+                                return [
+                                    'Volatilité: ' + context.raw.toFixed(2) + '%',
+                                    'Régime: ' + regimeNames[regime]
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            maxTicksLimit: 12,
+                            callback: function(value) {
+                                const date = new Date(this.getLabelForValue(value));
+                                return date.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' });
+                            }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Volatilité annualisée (%)'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    function renderRegimeStats(regimeStats) {
+        const container = document.getElementById('regimeStatsContainer');
+        
+        let html = '';
+        const regimeOrder = [0, 1, 2];
+        
+        regimeOrder.forEach(regime => {
+            const stats = regimeStats[regime];
+            const percentage = stats.count > 0 ? ((stats.count / Object.values(regimeStats).reduce((a, b) => a + b.count, 0)) * 100).toFixed(1) : 0;
+            
+            html += `
+                <div class="mb-3 p-3 rounded" style="background: ${stats.color}15; border-left: 4px solid ${stats.color};">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="fw-bold" style="color: ${stats.color};">
+                            <i class="bi bi-circle-fill me-2" style="font-size: 10px;"></i>${stats.nom}
+                        </span>
+                        <span class="badge" style="background: ${stats.color};">${stats.count} jours (${percentage}%)</span>
+                    </div>
+                    <div class="row text-center small">
+                        <div class="col-4">
+                            <div class="text-muted">Min</div>
+                            <div class="fw-bold">${stats.min}%</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-muted">Moyenne</div>
+                            <div class="fw-bold">${stats.mean}%</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-muted">Max</div>
+                            <div class="fw-bold">${stats.max}%</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    function renderTransitionMatrix(matrix) {
+        const container = document.getElementById('transitionMatrixContainer');
+        const regimeNames = ['Faible', 'Intermédiaire', 'Élevé'];
+        const regimeColors = ['#28a745', '#ffc107', '#dc3545'];
+        
+        let html = '<table class="table table-sm table-bordered mb-0">';
+        html += '<thead><tr><th style="background: var(--bg-secondary);">De \\ Vers</th>';
+        regimeNames.forEach((name, i) => {
+            html += `<th class="text-center" style="background: ${regimeColors[i]}20;">${name}</th>`;
+        });
+        html += '</tr></thead><tbody>';
+        
+        matrix.forEach((row, i) => {
+            html += `<tr><td class="fw-bold" style="background: ${regimeColors[i]}20;">${regimeNames[i]}</td>`;
+            row.forEach((prob, j) => {
+                const intensity = prob / 100;
+                const bgColor = i === j ? `rgba(0, 64, 128, ${0.2 + intensity * 0.6})` : `rgba(128, 128, 128, ${intensity * 0.5})`;
+                html += `<td class="text-center" style="background: ${bgColor};">${prob}%</td>`;
+            });
+            html += '</tr>';
+        });
+        
+        html += '</tbody></table>';
+        html += `
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Probabilité de transition d'un jour à l'autre
+                </small>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+    }
+    
+    function updateCurrentRegime(regime, volatility, thresholds) {
+        const regimeNames = {0: 'FAIBLE', 1: 'INTERMÉDIAIRE', 2: 'ÉLEVÉ'};
+        const regimeColors = {0: '#28a745', 1: '#ffc107', 2: '#dc3545'};
+        
+        const badge = document.getElementById('currentRegimeBadge');
+        badge.textContent = regimeNames[regime];
+        badge.style.background = regimeColors[regime];
+        
+        document.getElementById('currentVolatilityValue').textContent = `Volatilité actuelle: ${volatility}%`;
+        document.getElementById('thresholdsInfo').innerHTML = 
+            `<span style="color: #28a745;">Faible ≤ ${thresholds.low}%</span> | 
+             <span style="color: #ffc107;">Intermédiaire ≤ ${thresholds.high}%</span> | 
+             <span style="color: #dc3545;">Élevé > ${thresholds.high}%</span>`;
+    }
+    
+    // Risk FCP Selector
+    document.getElementById('riskFcpSelector')?.addEventListener('change', function() {
+        const selectedFcp = this.value;
+        const window = document.getElementById('volatilityWindow').value;
+        loadVolatilityClustering(selectedFcp, window);
+    });
+    
+    // Volatility Window Slider
+    document.getElementById('volatilityWindow')?.addEventListener('input', function() {
+        document.getElementById('windowValue').textContent = this.value;
+    });
+    
+    document.getElementById('volatilityWindow')?.addEventListener('change', function() {
+        const fcpName = document.getElementById('riskFcpSelector').value;
+        loadVolatilityClustering(fcpName, this.value);
+    });
+    
+    // Charger les données quand l'onglet Risque est affiché
+    document.querySelector('button[data-bs-target="#risk"]')?.addEventListener('shown.bs.tab', function() {
+        const fcpName = document.getElementById('riskFcpSelector').value;
+        const window = document.getElementById('volatilityWindow').value;
+        loadVolatilityClustering(fcpName, window);
+    });
 });
 </script>
 {% endblock %}

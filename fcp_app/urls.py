@@ -10,4 +10,6 @@ urlpatterns = [
     path('a-propos/', views.a_propos, name='a_propos'),
     path('api/vl-data/', views.api_vl_data, name='api_vl_data'),
     path('api/scatter-data/', views.api_scatter_data, name='api_scatter_data'),
+    path('api/correlation-matrix/', views.api_correlation_matrix, name='api_correlation_matrix'),
+    path('api/volatility-clustering/', views.api_volatility_clustering, name='api_volatility_clustering'),
 ]
