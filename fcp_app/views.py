@@ -137,7 +137,7 @@ def valeurs_liquidatives(request):
                 variance = sum((r - moyenne) ** 2 for r in period_rendements) / len(period_rendements)
                 ecart_type = variance ** 0.5
                 # Annualiser la volatilité
-                volatilite_ann = ecart_type * (252 ** 0.5)
+                volatilite_ann = ecart_type * (365 ** 0.5)
                 return round(volatilite_ann, 2)
             
             tracking_error = {
@@ -158,7 +158,7 @@ def valeurs_liquidatives(request):
                 moyenne_rdt = sum(rendements) / len(rendements)
                 variance = sum((r - moyenne_rdt) ** 2 for r in rendements) / len(rendements)
                 ecart_type = variance ** 0.5
-                volatilite_ann = ecart_type * (252 ** 0.5)
+                volatilite_ann = ecart_type * (365 ** 0.5)
                 
                 rendements_sorted = sorted(rendements)
                 n = len(rendements_sorted)
@@ -185,15 +185,15 @@ def valeurs_liquidatives(request):
                         max_drawdown = drawdown
                 
                 # Ratio de Sharpe (avec taux sans risque de 3,25%)
-                rf = 3.25 / 252  # Taux sans risque quotidien
-                sharpe = ((moyenne_rdt - rf) / ecart_type * (252 ** 0.5)) if ecart_type > 0 else 0
+                rf = 3.25 / 365  # Taux sans risque quotidien
+                sharpe = ((moyenne_rdt - rf) / ecart_type * (365 ** 0.5)) if ecart_type > 0 else 0
                 
                 # Ratio de Sortino
                 rendements_negatifs = [r for r in rendements if r < 0]
                 if rendements_negatifs:
                     downside_var = sum(r ** 2 for r in rendements_negatifs) / len(rendements_negatifs)
                     downside_std = downside_var ** 0.5
-                    sortino = ((moyenne_rdt - rf) / downside_std * (252 ** 0.5)) if downside_std > 0 else 0
+                    sortino = ((moyenne_rdt - rf) / downside_std * (365 ** 0.5)) if downside_std > 0 else 0
                 else:
                     sortino = 0
                 
@@ -299,7 +299,7 @@ def valeurs_liquidatives(request):
                     # Statistiques descriptives
                     'nb_observations': len(rendements),
                     'rendement_moyen': round(moyenne_rdt, 4),
-                    'rendement_moyen_ann': round(moyenne_rdt * 252, 2),
+                    'rendement_moyen_ann': round(moyenne_rdt * 365, 2),
                     'mediane': round(mediane, 4),
                     'ecart_type': round(ecart_type, 4),
                     'volatilite_ann': round(volatilite_ann, 2),
@@ -348,7 +348,7 @@ def valeurs_liquidatives(request):
                 if rendements:
                     moyenne = sum(rendements) / len(rendements)
                     variance = sum((r - moyenne) ** 2 for r in rendements) / len(rendements)
-                    vol = (variance ** 0.5) * (252 ** 0.5) * 100
+                    vol = (variance ** 0.5) * (365 ** 0.5) * 100
                 else:
                     vol = 0
                 
@@ -446,7 +446,7 @@ def api_scatter_data(request):
                         if rendements:
                             moyenne = sum(rendements) / len(rendements)
                             variance = sum((r - moyenne) ** 2 for r in rendements) / len(rendements)
-                            vol = (variance ** 0.5) * (252 ** 0.5) * 100
+                            vol = (variance ** 0.5) * (365 ** 0.5) * 100
                         else:
                             vol = 0
                     else:
@@ -633,7 +633,7 @@ def api_fcp_full_data(request):
             moyenne = sum(period_rendements) / len(period_rendements)
             variance = sum((r - moyenne) ** 2 for r in period_rendements) / len(period_rendements)
             ecart_type = variance ** 0.5
-            volatilite_ann = ecart_type * (252 ** 0.5)
+            volatilite_ann = ecart_type * (365 ** 0.5)
             return round(volatilite_ann, 2)
         
         tracking_error = {
@@ -653,7 +653,7 @@ def api_fcp_full_data(request):
             moyenne_rdt = sum(rendements) / len(rendements)
             variance = sum((r - moyenne_rdt) ** 2 for r in rendements) / len(rendements)
             ecart_type = variance ** 0.5
-            volatilite_ann = ecart_type * (252 ** 0.5)
+            volatilite_ann = ecart_type * (365 ** 0.5)
             
             rendements_sorted = sorted(rendements)
             n = len(rendements_sorted)
@@ -677,14 +677,14 @@ def api_fcp_full_data(request):
                 if drawdown > max_drawdown:
                     max_drawdown = drawdown
             
-            rf = 3.25 / 252
-            sharpe = ((moyenne_rdt - rf) / ecart_type * (252 ** 0.5)) if ecart_type > 0 else 0
+            rf = 3.25 / 365
+            sharpe = ((moyenne_rdt - rf) / ecart_type * (365 ** 0.5)) if ecart_type > 0 else 0
             
             rendements_negatifs = [r for r in rendements if r < 0]
             if rendements_negatifs:
                 downside_var = sum(r ** 2 for r in rendements_negatifs) / len(rendements_negatifs)
                 downside_std = downside_var ** 0.5
-                sortino = ((moyenne_rdt - rf) / downside_std * (252 ** 0.5)) if downside_std > 0 else 0
+                sortino = ((moyenne_rdt - rf) / downside_std * (365 ** 0.5)) if downside_std > 0 else 0
             else:
                 sortino = 0
             
@@ -775,7 +775,7 @@ def api_fcp_full_data(request):
             analyse_stats = {
                 'nb_observations': len(rendements),
                 'rendement_moyen': round(moyenne_rdt, 4),
-                'rendement_moyen_ann': round(moyenne_rdt * 252, 2),
+                'rendement_moyen_ann': round(moyenne_rdt * 365, 2),
                 'mediane': round(mediane, 4),
                 'ecart_type': round(ecart_type, 4),
                 'volatilite_ann': round(volatilite_ann, 2),
@@ -1002,7 +1002,7 @@ def api_volatility_clustering(request):
         window_returns = rendements[i - window + 1:i + 1]
         mean_ret = sum(window_returns) / len(window_returns)
         variance = sum((r - mean_ret) ** 2 for r in window_returns) / len(window_returns)
-        vol = (variance ** 0.5) * (252 ** 0.5)  # Volatilité annualisée
+        vol = (variance ** 0.5) * (365 ** 0.5)  # Volatilité annualisée
         volatilites.append(vol)
         vol_dates.append(dates[i])
     
@@ -1138,7 +1138,7 @@ def api_rolling_metrics(request):
             benchmark_returns[bench_vl[i]['date']] = ret
     
     # Taux sans risque journalier (3.25% annuel)
-    rf_daily = 3.25 / 252
+    rf_daily = 3.25 / 365
     
     # Calculer les métriques glissantes
     rolling_sharpe = []
@@ -1155,7 +1155,7 @@ def api_rolling_metrics(request):
         std_ret = variance ** 0.5
         
         if std_ret > 0:
-            sharpe = ((mean_ret - rf_daily) / std_ret) * (252 ** 0.5)
+            sharpe = ((mean_ret - rf_daily) / std_ret) * (365 ** 0.5)
         else:
             sharpe = 0
         
