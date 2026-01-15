@@ -101,10 +101,18 @@ def valeurs_liquidatives(request):
                 else:
                     vol = 0
                 
+                # Récupérer le type de fond depuis FicheSignaletique
+                try:
+                    fiche = FicheSignaletique.objects.get(nom=fcp_name)
+                    type_fond = fiche.type_fond
+                except FicheSignaletique.DoesNotExist:
+                    type_fond = 'Diversifié'
+                
                 all_fcp_stats.append({
                     'nom': fcp_name,
                     'rendement': round(rendement, 2),
                     'volatilite': round(vol, 2),
+                    'type_fond': type_fond,
                     'selected': fcp_name == selected_fcp
                 })
     
@@ -118,6 +126,84 @@ def valeurs_liquidatives(request):
         'all_fcp_stats_json': json.dumps(all_fcp_stats),
     }
     return render(request, 'fcp_app/valeurs_liquidatives.html', context)
+
+
+def api_scatter_data(request):
+    """API pour récupérer les données du scatter plot avec filtre de période"""
+    period = request.GET.get('period', 'origin')
+    
+    fcp_list = list(FicheSignaletique.objects.values_list('nom', flat=True).order_by('nom'))
+    all_fcp_stats = []
+    
+    for fcp_name in fcp_list:
+        fcp_vl_model = get_vl_model(fcp_name)
+        if fcp_vl_model:
+            fcp_vl = fcp_vl_model.objects.all().order_by('date')
+            if fcp_vl.exists() and fcp_vl.count() > 30:
+                last = fcp_vl.last()
+                latest_date = last.date
+                
+                # Filtrer par période
+                if period == 'wtd':  # Week-to-Date (depuis lundi)
+                    start_date = latest_date - timedelta(days=latest_date.weekday())
+                elif period == 'mtd':  # Month-to-Date
+                    start_date = latest_date.replace(day=1)
+                elif period == 'qtd':  # Quarter-to-Date
+                    quarter_month = ((latest_date.month - 1) // 3) * 3 + 1
+                    start_date = latest_date.replace(month=quarter_month, day=1)
+                elif period == 'std':  # Semester-to-Date
+                    semester_month = 1 if latest_date.month <= 6 else 7
+                    start_date = latest_date.replace(month=semester_month, day=1)
+                elif period == 'ytd':  # Year-to-Date
+                    start_date = latest_date.replace(month=1, day=1)
+                else:  # origin
+                    start_date = None
+                
+                if start_date:
+                    filtered_vl = fcp_vl.filter(date__gte=start_date)
+                else:
+                    filtered_vl = fcp_vl
+                
+                if filtered_vl.count() > 10:
+                    first = filtered_vl.first()
+                    last_filtered = filtered_vl.last()
+                    rendement = ((float(last_filtered.valeur) / float(first.valeur)) - 1) * 100
+                    
+                    # Calculer volatilité sur la période
+                    valeurs = list(filtered_vl.values_list('valeur', flat=True))
+                    rendements = [(float(valeurs[i]) / float(valeurs[i-1]) - 1) for i in range(1, len(valeurs))]
+                    if rendements:
+                        moyenne = sum(rendements) / len(rendements)
+                        variance = sum((r - moyenne) ** 2 for r in rendements) / len(rendements)
+                        vol = (variance ** 0.5) * (252 ** 0.5) * 100
+                    else:
+                        vol = 0
+                    
+                    # Récupérer le type de fond
+                    try:
+                        fiche = FicheSignaletique.objects.get(nom=fcp_name)
+                        type_fond = fiche.type_fond
+                    except FicheSignaletique.DoesNotExist:
+                        type_fond = 'Diversifié'
+                    
+                    all_fcp_stats.append({
+                        'nom': fcp_name,
+                        'rendement': round(rendement, 2),
+                        'volatilite': round(vol, 2),
+                        'type_fond': type_fond
+                    })
+    
+    # Récupérer la dernière date de la base (prendre la première disponible)
+    last_date_str = None
+    for fcp_name in fcp_list:
+        fcp_vl_model = get_vl_model(fcp_name)
+        if fcp_vl_model:
+            last_vl = fcp_vl_model.objects.order_by('-date').first()
+            if last_vl:
+                last_date_str = last_vl.date.strftime('%d/%m/%Y')
+                break
+    
+    return JsonResponse({'data': all_fcp_stats, 'last_date': last_date_str})
 
 
 def api_vl_data(request):

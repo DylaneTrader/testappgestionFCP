@@ -398,7 +398,12 @@
                     
                     <!-- Period Filters for Scatter -->
                     <div class="filter-pills" id="scatterPeriodFilters">
-                        <button class="filter-pill active" data-period="origin">Depuis Origine</button>
+                        <button class="filter-pill" data-period="wtd">WTD</button>
+                        <button class="filter-pill" data-period="mtd">MTD</button>
+                        <button class="filter-pill" data-period="qtd">QTD</button>
+                        <button class="filter-pill" data-period="std">STD</button>
+                        <button class="filter-pill" data-period="ytd">YTD</button>
+                        <button class="filter-pill active" data-period="origin">Origine</button>
                     </div>
                 </div>
                 
@@ -411,44 +416,54 @@
                     <div class="col-lg-4">
                         <div class="scatter-info flex-column h-100 justify-content-center">
                             <div class="scatter-info-item mb-3">
+                                <div class="label">FCP sélectionné</div>
+                                <div class="value fw-bold" style="color: var(--primary-color);" id="scatterSelectedFcp">{{ selected_fcp }}</div>
+                            </div>
+                            <div class="scatter-info-item mb-3">
                                 <div class="label">Rendement</div>
-                                <div class="value" style="color: var(--success-color);">+8.52%</div>
+                                <div class="value" id="scatterRendement" style="color: var(--success-color);">{{ stats.var_origine|default:"0" }}%</div>
                             </div>
                             <div class="scatter-info-item mb-3">
                                 <div class="label">Risque (Volatilité)</div>
-                                <div class="value">4.25%</div>
+                                <div class="value" id="scatterVolatilite">{{ stats.volatilite|default:"0" }}%</div>
                             </div>
                             <div class="scatter-info-item mb-3">
-                                <div class="label">Ratio de Sharpe</div>
-                                <div class="value">1.85</div>
+                                <div class="label">Ratio Rendement/Risque</div>
+                                <div class="value" id="scatterRatio">--</div>
                             </div>
                             <div class="scatter-info-item">
-                                <div class="label">Position</div>
-                                <div class="value" style="color: var(--primary-color);">
-                                    <i class="bi bi-star-fill me-1"></i>Optimal
+                                <div class="label">Type de fond</div>
+                                <div class="value" id="scatterTypeFond" style="color: var(--primary-color);">
+                                    <i class="bi bi-tag-fill me-1"></i>--
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Scatter Legend -->
-                <div class="chart-legend mt-3">
-                    <div class="legend-item">
-                        <div class="legend-dot" style="background: #004080;"></div>
-                        <span>FCP Croissance</span>
+                <!-- Scatter Legend par Type de Fond -->
+                <div class="d-flex justify-content-between align-items-center flex-wrap mt-3">
+                    <div class="chart-legend" id="scatterLegend">
+                        <div class="legend-item" data-type="Obligataire">
+                            <div class="legend-dot" style="background: #004080;"></div>
+                            <span>Obligataire</span>
+                        </div>
+                        <div class="legend-item" data-type="Diversifié">
+                            <div class="legend-dot" style="background: #28a745;"></div>
+                            <span>Diversifié</span>
+                        </div>
+                        <div class="legend-item" data-type="Actions">
+                            <div class="legend-dot" style="background: #dc3545;"></div>
+                            <span>Actions</span>
+                        </div>
+                        <div class="legend-item" data-type="Monétaire">
+                            <div class="legend-dot" style="background: #ffc107;"></div>
+                            <span>Monétaire</span>
+                        </div>
                     </div>
-                    <div class="legend-item">
-                        <div class="legend-dot" style="background: #28a745;"></div>
-                        <span>FCP Équilibre</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-dot" style="background: #e6a800;"></div>
-                        <span>FCP Sécurité</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-dot" style="background: #333333; opacity: 0.5;"></div>
-                        <span>Benchmark</span>
+                    <div class="text-muted small" id="scatterDateNote">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Données au <strong>{{ stats.derniere_date }}</strong> (dernière date en base)
                     </div>
                 </div>
             </div>
@@ -688,21 +703,33 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Risk/Return Scatter Chart avec données réelles
+    // Risk/Return Scatter Chart avec données réelles et catégorisation par type_fond
     const scatterCtx = document.getElementById('riskReturnChart').getContext('2d');
     
-    // Générer les couleurs pour les FCP
-    const colors = ['#004080', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1', '#e83e8c', '#fd7e14', '#20c997', '#6c757d'];
+    // Couleurs par type de fond
+    const typeColors = {
+        'Obligataire': '#004080',
+        'Diversifié': '#28a745',
+        'Actions': '#dc3545',
+        'Monétaire': '#ffc107'
+    };
     
-    const scatterDatasets = allFcpStats.map((fcp, index) => ({
-        label: fcp.nom,
-        data: [{ x: fcp.volatilite, y: fcp.rendement }],
-        backgroundColor: fcp.selected ? '#004080' : colors[index % colors.length],
-        pointRadius: fcp.selected ? 14 : 8,
-        pointHoverRadius: fcp.selected ? 16 : 10,
-        borderColor: fcp.selected ? '#fff' : 'transparent',
-        borderWidth: fcp.selected ? 3 : 0
-    }));
+    // Fonction pour créer les datasets du scatter chart
+    function createScatterDatasets(data) {
+        return data.map((fcp) => ({
+            label: fcp.nom,
+            data: [{ x: fcp.volatilite, y: fcp.rendement, type_fond: fcp.type_fond }],
+            backgroundColor: fcp.selected ? typeColors[fcp.type_fond] || '#6c757d' : typeColors[fcp.type_fond] || '#6c757d',
+            pointRadius: fcp.selected ? 14 : 8,
+            pointHoverRadius: fcp.selected ? 16 : 10,
+            borderColor: fcp.selected ? '#fff' : 'rgba(255,255,255,0.5)',
+            borderWidth: fcp.selected ? 3 : 1,
+            type_fond: fcp.type_fond
+        }));
+    }
+    
+    // Initialiser le scatter chart
+    let scatterDatasets = createScatterDatasets(allFcpStats);
     
     const scatterChart = new Chart(scatterCtx, {
         type: 'scatter',
@@ -722,8 +749,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     cornerRadius: 8,
                     callbacks: {
                         label: function(context) {
+                            const typeFond = context.dataset.type_fond || 'N/A';
                             return [
                                 context.dataset.label,
+                                'Type: ' + typeFond,
                                 'Rendement: ' + context.raw.y.toFixed(2) + '%',
                                 'Volatilité: ' + context.raw.x.toFixed(2) + '%'
                             ];
@@ -766,8 +795,70 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                 }
+            },
+            onClick: function(event, elements) {
+                if (elements.length > 0) {
+                    const datasetIndex = elements[0].datasetIndex;
+                    const fcpData = scatterChart.data.datasets[datasetIndex];
+                    updateScatterInfo(fcpData.label, fcpData.data[0].y, fcpData.data[0].x, fcpData.type_fond);
+                }
             }
         }
+    });
+    
+    // Fonction pour mettre à jour les infos du scatter
+    function updateScatterInfo(nom, rendement, volatilite, typeFond) {
+        document.getElementById('scatterSelectedFcp').textContent = nom;
+        const rendementEl = document.getElementById('scatterRendement');
+        rendementEl.textContent = (rendement >= 0 ? '+' : '') + rendement.toFixed(2) + '%';
+        rendementEl.style.color = rendement >= 0 ? 'var(--success-color)' : 'var(--danger-color)';
+        document.getElementById('scatterVolatilite').textContent = volatilite.toFixed(2) + '%';
+        const ratio = volatilite > 0 ? (rendement / volatilite).toFixed(2) : '--';
+        document.getElementById('scatterRatio').textContent = ratio;
+        document.getElementById('scatterTypeFond').innerHTML = '<i class="bi bi-tag-fill me-1"></i>' + typeFond;
+    }
+    
+    // Initialiser les infos avec le FCP sélectionné
+    const selectedFcpData = allFcpStats.find(f => f.selected);
+    if (selectedFcpData) {
+        updateScatterInfo(selectedFcpData.nom, selectedFcpData.rendement, selectedFcpData.volatilite, selectedFcpData.type_fond);
+    }
+    
+    // Scatter Period Filter Click Handler
+    document.querySelectorAll('#scatterPeriodFilters .filter-pill').forEach(pill => {
+        pill.addEventListener('click', function() {
+            document.querySelectorAll('#scatterPeriodFilters .filter-pill').forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            
+            const period = this.dataset.period;
+            
+            // Appeler l'API pour récupérer les données filtrées
+            fetch('/api/scatter-data/?period=' + period)
+                .then(response => response.json())
+                .then(result => {
+                    // Marquer le FCP sélectionné
+                    result.data.forEach(fcp => {
+                        fcp.selected = fcp.nom === selectedFcp;
+                    });
+                    
+                    // Mettre à jour le chart
+                    scatterChart.data.datasets = createScatterDatasets(result.data);
+                    scatterChart.update();
+                    
+                    // Mettre à jour les infos si le FCP sélectionné est dans les résultats
+                    const selectedData = result.data.find(f => f.selected);
+                    if (selectedData) {
+                        updateScatterInfo(selectedData.nom, selectedData.rendement, selectedData.volatilite, selectedData.type_fond);
+                    }
+                    
+                    // Mettre à jour la note avec la date
+                    if (result.last_date) {
+                        document.getElementById('scatterDateNote').innerHTML = 
+                            '<i class="bi bi-info-circle me-1"></i>Données au <strong>' + result.last_date + '</strong> (dernière date en base)';
+                    }
+                })
+                .catch(error => console.error('Erreur:', error));
+        });
     });
     
     // Period Filter Click Handler
