@@ -12,6 +12,7 @@ class FicheSignaletique(models.Model):
         ('Obligataire', 'Obligataire'),
         ('Actions', 'Actions'),
         ('Monétaire', 'Monétaire'),
+        ('Capital-Risque', 'Capital-Risque'),
     ]
     
     ECHELLE_RISQUE_CHOICES = [(i, str(i)) for i in range(1, 8)]
@@ -323,6 +324,322 @@ class VL_FCPR_SenFonds(BaseValeurLiquidative):
         verbose_name = "VL FCPR Sen'Fonds"
         verbose_name_plural = "VL FCPR Sen'Fonds"
         db_table = 'fcp_app_vl_senfonds'
+
+
+# ============================================================================
+# Tables de Composition des FCP - Poches et Instruments
+# ============================================================================
+
+class TypePoche(models.TextChoices):
+    """Types de poches disponibles pour la composition d'un FCP"""
+    ACTION = 'ACTION', 'Action'
+    OBLIGATION = 'OBLIGATION', 'Obligation'
+    LIQUIDITE = 'LIQUIDITE', 'Liquidité'
+    FCP = 'FCP', 'FCP'
+
+
+class CompositionPoche(models.Model):
+    """
+    Table de composition d'un FCP par poche.
+    Chaque FCP peut avoir jusqu'à 4 poches (Action, Obligation, Liquidité, FCP).
+    """
+    fcp = models.ForeignKey(
+        FicheSignaletique, 
+        on_delete=models.CASCADE, 
+        related_name='poches',
+        verbose_name="FCP"
+    )
+    type_poche = models.CharField(
+        max_length=20,
+        choices=TypePoche.choices,
+        verbose_name="Type de poche"
+    )
+    date_composition = models.DateField(verbose_name="Date de composition")
+    poids_poche = models.DecimalField(
+        max_digits=6, 
+        decimal_places=2, 
+        verbose_name="Poids de la poche (%)",
+        help_text="Pourcentage du total de l'actif"
+    )
+    montant = models.DecimalField(
+        max_digits=20, 
+        decimal_places=2, 
+        null=True, 
+        blank=True, 
+        verbose_name="Montant (XOF)"
+    )
+    
+    class Meta:
+        verbose_name = "Composition - Poche"
+        verbose_name_plural = "Compositions - Poches"
+        ordering = ['fcp', 'date_composition', 'type_poche']
+        unique_together = ['fcp', 'type_poche', 'date_composition']
+    
+    def __str__(self):
+        return f"{self.fcp.nom} - {self.get_type_poche_display()} ({self.date_composition})"
+
+
+class BaseInstrument(models.Model):
+    """
+    Classe abstraite de base pour tous les instruments d'une poche.
+    """
+    poche = models.ForeignKey(
+        CompositionPoche, 
+        on_delete=models.CASCADE, 
+        related_name='%(class)s_instruments',
+        verbose_name="Poche"
+    )
+    nom = models.CharField(max_length=200, verbose_name="Nom de l'instrument")
+    code_isin = models.CharField(
+        max_length=20, 
+        null=True, 
+        blank=True, 
+        verbose_name="Code ISIN"
+    )
+    quantite = models.DecimalField(
+        max_digits=18, 
+        decimal_places=4, 
+        null=True, 
+        blank=True, 
+        verbose_name="Quantité"
+    )
+    prix_unitaire = models.DecimalField(
+        max_digits=15, 
+        decimal_places=4, 
+        null=True, 
+        blank=True, 
+        verbose_name="Prix unitaire"
+    )
+    valorisation = models.DecimalField(
+        max_digits=20, 
+        decimal_places=2, 
+        verbose_name="Valorisation (XOF)"
+    )
+    poids = models.DecimalField(
+        max_digits=6, 
+        decimal_places=2, 
+        verbose_name="Poids (%)",
+        help_text="Pourcentage dans la poche"
+    )
+    
+    class Meta:
+        abstract = True
+        ordering = ['-poids']
+    
+    def __str__(self):
+        return f"{self.nom} - {self.poids}%"
+
+
+class InstrumentAction(BaseInstrument):
+    """
+    Instrument de type Action (titres de capital cotés BRVM).
+    """
+    secteur = models.CharField(
+        max_length=100, 
+        null=True, 
+        blank=True, 
+        verbose_name="Secteur d'activité"
+    )
+    ticker = models.CharField(
+        max_length=20, 
+        null=True, 
+        blank=True, 
+        verbose_name="Ticker BRVM"
+    )
+    pays = models.CharField(
+        max_length=50, 
+        null=True, 
+        blank=True, 
+        verbose_name="Pays"
+    )
+    
+    class Meta(BaseInstrument.Meta):
+        verbose_name = "Instrument - Action"
+        verbose_name_plural = "Instruments - Actions"
+        db_table = 'fcp_app_instrument_action'
+
+
+class InstrumentObligation(BaseInstrument):
+    """
+    Instrument de type Obligation (titres de créance).
+    """
+    TYPE_OBLIGATION_CHOICES = [
+        ('ETAT', 'Obligation d\'État'),
+        ('CORPORATE', 'Obligation Corporate'),
+        ('TRESOR', 'Bon du Trésor'),
+        ('AUTRE', 'Autre'),
+    ]
+    
+    type_obligation = models.CharField(
+        max_length=20,
+        choices=TYPE_OBLIGATION_CHOICES,
+        null=True,
+        blank=True,
+        verbose_name="Type d'obligation"
+    )
+    emetteur = models.CharField(
+        max_length=200, 
+        null=True, 
+        blank=True, 
+        verbose_name="Émetteur"
+    )
+    taux_nominal = models.DecimalField(
+        max_digits=6, 
+        decimal_places=3, 
+        null=True, 
+        blank=True, 
+        verbose_name="Taux nominal (%)"
+    )
+    date_echeance = models.DateField(
+        null=True, 
+        blank=True, 
+        verbose_name="Date d'échéance"
+    )
+    maturite_residuelle = models.DecimalField(
+        max_digits=6, 
+        decimal_places=2, 
+        null=True, 
+        blank=True, 
+        verbose_name="Maturité résiduelle (années)"
+    )
+    
+    class Meta(BaseInstrument.Meta):
+        verbose_name = "Instrument - Obligation"
+        verbose_name_plural = "Instruments - Obligations"
+        db_table = 'fcp_app_instrument_obligation'
+
+
+class InstrumentLiquidite(BaseInstrument):
+    """
+    Instrument de type Liquidité (dépôts, comptes courants, placements monétaires).
+    """
+    TYPE_LIQUIDITE_CHOICES = [
+        ('DAT', 'Dépôt à Terme'),
+        ('COMPTE_COURANT', 'Compte Courant'),
+        ('DAV', 'Dépôt à Vue'),
+        ('PENSION', 'Mise en Pension'),
+        ('AUTRE', 'Autre'),
+    ]
+    
+    type_liquidite = models.CharField(
+        max_length=20,
+        choices=TYPE_LIQUIDITE_CHOICES,
+        null=True,
+        blank=True,
+        verbose_name="Type de liquidité"
+    )
+    etablissement = models.CharField(
+        max_length=200, 
+        null=True, 
+        blank=True, 
+        verbose_name="Établissement"
+    )
+    taux = models.DecimalField(
+        max_digits=6, 
+        decimal_places=3, 
+        null=True, 
+        blank=True, 
+        verbose_name="Taux de rémunération (%)"
+    )
+    date_echeance = models.DateField(
+        null=True, 
+        blank=True, 
+        verbose_name="Date d'échéance"
+    )
+    
+    class Meta(BaseInstrument.Meta):
+        verbose_name = "Instrument - Liquidité"
+        verbose_name_plural = "Instruments - Liquidités"
+        db_table = 'fcp_app_instrument_liquidite'
+
+
+class InstrumentFCP(BaseInstrument):
+    """
+    Instrument de type FCP (investissement dans d'autres FCP/OPCVM).
+    """
+    fcp_cible = models.ForeignKey(
+        FicheSignaletique,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='investissements_recus',
+        verbose_name="FCP cible (si géré par CGF)"
+    )
+    gestionnaire = models.CharField(
+        max_length=100, 
+        null=True, 
+        blank=True, 
+        verbose_name="Gestionnaire du FCP"
+    )
+    type_fcp = models.CharField(
+        max_length=50, 
+        null=True, 
+        blank=True, 
+        verbose_name="Type de FCP",
+        help_text="Diversifié, Obligataire, Actions, Monétaire"
+    )
+    vl_souscription = models.DecimalField(
+        max_digits=15, 
+        decimal_places=4, 
+        null=True, 
+        blank=True, 
+        verbose_name="VL de souscription"
+    )
+    
+    class Meta(BaseInstrument.Meta):
+        verbose_name = "Instrument - FCP"
+        verbose_name_plural = "Instruments - FCP"
+        db_table = 'fcp_app_instrument_fcp'
+
+
+# ============================================================================
+# Tables de Séries de Benchmarks
+# ============================================================================
+
+class BaseBenchmark(models.Model):
+    """
+    Classe abstraite de base pour les tables de benchmarks.
+    """
+    date = models.DateField(verbose_name="Date", unique=True)
+    valeur = models.DecimalField(
+        max_digits=15,
+        decimal_places=4,
+        verbose_name="Valeur de l'indice"
+    )
+    variation_journaliere = models.DecimalField(
+        max_digits=10,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        verbose_name="Variation journalière (%)"
+    )
+    
+    class Meta:
+        abstract = True
+        ordering = ['-date']
+    
+    def __str__(self):
+        return f"{self.date}: {self.valeur}"
+
+
+class BenchmarkObligation(BaseBenchmark):
+    """
+    Table des séries temporelles du benchmark obligataire.
+    """
+    class Meta(BaseBenchmark.Meta):
+        verbose_name = "Benchmark Obligataire"
+        verbose_name_plural = "Benchmarks Obligataires"
+        db_table = 'fcp_app_benchmark_obligation'
+
+
+class BenchmarkBRVM(BaseBenchmark):
+    """
+    Table des séries temporelles du benchmark actions (BRVM Composite).
+    """
+    class Meta(BaseBenchmark.Meta):
+        verbose_name = "Benchmark BRVM"
+        verbose_name_plural = "Benchmarks BRVM"
+        db_table = 'fcp_app_benchmark_brvm'
 
 
 # Dictionnaire de mapping nom FCP -> modèle VL

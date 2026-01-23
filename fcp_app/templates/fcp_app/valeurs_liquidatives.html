@@ -32,6 +32,468 @@
         border-bottom: 3px solid var(--primary-color);
     }
     
+    /* Sub-tabs Styling (Pills) */
+    #analyseSubTabs {
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        padding: 8px;
+        gap: 8px;
+    }
+    
+    #analyseSubTabs .nav-link {
+        color: var(--text-secondary);
+        font-weight: 500;
+        font-size: 14px;
+        padding: 10px 18px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+    }
+    
+    #analyseSubTabs .nav-link:hover {
+        color: var(--primary-color);
+        background: var(--bg-primary);
+        border-color: var(--border-color);
+    }
+    
+    #analyseSubTabs .nav-link.active {
+        color: white;
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        box-shadow: 0 2px 8px rgba(0, 64, 128, 0.25);
+    }
+    
+    #analyseSubTabs .nav-link i,
+    #risqueSubTabs .nav-link i {
+        opacity: 0.8;
+    }
+    
+    #analyseSubTabs .nav-link.active i,
+    #risqueSubTabs .nav-link.active i {
+        opacity: 1;
+    }
+    
+    /* Risque Sub-tabs Styling (Pills) */
+    #risqueSubTabs {
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        padding: 8px;
+        gap: 8px;
+    }
+    
+    #risqueSubTabs .nav-link {
+        color: var(--text-secondary);
+        font-weight: 500;
+        font-size: 14px;
+        padding: 10px 18px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+    }
+    
+    #risqueSubTabs .nav-link:hover {
+        color: var(--primary-color);
+        background: var(--bg-primary);
+        border-color: var(--border-color);
+    }
+    
+    #risqueSubTabs .nav-link.active {
+        color: white;
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        box-shadow: 0 2px 8px rgba(0, 64, 128, 0.25);
+    }
+    
+    /* Overview Sub-tabs Styling (Pills) */
+    #overviewSubTabs {
+        background: var(--bg-secondary);
+        border-radius: 12px;
+        padding: 8px;
+        gap: 8px;
+    }
+    
+    #overviewSubTabs .nav-link {
+        color: var(--text-secondary);
+        font-weight: 500;
+        font-size: 14px;
+        padding: 10px 18px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+    }
+    
+    #overviewSubTabs .nav-link:hover {
+        color: var(--primary-color);
+        background: var(--bg-primary);
+        border-color: var(--border-color);
+    }
+    
+    #overviewSubTabs .nav-link.active {
+        color: white;
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        box-shadow: 0 2px 8px rgba(0, 64, 128, 0.25);
+    }
+    
+    #overviewSubTabs .nav-link i {
+        opacity: 0.8;
+    }
+    
+    #overviewSubTabs .nav-link.active i {
+        opacity: 1;
+    }
+    
+    /* Fiche Signalétique Styles */
+    .risk-scale-container {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 16px;
+    }
+    
+    .risk-scale {
+        display: flex;
+        gap: 3px;
+        margin: 12px 0 8px;
+    }
+    
+    .risk-level {
+        flex: 1;
+        height: 32px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 12px;
+        color: white;
+        transition: all 0.3s ease;
+        opacity: 0.4;
+    }
+    
+    .risk-level.active {
+        opacity: 1;
+        transform: scaleY(1.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .risk-level-1 { background: #22c55e; }
+    .risk-level-2 { background: #84cc16; }
+    .risk-level-3 { background: #eab308; }
+    .risk-level-4 { background: #f97316; }
+    .risk-level-5 { background: #ef4444; }
+    .risk-level-6 { background: #dc2626; }
+    .risk-level-7 { background: #991b1b; }
+    
+    .risk-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--text-muted);
+    }
+    
+    .risk-current-inline {
+        text-align: right;
+    }
+    
+    .risk-value-inline {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: block;
+        line-height: 1;
+    }
+    
+    .risk-label-inline {
+        font-size: 11px;
+        color: var(--text-secondary);
+    }
+    
+    .info-card-mini {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        height: 100%;
+        transition: all 0.2s ease;
+    }
+    
+    .info-card-mini:hover {
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .card-icon-mini {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+    
+    .card-label-mini {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: var(--text-muted);
+        margin-bottom: 2px;
+    }
+    
+    .card-value-mini {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-primary);
+        line-height: 1.2;
+    }
+
+    .benchmark-allocation-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 16px;
+    }
+    
+    .benchmark-donut-container {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .donut-wrapper {
+        position: relative;
+        width: 90px;
+        height: 90px;
+        flex-shrink: 0;
+    }
+    
+    .donut-chart {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        transform: rotate(-90deg);
+    }
+    
+    .donut-center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+    
+    .donut-center-value {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+        line-height: 1;
+    }
+    
+    .donut-center-label {
+        font-size: 9px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+    }
+    
+    .benchmark-details {
+        flex: 1;
+    }
+    
+    .benchmark-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: var(--bg-secondary);
+        border-radius: 8px;
+        margin-bottom: 6px;
+    }
+    
+    .benchmark-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .benchmark-item-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .benchmark-color-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+        flex-shrink: 0;
+    }
+    
+    .benchmark-item-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+    
+    .benchmark-item-value {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .fcp-table-container {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .fcp-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .fcp-table thead {
+        background: var(--bg-secondary);
+    }
+    
+    .fcp-table th {
+        padding: 14px 16px;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .fcp-table td {
+        padding: 14px 16px;
+        font-size: 14px;
+        color: var(--text-primary);
+        border-bottom: 1px solid var(--border-light);
+        vertical-align: middle;
+    }
+    
+    .fcp-table tbody tr {
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .fcp-table tbody tr:hover {
+        background: var(--third-color);
+    }
+    
+    .fcp-table tbody tr.selected {
+        background: var(--primary-light);
+    }
+    
+    .fcp-name-cell {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    
+    .type-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .risk-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 13px;
+        color: white;
+    }
+    
+    .horizon-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--text-secondary);
+        font-size: 13px;
+    }
+
+    .table-filters {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color);
+        flex-wrap: wrap;
+    }
+    
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .filter-label {
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+    
+    .mini-pill {
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid var(--border-color);
+        background: var(--bg-primary);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .mini-pill:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+    
+    .mini-pill.active {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+    }
+
+    .stats-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 16px;
+        padding: 16px 20px;
+        background: var(--bg-secondary);
+        border-radius: 0 0 12px 12px;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-item .stat-number {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+    
+    .stat-item .stat-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-top: 4px;
+    }
+    
     /* Filter Pills */
     .filter-pills {
         display: flex;
@@ -71,8 +533,71 @@
     
     .chart-container-scatter {
         position: relative;
-        height: 300px;
+        height: 450px;
         width: 100%;
+    }
+    
+    /* Scatter Table Styles */
+    .scatter-table-container {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-top: 20px;
+    }
+    
+    .scatter-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .scatter-table thead {
+        background: var(--bg-secondary);
+    }
+    
+    .scatter-table th {
+        padding: 12px 14px;
+        text-align: left;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .scatter-table td {
+        padding: 10px 14px;
+        font-size: 13px;
+        color: var(--text-primary);
+        border-bottom: 1px solid var(--border-light);
+        vertical-align: middle;
+    }
+    
+    .scatter-table tbody tr {
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .scatter-table tbody tr:hover {
+        background: var(--third-color);
+    }
+    
+    .scatter-table tbody tr.selected {
+        background: var(--primary-light);
+    }
+    
+    .scatter-table .fcp-name {
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    
+    .scatter-table .positive {
+        color: var(--success-color);
+    }
+    
+    .scatter-table .negative {
+        color: var(--danger-color);
     }
     
     /* Toggle Switch */
@@ -278,11 +803,6 @@
             <i class="bi bi-shield-exclamation me-2"></i>Risque
         </button>
     </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="calendar-tab" data-bs-toggle="tab" data-bs-target="#calendar" type="button" role="tab">
-            <i class="bi bi-calendar3 me-2"></i>Calendrier
-        </button>
-    </li>
 </ul>
 
 <!-- Tab Content -->
@@ -290,188 +810,385 @@
     <!-- Vue d'ensemble Tab -->
     <div class="tab-pane fade show active" id="overview" role="tabpanel">
         
-        <!-- Évolution VL Section -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <!-- Header with filters -->
-                <div class="section-header">
-                    <div class="section-title">
-                        <i class="bi bi-graph-up"></i>
-                        <span>Évolution de la Valeur Liquidative</span>
-                    </div>
-                    
-                    <div class="options-bar">
-                        <!-- FCP Selector -->
-                        <select class="select-custom" id="fcpSelector">
-                            {% for fcp_name in fcp_list %}
-                            <option value="{{ fcp_name }}" {% if fcp_name == selected_fcp %}selected{% endif %}>{{ fcp_name }}</option>
-                            {% endfor %}
-                        </select>
-                        
-                        <!-- Benchmark Toggle -->
-                        <label class="toggle-option" id="benchmarkToggle">
-                            <input class="form-check-input" type="checkbox" id="showBenchmark">
-                            <span>Benchmark</span>
-                        </label>
-                        
-                        <!-- Cumulative Toggle -->
-                        <label class="toggle-option" id="cumulativeToggle">
-                            <input class="form-check-input" type="checkbox" id="showCumulative">
-                            <span>Vue Cumulée</span>
-                        </label>
-                    </div>
-                </div>
-                
-                <!-- Period Filters -->
-                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                    <div class="filter-pills" id="periodFilters">
-                        <button class="filter-pill" data-period="1m">1M</button>
-                        <button class="filter-pill" data-period="3m">3M</button>
-                        <button class="filter-pill" data-period="6m">6M</button>
-                        <button class="filter-pill active" data-period="1y">1A</button>
-                        <button class="filter-pill" data-period="5y">5A</button>
-                        <button class="filter-pill" data-period="all">Tout</button>
-                    </div>
-                </div>
-                
-                <!-- Chart -->
-                <div class="chart-container">
-                    <canvas id="vlEvolutionChart"></canvas>
-                </div>
-                
-                <!-- Legend -->
-                <div class="chart-legend">
-                    <div class="legend-item">
-                        <div class="legend-line" style="background: #004080;"></div>
-                        <span id="legendFcpName">{{ selected_fcp }}</span>
-                    </div>
-                    <div class="legend-item" id="benchmarkLegend" style="display: none;">
-                        <div class="legend-line" style="background: #E0DEDD; border: 1px dashed #333;"></div>
-                        <span>Benchmark (BRVM Composite)</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Sub-tabs Navigation -->
+        <ul class="nav nav-pills d-inline-flex mb-4" id="overviewSubTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="evolution-vl-tab" data-bs-toggle="pill" data-bs-target="#evolutionVl" type="button" role="tab">
+                    <i class="bi bi-graph-up me-2"></i>Évolution VL
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="rendement-risque-tab" data-bs-toggle="pill" data-bs-target="#rendementRisque" type="button" role="tab">
+                    <i class="bi bi-bullseye me-2"></i>Rendement/Risque
+                </button>
+            </li>
+        </ul>
         
-        <!-- Metric Cards -->
-        <div class="row mb-4">
-            <div class="col-md-3 col-sm-6 mb-3">
-                <div class="metric-card">
-                    <div class="metric-label">Dernière VL (<span id="metricDerniereDate">{{ stats.derniere_date|default:"--" }}</span>)</div>
-                    <div class="metric-value" id="metricDerniereVL">{{ stats.derniere_vl|floatformat:2|default:"--" }} <small style="font-size: 14px;">XOF</small></div>
-                    <div class="metric-change" id="metricVar1JContainer">
-                        <span id="metricVar1J" class="{% if stats.var_1j >= 0 %}positive{% else %}negative{% endif %}">
-                            <i class="bi bi-arrow-{% if stats.var_1j >= 0 %}up{% else %}down{% endif %}"></i> {% if stats.var_1j >= 0 %}+{% endif %}{{ stats.var_1j|default:"0" }}% (1j)
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-3">
-                <div class="metric-card">
-                    <div class="metric-label">Rendement YTD</div>
-                    <div class="metric-value" id="metricYTD">{% if stats.var_ytd >= 0 %}+{% endif %}{{ stats.var_ytd|default:"0" }}%</div>
-                    <div class="metric-change">
-                        Depuis début d'année
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-3">
-                <div class="metric-card">
-                    <div class="metric-label">Rendement Annualisé</div>
-                    <div class="metric-value" id="metricRendementAnn">{% if analyse_stats.rendement_moyen_ann >= 0 %}+{% endif %}{{ analyse_stats.rendement_moyen_ann|default:"0" }}%</div>
-                    <div class="metric-change">
-                        Moyenne quotidienne × 365
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-3">
-                <div class="metric-card">
-                    <div class="metric-label">Volatilité</div>
-                    <div class="metric-value" id="metricVolatilite">{{ stats.volatilite|default:"0" }}%</div>
-                    <div class="metric-change">
-                        Écart-type annualisé
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Risk/Return Scatter Plot -->
-        <div class="card">
-            <div class="card-body">
-                <div class="section-header">
-                    <div class="section-title">
-                        <i class="bi bi-bullseye"></i>
-                        <span>Rendement / Risque - Tous les FCP</span>
-                    </div>
-                    
-                    <!-- Period Filters for Scatter -->
-                    <div class="filter-pills" id="scatterPeriodFilters">
-                        <button class="filter-pill" data-period="wtd">WTD</button>
-                        <button class="filter-pill" data-period="mtd">MTD</button>
-                        <button class="filter-pill" data-period="qtd">QTD</button>
-                        <button class="filter-pill" data-period="std">STD</button>
-                        <button class="filter-pill" data-period="ytd">YTD</button>
-                        <button class="filter-pill active" data-period="origin">Origine</button>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-lg-8">
-                        <div class="chart-container-scatter">
-                            <canvas id="riskReturnChart"></canvas>
+        <!-- Sub-tabs Content -->
+        <div class="tab-content" id="overviewSubTabsContent">
+            <!-- Evolution VL Sub-tab -->
+            <div class="tab-pane fade show active" id="evolutionVl" role="tabpanel">
+                <!-- Sélecteur FCP - En-tête -->
+                <div class="card mb-4">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-graph-up me-2" style="color: var(--primary-color);"></i>
+                                Évolution VL - <span id="evolutionVlFcpTitle" style="color: var(--primary-color);">{{ selected_fcp }}</span>
+                            </h5>
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="text-muted small me-2">Sélectionner un FCP :</label>
+                                <select class="select-custom" id="fcpSelector" style="min-width: 220px;">
+                                    {% for fcp_name in fcp_list %}
+                                    <option value="{{ fcp_name }}" {% if fcp_name == selected_fcp %}selected{% endif %}>{{ fcp_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="scatter-info flex-column h-100 justify-content-center">
-                            <div class="scatter-info-item mb-3">
-                                <div class="label">FCP sélectionné</div>
-                                <div class="value fw-bold" style="color: var(--primary-color);" id="scatterSelectedFcp">{{ selected_fcp }}</div>
+                </div>
+                
+                <!-- Évolution VL Section -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <!-- Header with filters -->
+                        <div class="section-header">
+                            <div class="section-title">
+                                <i class="bi bi-graph-up"></i>
+                                <span>Graphique d'Évolution</span>
                             </div>
-                            <div class="scatter-info-item mb-3">
-                                <div class="label">Rendement</div>
-                                <div class="value" id="scatterRendement" style="color: var(--success-color);">{{ stats.var_origine|default:"0" }}%</div>
+                            
+                            <div class="options-bar">
+                                <!-- Benchmark Toggle -->
+                                <label class="toggle-option" id="benchmarkToggle">
+                                    <input class="form-check-input" type="checkbox" id="showBenchmark">
+                                    <span>Benchmark</span>
+                                </label>
+                                
+                                <!-- Cumulative Toggle -->
+                                <label class="toggle-option" id="cumulativeToggle">
+                                    <input class="form-check-input" type="checkbox" id="showCumulative">
+                                    <span>Vue Cumulée</span>
+                                </label>
                             </div>
-                            <div class="scatter-info-item mb-3">
-                                <div class="label">Risque (Volatilité)</div>
-                                <div class="value" id="scatterVolatilite">{{ stats.volatilite|default:"0" }}%</div>
+                        </div>
+                        
+                        <!-- Period Filters -->
+                        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                            <div class="filter-pills" id="periodFilters">
+                                <button class="filter-pill" data-period="1m">1M</button>
+                                <button class="filter-pill" data-period="3m">3M</button>
+                                <button class="filter-pill" data-period="6m">6M</button>
+                                <button class="filter-pill active" data-period="1y">1A</button>
+                                <button class="filter-pill" data-period="5y">5A</button>
+                                <button class="filter-pill" data-period="all">Tout</button>
                             </div>
-                            <div class="scatter-info-item mb-3">
-                                <div class="label">Ratio Rendement/Risque</div>
-                                <div class="value" id="scatterRatio">--</div>
+                        </div>
+                        
+                        <!-- Chart -->
+                        <div class="chart-container">
+                            <canvas id="vlEvolutionChart"></canvas>
+                        </div>
+                        
+                        <!-- Legend -->
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <div class="legend-line" style="background: #004080;"></div>
+                                <span id="legendFcpName">{{ selected_fcp }}</span>
                             </div>
-                            <div class="scatter-info-item">
-                                <div class="label">Type de fond</div>
-                                <div class="value" id="scatterTypeFond" style="color: var(--primary-color);">
-                                    <i class="bi bi-tag-fill me-1"></i>--
+                            <div class="legend-item" id="benchmarkLegend" style="display: none;">
+                                <div class="legend-line" style="background: #E0DEDD; border: 1px dashed #333;"></div>
+                                <span>Benchmark (BRVM Composite)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Metric Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="metric-card">
+                            <div class="metric-label">Dernière VL (<span id="metricDerniereDate">{{ stats.derniere_date|default:"--" }}</span>)</div>
+                            <div class="metric-value" id="metricDerniereVL">{{ stats.derniere_vl|floatformat:2|default:"--" }} <small style="font-size: 14px;">XOF</small></div>
+                            <div class="metric-change" id="metricVar1JContainer">
+                                <span id="metricVar1J" class="{% if stats.var_1j >= 0 %}positive{% else %}negative{% endif %}">
+                                    <i class="bi bi-arrow-{% if stats.var_1j >= 0 %}up{% else %}down{% endif %}"></i> {% if stats.var_1j >= 0 %}+{% endif %}{{ stats.var_1j|default:"0" }}% (1j)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="metric-card">
+                            <div class="metric-label">Rendement YTD</div>
+                            <div class="metric-value" id="metricYTD">{% if stats.var_ytd >= 0 %}+{% endif %}{{ stats.var_ytd|default:"0" }}%</div>
+                            <div class="metric-change">
+                                Depuis début d'année
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="metric-card">
+                            <div class="metric-label">Rendement Annualisé</div>
+                            <div class="metric-value" id="metricRendementAnn">{% if analyse_stats.rendement_moyen_ann >= 0 %}+{% endif %}{{ analyse_stats.rendement_moyen_ann|default:"0" }}%</div>
+                            <div class="metric-change">
+                                Moyenne quotidienne × 365
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <div class="metric-card">
+                            <div class="metric-label">Volatilité</div>
+                            <div class="metric-value" id="metricVolatilite">{{ stats.volatilite|default:"0" }}%</div>
+                            <div class="metric-change">
+                                Écart-type annualisé
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Fiche Signalétique Section -->
+                <div class="row">
+                    <div class="col-12">
+                        <!-- Risk Scale Card - Compact -->
+                        <div class="risk-scale-container mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0" style="font-weight: 600; color: var(--text-primary);">
+                                    <i class="bi bi-speedometer2 me-2" style="color: var(--primary-color);"></i>
+                                    Échelle de Risque
+                                </h6>
+                                <div class="risk-current-inline">
+                                    <span class="risk-value-inline" id="overviewRiskValue">{{ selected_fcp_data.echelle_risque }}/7</span>
+                                    <span class="risk-label-inline" id="overviewRiskLabel">{{ selected_fcp_data.risk_label }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="risk-scale" id="overviewRiskScale">
+                                <div class="risk-level risk-level-1 {% if selected_fcp_data.echelle_risque == 1 %}active{% endif %}" data-level="1">1</div>
+                                <div class="risk-level risk-level-2 {% if selected_fcp_data.echelle_risque == 2 %}active{% endif %}" data-level="2">2</div>
+                                <div class="risk-level risk-level-3 {% if selected_fcp_data.echelle_risque == 3 %}active{% endif %}" data-level="3">3</div>
+                                <div class="risk-level risk-level-4 {% if selected_fcp_data.echelle_risque == 4 %}active{% endif %}" data-level="4">4</div>
+                                <div class="risk-level risk-level-5 {% if selected_fcp_data.echelle_risque == 5 %}active{% endif %}" data-level="5">5</div>
+                                <div class="risk-level risk-level-6 {% if selected_fcp_data.echelle_risque == 6 %}active{% endif %}" data-level="6">6</div>
+                                <div class="risk-level risk-level-7 {% if selected_fcp_data.echelle_risque == 7 %}active{% endif %}" data-level="7">7</div>
+                            </div>
+                            
+                            <div class="risk-labels">
+                                <span>Risque faible</span>
+                                <span>Risque élevé</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row g-3">
+                    <!-- Info Cards Grid -->
+                    <div class="col-lg-6">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="info-card-mini">
+                                    <div class="card-icon-mini" id="overviewTypeIcon" style="background: var(--primary-light); color: var(--primary-color);">
+                                        <i class="{{ selected_fcp_data.type_icon }}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="card-label-mini">Type</div>
+                                        <div class="card-value-mini" id="overviewTypeFond">{{ selected_fcp_data.type_fond }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="info-card-mini">
+                                    <div class="card-icon-mini" style="background: #d4edda; color: #28a745;">
+                                        <i class="bi bi-calendar-range"></i>
+                                    </div>
+                                    <div>
+                                        <div class="card-label-mini">Horizon</div>
+                                        <div class="card-value-mini" id="overviewHorizon">{{ selected_fcp_data.horizon }} ans</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="info-card-mini">
+                                    <div class="card-icon-mini" style="background: #fff3cd; color: #e6a800;">
+                                        <i class="bi bi-currency-exchange"></i>
+                                    </div>
+                                    <div>
+                                        <div class="card-label-mini">Devise</div>
+                                        <div class="card-value-mini" id="overviewDevise">{{ selected_fcp_data.devise }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="info-card-mini">
+                                    <div class="card-icon-mini" style="background: #d1ecf1; color: #17a2b8;">
+                                        <i class="bi bi-building"></i>
+                                    </div>
+                                    <div>
+                                        <div class="card-label-mini">Gestionnaire</div>
+                                        <div class="card-value-mini" id="overviewGestionnaire" style="font-size: 13px;">{{ selected_fcp_data.gestionnaire }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Benchmark Allocation Card - Donut Chart -->
+                    <div class="col-lg-6">
+                        <div class="benchmark-allocation-card h-100">
+                            <h6 style="font-weight: 600; color: var(--text-primary); margin-bottom: 12px; font-size: 14px;">
+                                <i class="bi bi-pie-chart-fill me-2" style="color: var(--primary-color);"></i>
+                                Allocation Benchmark
+                            </h6>
+                            
+                            <div class="benchmark-donut-container">
+                                <!-- Donut Chart SVG -->
+                                <div class="donut-wrapper">
+                                    <svg class="donut-chart" viewBox="0 0 36 36" id="overviewBenchmarkDonut">
+                                        <!-- Background circle -->
+                                        <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e9ecef" stroke-width="3"/>
+                                    </svg>
+                                    <div class="donut-center">
+                                        <div class="donut-center-value">100%</div>
+                                        <div class="donut-center-label">Total</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Legend Details -->
+                                <div class="benchmark-details">
+                                    <div class="benchmark-item">
+                                        <div class="benchmark-item-left">
+                                            <div class="benchmark-color-indicator" style="background: #004080;"></div>
+                                            <span class="benchmark-item-name">Obligataire</span>
+                                        </div>
+                                        <span class="benchmark-item-value" id="overviewBenchmarkOblig" style="color: #004080;">{{ selected_fcp_data.benchmark_oblig }}%</span>
+                                    </div>
+                                    <div class="benchmark-item">
+                                        <div class="benchmark-item-left">
+                                            <div class="benchmark-color-indicator" style="background: #28a745;"></div>
+                                            <span class="benchmark-item-name">BRVM C</span>
+                                        </div>
+                                        <span class="benchmark-item-value" id="overviewBenchmarkBrvm" style="color: #28a745;">{{ selected_fcp_data.benchmark_brvmc }}%</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Scatter Legend par Type de Fond -->
-                <div class="d-flex justify-content-between align-items-center flex-wrap mt-3">
-                    <div class="chart-legend" id="scatterLegend">
-                        <div class="legend-item" data-type="Obligataire">
-                            <div class="legend-dot" style="background: #004080;"></div>
-                            <span>Obligataire</span>
+            </div>
+            
+            <!-- Rendement/Risque Sub-tab -->
+            <div class="tab-pane fade" id="rendementRisque" role="tabpanel">
+                <!-- Risk/Return Scatter Plot -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <i class="bi bi-bullseye"></i>
+                                <span>Rendement / Risque - Tous les FCP</span>
+                            </div>
+                            
+                            <div class="options-bar">
+                                <!-- Show Labels Toggle -->
+                                <label class="toggle-option" id="scatterLabelsToggle">
+                                    <input class="form-check-input" type="checkbox" id="showScatterLabels" checked>
+                                    <span>Afficher légendes</span>
+                                </label>
+                                
+                                <!-- Period Filters for Scatter -->
+                                <div class="filter-pills" id="scatterPeriodFilters">
+                                    <button class="filter-pill" data-period="wtd">WTD</button>
+                                    <button class="filter-pill" data-period="mtd">MTD</button>
+                                    <button class="filter-pill" data-period="qtd">QTD</button>
+                                    <button class="filter-pill" data-period="std">STD</button>
+                                    <button class="filter-pill" data-period="ytd">YTD</button>
+                                    <button class="filter-pill active" data-period="origin">Origine</button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="legend-item" data-type="Diversifié">
-                            <div class="legend-dot" style="background: #28a745;"></div>
-                            <span>Diversifié</span>
+                        
+                        <!-- Chart Full Width -->
+                        <div class="chart-container-scatter">
+                            <canvas id="riskReturnChart"></canvas>
                         </div>
-                        <div class="legend-item" data-type="Actions">
-                            <div class="legend-dot" style="background: #dc3545;"></div>
-                            <span>Actions</span>
+                        
+                        <!-- Scatter Legend par Type de Fond -->
+                        <div class="d-flex justify-content-between align-items-center flex-wrap mt-3">
+                            <div class="chart-legend" id="scatterLegend">
+                                <div class="legend-item" data-type="Obligataire">
+                                    <div class="legend-dot" style="background: #004080;"></div>
+                                    <span>Obligataire</span>
+                                </div>
+                                <div class="legend-item" data-type="Diversifié">
+                                    <div class="legend-dot" style="background: #28a745;"></div>
+                                    <span>Diversifié</span>
+                                </div>
+                                <div class="legend-item" data-type="Actions">
+                                    <div class="legend-dot" style="background: #dc3545;"></div>
+                                    <span>Actions</span>
+                                </div>
+                                <div class="legend-item" data-type="Monétaire">
+                                    <div class="legend-dot" style="background: #ffc107;"></div>
+                                    <span>Monétaire</span>
+                                </div>
+                            </div>
+                            <div class="text-muted small" id="scatterDateNote">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Données au <strong id="overviewDerniereDate">{{ stats.derniere_date }}</strong> (dernière date en base)
+                            </div>
                         </div>
-                        <div class="legend-item" data-type="Monétaire">
-                            <div class="legend-dot" style="background: #ffc107;"></div>
-                            <span>Monétaire</span>
+                        
+                        <!-- FCP Data Table - Complet -->
+                        <div class="scatter-table-container">
+                            <!-- Filters -->
+                            <div class="table-filters mb-2">
+                                <div class="filter-group">
+                                    <span class="filter-label">Type:</span>
+                                    <button class="mini-pill active" data-filter="all" data-table="scatterDataTable">Tous</button>
+                                    <button class="mini-pill" data-filter="Diversifié" data-table="scatterDataTable">Diversifié</button>
+                                    <button class="mini-pill" data-filter="Obligataire" data-table="scatterDataTable">Obligataire</button>
+                                    <button class="mini-pill" data-filter="Actions" data-table="scatterDataTable">Actions</button>
+                                    <button class="mini-pill" data-filter="Monétaire" data-table="scatterDataTable">Monétaire</button>
+                                </div>
+                            </div>
+                            <div style="max-height: 400px; overflow-y: auto;">
+                                <table class="scatter-table" id="scatterDataTable">
+                                    <thead>
+                                        <tr>
+                                            <th>FCP</th>
+                                            <th>Type</th>
+                                            <th style="text-align: right;">Rendement</th>
+                                            <th style="text-align: right;">Volatilité</th>
+                                            <th style="text-align: right;">Ratio R/V</th>
+                                            <th style="text-align: center;">Échelle Risque</th>
+                                            <th style="text-align: center;">Horizon</th>
+                                            <th style="text-align: center;">Benchmark</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="scatterTableBody">
+                                        <!-- Populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Stats Summary -->
+                            <div class="stats-summary">
+                                <div class="stat-item">
+                                    <div class="stat-number">{{ fcp_list|length }}</div>
+                                    <div class="stat-label">Total FCP</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number" id="overviewDiversifiedCount">-</div>
+                                    <div class="stat-label">Diversifiés</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number" id="overviewObligataireCount">-</div>
+                                    <div class="stat-label">Obligataires</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number" id="overviewActionsCount">-</div>
+                                    <div class="stat-label">Actions</div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="text-muted small" id="scatterDateNote">
-                        <i class="bi bi-info-circle me-1"></i>
-                        Données au <strong id="overviewDerniereDate">{{ stats.derniere_date }}</strong> (dernière date en base)
                     </div>
                 </div>
             </div>
@@ -511,7 +1228,6 @@
                         <h5 class="card-title mb-0">
                             <i class="bi bi-calendar3 me-2"></i>Performances Calendaires
                         </h5>
-                        <small class="text-muted">Depuis le début de chaque période</small>
                     </div>
                     <div class="card-body p-0">
                         <table class="table table-hover mb-0">
@@ -591,7 +1307,6 @@
                         <h5 class="card-title mb-0">
                             <i class="bi bi-arrow-repeat me-2"></i>Performances Glissantes
                         </h5>
-                        <small class="text-muted">Sur les X derniers mois/années</small>
                     </div>
                     <div class="card-body p-0">
                         <table class="table table-hover mb-0">
@@ -793,7 +1508,7 @@
     <!-- Analyse Tab -->
     <div class="tab-pane fade" id="analysis" role="tabpanel">
         <div class="row g-4">
-            <!-- Header -->
+            <!-- Header avec FCP Selector -->
             <div class="col-12">
                 <div class="card">
                     <div class="card-body py-3">
@@ -815,6 +1530,33 @@
                 </div>
             </div>
             
+            <!-- Sub-tabs Navigation -->
+            <div class="col-12">
+                <ul class="nav nav-pills mb-3" id="analyseSubTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="stats-subtab" data-bs-toggle="pill" data-bs-target="#stats-content" type="button" role="tab" aria-controls="stats-content" aria-selected="true">
+                            <i class="bi bi-calculator me-2"></i>Statistiques descriptives
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="correlation-subtab" data-bs-toggle="pill" data-bs-target="#correlation-content" type="button" role="tab" aria-controls="correlation-content" aria-selected="false">
+                            <i class="bi bi-grid-3x3 me-2"></i>Corrélation
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="calendar-subtab" data-bs-toggle="pill" data-bs-target="#calendar-content" type="button" role="tab" aria-controls="calendar-content" aria-selected="false">
+                            <i class="bi bi-calendar3 me-2"></i>Calendrier
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Sub-tabs Content -->
+            <div class="col-12">
+                <div class="tab-content" id="analyseSubTabsContent">
+                    <!-- Statistiques Descriptives Sub-tab -->
+                    <div class="tab-pane fade show active" id="stats-content" role="tabpanel" aria-labelledby="stats-subtab">
+                        <div class="row g-4">
             <!-- Statistiques Descriptives -->
             <div class="col-lg-6">
                 <div class="card h-100">
@@ -897,124 +1639,6 @@
                 </div>
             </div>
             
-            <!-- Profil de Risque -->
-            <div class="col-lg-6">
-                <div class="card h-100">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-shield-exclamation me-2"></i>Profil de Risque
-                        </h5>
-                        <small class="text-muted">Indicateurs de risque et ratios</small>
-                    </div>
-                    <div class="card-body">
-                        <!-- Drawdown Max -->
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted">
-                                    <i class="bi bi-graph-down-arrow me-2"></i>Drawdown Maximum
-                                </span>
-                                <span class="fw-bold text-danger fs-5" id="analyse-max-drawdown">-{{ analyse_stats.max_drawdown|default:"--" }}%</span>
-                            </div>
-                            <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-danger" role="progressbar" id="analyse-drawdown-bar"
-                                     style="width: {{ analyse_stats.max_drawdown|default:0 }}%"></div>
-                            </div>
-                            <small class="text-muted">Perte maximale depuis un pic historique</small>
-                        </div>
-                        
-                        <!-- Ratio de Sharpe -->
-                        <div class="mb-4 p-3 rounded" style="background: var(--bg-secondary);">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <i class="bi bi-trophy me-2" style="color: var(--primary-color);"></i>
-                                    <span class="fw-medium">Ratio de Sharpe</span>
-                                    <br><small class="text-muted">Rendement ajusté du risque (rf=3,25%)</small>
-                                </div>
-                                <span class="fs-4 fw-bold" id="analyse-sharpe">
-                                    {{ analyse_stats.sharpe|default:"--" }}
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <!-- Ratio de Sortino -->
-                        <div class="mb-4 p-3 rounded" style="background: var(--bg-secondary);">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <i class="bi bi-shield-check me-2" style="color: var(--primary-color);"></i>
-                                    <span class="fw-medium">Ratio de Sortino</span>
-                                    <br><small class="text-muted">Rendement ajusté du risque baissier</small>
-                                </div>
-                                <span class="fs-4 fw-bold" id="analyse-sortino">
-                                    {{ analyse_stats.sortino|default:"--" }}
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <!-- Jours Positifs/Négatifs -->
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-muted">Distribution des jours</span>
-                                <span class="fw-bold" id="analyse-ratio-positif">{{ analyse_stats.ratio_positif|default:"--" }}% positifs</span>
-                            </div>
-                            <div class="progress" style="height: 24px;" id="analyse-jours-progress">
-                                <div class="progress-bar bg-success" role="progressbar" id="analyse-jours-positifs-bar"
-                                     style="width: {{ analyse_stats.ratio_positif|default:50 }}%"
-                                     title="{{ analyse_stats.jours_positifs }} jours positifs">
-                                    <small><span id="analyse-jours-positifs">{{ analyse_stats.jours_positifs|default:"--" }}</span> <i class="bi bi-arrow-up"></i></small>
-                                </div>
-                                <div class="progress-bar bg-danger" role="progressbar" id="analyse-jours-negatifs-bar"
-                                     style="width: {% widthratio analyse_stats.jours_negatifs analyse_stats.nb_observations 100 %}%"
-                                     title="{{ analyse_stats.jours_negatifs }} jours négatifs">
-                                    <small><span id="analyse-jours-negatifs">{{ analyse_stats.jours_negatifs|default:"--" }}</span> <i class="bi bi-arrow-down"></i></small>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Tracking Error Table -->
-                        <div class="mt-4">
-                            <div class="d-flex align-items-center mb-2">
-                                <i class="bi bi-graph-up-arrow me-2" style="color: var(--primary-color);"></i>
-                                <span class="fw-medium">Tracking Error (Volatilité annualisée)</span>
-                            </div>
-                            <div class="table-responsive">
-                                <table class="table table-sm table-bordered mb-0" style="font-size: 0.85rem;">
-                                    <thead style="background: var(--bg-secondary);">
-                                        <tr class="text-center">
-                                            <th class="py-2">WTD</th>
-                                            <th class="py-2">MTD</th>
-                                            <th class="py-2">QTD</th>
-                                            <th class="py-2">STD</th>
-                                            <th class="py-2">YTD</th>
-                                            <th class="py-2">Origine</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="text-center">
-                                            <td class="py-2 fw-bold" id="tracking-error-wtd">{{ tracking_error.wtd|default:"--" }}%</td>
-                                            <td class="py-2 fw-bold" id="tracking-error-mtd">{{ tracking_error.mtd|default:"--" }}%</td>
-                                            <td class="py-2 fw-bold" id="tracking-error-qtd">{{ tracking_error.qtd|default:"--" }}%</td>
-                                            <td class="py-2 fw-bold" id="tracking-error-std">{{ tracking_error.std|default:"--" }}%</td>
-                                            <td class="py-2 fw-bold" id="tracking-error-ytd">{{ tracking_error.ytd|default:"--" }}%</td>
-                                            <td class="py-2 fw-bold" id="tracking-error-origine" style="color: var(--primary-color);">{{ tracking_error.origine|default:"--" }}%</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <!-- Légende interprétation -->
-                        <div class="alert alert-light border-0 mb-0 mt-4">
-                            <small>
-                                <strong>Interprétation des ratios :</strong><br>
-                                <span class="text-success">● &gt; 1</span> = Excellent |
-                                <span class="text-warning">● 0-1</span> = Acceptable |
-                                <span class="text-danger">● &lt; 0</span> = À éviter
-                            </small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
             <!-- Distribution des Rendements -->
             <div class="col-lg-6">
                 <div class="card h-100">
@@ -1022,7 +1646,6 @@
                         <h5 class="card-title mb-0">
                             <i class="bi bi-bar-chart me-2"></i>Distribution des Rendements
                         </h5>
-                        <small class="text-muted">Histogramme et test de normalité</small>
                     </div>
                     <div class="card-body">
                         <div style="height: 200px;">
@@ -1056,144 +1679,12 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- VaR et CVaR -->
-            <div class="col-lg-6">
-                <div class="card h-100">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-exclamation-triangle me-2"></i>Value at Risk (VaR)
-                        </h5>
-                        <small class="text-muted">Mesures de risque extrême - Méthode historique</small>
-                    </div>
-                    <div class="card-body">
-                        <!-- VaR 95% -->
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div>
-                                    <span class="fw-medium">VaR 95%</span>
-                                    <br><small class="text-muted">Perte max dans 95% des cas (1 jour)</small>
-                                </div>
-                                <span class="fs-4 fw-bold text-danger" id="analyse-var95">{{ analyse_stats.var_95|default:"--" }}%</span>
-                            </div>
-                            <div class="progress" style="height: 6px;">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: 95%;"></div>
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: 5%;"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- VaR 99% -->
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div>
-                                    <span class="fw-medium">VaR 99%</span>
-                                    <br><small class="text-muted">Perte max dans 99% des cas (1 jour)</small>
-                                </div>
-                                <span class="fs-4 fw-bold text-danger" id="analyse-var99">{{ analyse_stats.var_99|default:"--" }}%</span>
-                            </div>
-                            <div class="progress" style="height: 6px;">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: 99%;"></div>
-                                <div class="progress-bar bg-danger" role="progressbar" style="width: 1%;"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- CVaR / Expected Shortfall -->
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="p-3 rounded text-center" style="background: rgba(220, 53, 69, 0.1); border: 1px solid rgba(220, 53, 69, 0.3);">
-                                    <div class="text-muted small">CVaR 95%</div>
-                                    <div class="fw-bold fs-5 text-danger" id="analyse-cvar95">{{ analyse_stats.cvar_95|default:"--" }}%</div>
-                                    <small class="text-muted">Expected Shortfall</small>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="p-3 rounded text-center" style="background: rgba(220, 53, 69, 0.15); border: 1px solid rgba(220, 53, 69, 0.4);">
-                                    <div class="text-muted small">CVaR 99%</div>
-                                    <div class="fw-bold fs-5 text-danger" id="analyse-cvar99">{{ analyse_stats.cvar_99|default:"--" }}%</div>
-                                    <small class="text-muted">Expected Shortfall</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="alert alert-light border-0 mt-3 mb-0 small">
-                            <i class="bi bi-info-circle me-1"></i>
-                            <strong>CVaR</strong> = Perte moyenne quand on dépasse la VaR (plus conservateur).
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Underwater Chart (Drawdowns dans le temps) -->
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-water me-2"></i>Underwater Chart - Évolution des Drawdowns
-                        </h5>
-                        <small class="text-muted">Visualisation des périodes de perte par rapport aux pics historiques</small>
-                    </div>
-                    <div class="card-body">
-                        <div style="height: 250px;">
-                            <canvas id="underwaterChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Top Drawdowns -->
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div>
-                            <h5 class="card-title mb-0">
-                                <i class="bi bi-graph-down-arrow me-2"></i>Top 5 des Pires Drawdowns
-                            </h5>
-                            <small class="text-muted">Analyse détaillée des périodes de baisse</small>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <label class="text-muted small">Seuil minimum :</label>
-                            <select class="select-custom" id="drawdownThreshold" style="width: auto;">
-                                <option value="0">Tous</option>
-                                <option value="1">≥ 1%</option>
-                                <option value="2" selected>≥ 2%</option>
-                                <option value="5">≥ 5%</option>
-                                <option value="10">≥ 10%</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0" id="drawdownsTable">
-                                <thead>
-                                    <tr>
-                                        <th class="px-4 py-3">#</th>
-                                        <th class="px-4 py-3">Début</th>
-                                        <th class="px-4 py-3">Point bas</th>
-                                        <th class="px-4 py-3">Fin</th>
-                                        <th class="px-4 py-3 text-end">Profondeur</th>
-                                        <th class="px-4 py-3 text-center">Durée (jours)</th>
-                                        <th class="px-4 py-3 text-center">Recovery (jours)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="drawdownsTableBody">
-                                    <!-- Rempli par JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Note -->
-            <div class="col-12">
-                <div class="alert alert-light border d-flex align-items-center" role="alert">
-                    <i class="bi bi-info-circle me-2" style="color: var(--primary-color);"></i>
-                    <div>
-                        <small>Analyse basée sur les données du <strong>{{ stats.premiere_date }}</strong> au <strong>{{ stats.derniere_date }}</strong>. 
-                        Taux sans risque utilisé : 3,25% annuel.</small>
-                    </div>
-                </div>
-            </div>
-            
+                    
+                    <!-- Corrélation Sub-tab -->
+                    <div class="tab-pane fade" id="correlation-content" role="tabpanel" aria-labelledby="correlation-subtab">
+                        <div class="row g-4">
             <!-- Matrice de Corrélation -->
             <div class="col-12">
                 <div class="card">
@@ -1243,270 +1734,21 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Risque Tab -->
-    <div class="tab-pane fade" id="risk" role="tabpanel">
-        <div class="row g-4">
-            <!-- Header -->
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body py-3">
-                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                            <h5 class="card-title mb-0">
-                                <i class="bi bi-shield-exclamation me-2" style="color: var(--primary-color);"></i>
-                                Analyse du Risque - <span id="riskFcpTitle" style="color: var(--primary-color);">{{ selected_fcp }}</span>
-                            </h5>
-                            <div class="d-flex align-items-center gap-3 flex-wrap">
-                                <div class="d-flex align-items-center gap-2">
-                                    <label class="text-muted small">FCP :</label>
-                                    <select class="select-custom" id="riskFcpSelector" style="min-width: 220px;">
-                                        {% for fcp_name in fcp_list %}
-                                        <option value="{{ fcp_name }}" {% if fcp_name == selected_fcp %}selected{% endif %}>{{ fcp_name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <label class="text-muted small">Fenêtre :</label>
-                                    <input type="range" class="form-range" id="volatilityWindow" min="5" max="30" value="20" style="width: 100px;">
-                                    <span class="badge bg-primary" id="windowValue">20</span>
-                                    <small class="text-muted">jours</small>
-                                </div>
-                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Graphique Volatilité Glissante -->
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-activity me-2"></i>Volatilité Glissante et Régimes
-                        </h5>
-                        <small class="text-muted">Clustering en 3 régimes : Faible, Intermédiaire, Élevé</small>
-                    </div>
-                    <div class="card-body">
-                        <div id="volatilityChartContainer" style="height: 350px;">
-                            <div class="text-center py-5">
-                                <div class="spinner-border text-primary" role="status">
-                                    <span class="visually-hidden">Chargement...</span>
-                                </div>
-                                <p class="text-muted mt-2">Calcul du clustering de volatilité...</p>
-                            </div>
-                        </div>
-                        <canvas id="volatilityChart" style="display: none;"></canvas>
-                        <!-- Légende régimes -->
-                        <div class="d-flex justify-content-center gap-4 mt-3">
-                            <div class="d-flex align-items-center gap-2">
-                                <div style="width: 16px; height: 16px; background: #28a745; border-radius: 50%;"></div>
-                                <small>Régime Faible</small>
-                            </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <div style="width: 16px; height: 16px; background: #ffc107; border-radius: 50%;"></div>
-                                <small>Régime Intermédiaire</small>
-                            </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <div style="width: 16px; height: 16px; background: #dc3545; border-radius: 50%;"></div>
-                                <small>Régime Élevé</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Statistiques des Régimes et Matrice de Transition -->
-            <div class="col-lg-6">
-                <div class="card h-100">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-pie-chart me-2"></i>Statistiques des Régimes
-                        </h5>
-                        <small class="text-muted">Distribution de la volatilité par régime</small>
-                    </div>
-                    <div class="card-body" id="regimeStatsContainer">
-                        <div class="text-center py-4">
-                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-lg-6">
-                <div class="card h-100">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-arrow-left-right me-2"></i>Matrice de Transition
-                        </h5>
-                        <small class="text-muted">Probabilité de passage entre régimes (%)</small>
-                    </div>
-                    <div class="card-body" id="transitionMatrixContainer">
-                        <div class="text-center py-4">
-                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Régime actuel -->
-            <div class="col-12">
-                <div class="card" id="currentRegimeCard">
-                    <div class="card-body py-3">
-                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                            <div class="d-flex align-items-center gap-3">
-                                <div id="currentRegimeBadge" class="px-4 py-2 rounded-pill text-white fw-bold" style="background: #6c757d;">
-                                    --
-                                </div>
-                                <div>
-                                    <div class="text-muted small">Régime actuel</div>
-                                    <div class="fw-bold" id="currentVolatilityValue">Volatilité: --</div>
-                                </div>
-                            </div>
-                            <div class="text-end">
-                                <div class="text-muted small">Seuils de classification</div>
-                                <div id="thresholdsInfo">Faible ≤ -- | Intermédiaire ≤ -- | Élevé > --</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Rolling Metrics Section -->
-            <div class="col-12 mt-4">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div>
-                            <h5 class="card-title mb-0">
-                                <i class="bi bi-graph-up-arrow me-2"></i>Métriques Glissantes
-                            </h5>
-                            <small class="text-muted">Sharpe Ratio et Beta glissants</small>
-                        </div>
-                        <div class="d-flex align-items-center gap-3 flex-wrap">
-                            <div class="d-flex align-items-center gap-2">
-                                <label class="text-muted small">Fenêtre :</label>
-                                <input type="range" class="form-range" id="rollingMetricsWindow" min="10" max="60" value="20" style="width: 100px;">
-                                <span class="badge bg-primary" id="rollingWindowValue">20</span>
-                                <small class="text-muted">jours</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
+                    <!-- End Corrélation Sub-tab -->
+                    
+                    <!-- Calendrier Sub-tab -->
+                    <div class="tab-pane fade" id="calendar-content" role="tabpanel" aria-labelledby="calendar-subtab">
                         <div class="row g-4">
-                            <!-- Sharpe Ratio Glissant -->
-                            <div class="col-md-6">
-                                <div class="mb-2 d-flex justify-content-between">
-                                    <span class="fw-bold">Sharpe Ratio Glissant</span>
-                                    <span class="badge bg-primary" id="currentSharpeValue">--</span>
-                                </div>
-                                <div style="height: 200px;">
-                                    <canvas id="rollingSharpeChart"></canvas>
-                                </div>
-                            </div>
-                            <!-- Beta Glissant -->
-                            <div class="col-md-6">
-                                <div class="mb-2 d-flex justify-content-between">
-                                    <span class="fw-bold">Beta Glissant <small class="text-muted">(vs FCP Actions Performances)</small></span>
-                                    <span class="badge bg-secondary" id="currentBetaValue">--</span>
-                                </div>
-                                <div style="height: 200px;">
-                                    <canvas id="rollingBetaChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Tail Risk Analysis Section -->
-            <div class="col-12 mt-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-exclamation-triangle me-2"></i>Analyse du Tail Risk
-                        </h5>
-                        <small class="text-muted">Événements extrêmes et fréquence des pertes</small>
-                    </div>
-                    <div class="card-body" id="tailRiskContainer">
-                        <div class="text-center py-4">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Chargement...</span>
-                            </div>
-                            <p class="text-muted mt-2">Analyse des événements extrêmes...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Pires et Meilleurs Jours -->
-            <div class="col-md-6 mt-4">
-                <div class="card h-100">
-                    <div class="card-header" style="background: rgba(220, 53, 69, 0.1);">
-                        <h5 class="card-title mb-0 text-danger">
-                            <i class="bi bi-arrow-down-circle me-2"></i>Top 10 Pires Jours
-                        </h5>
-                    </div>
-                    <div class="card-body" id="worstDaysContainer">
-                        <div class="text-center py-4">
-                            <div class="spinner-border spinner-border-sm text-danger" role="status"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-6 mt-4">
-                <div class="card h-100">
-                    <div class="card-header" style="background: rgba(40, 167, 69, 0.1);">
-                        <h5 class="card-title mb-0 text-success">
-                            <i class="bi bi-arrow-up-circle me-2"></i>Top 10 Meilleurs Jours
-                        </h5>
-                    </div>
-                    <div class="card-body" id="bestDaysContainer">
-                        <div class="text-center py-4">
-                            <div class="spinner-border spinner-border-sm text-success" role="status"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Note -->
-            <div class="col-12">
-                <div class="alert alert-light border d-flex align-items-center" role="alert">
-                    <i class="bi bi-info-circle me-2" style="color: var(--primary-color);"></i>
-                    <div>
-                        <small>
-                            <strong>Clustering de volatilité :</strong> Classification des régimes basée sur les percentiles 33% et 66% de la volatilité glissante.
-                            La <strong>matrice de transition</strong> indique la probabilité de passer d'un régime à un autre le jour suivant.
-                            <br><strong>Tail Risk :</strong> Analyse des événements extrêmes au-delà de 1, 2 et 3 écarts-types par rapport à la distribution normale attendue.
-                        </small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Calendrier Tab -->
-    <div class="tab-pane fade" id="calendar" role="tabpanel">
-        <div class="row g-4">
             <!-- Header -->
             <div class="col-12">
                 <div class="card">
                     <div class="card-body py-3">
-                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                            <h5 class="card-title mb-0">
-                                <i class="bi bi-calendar3 me-2" style="color: var(--primary-color);"></i>
-                                Calendrier de Performance - <span id="calendarFcpTitle" style="color: var(--primary-color);">{{ selected_fcp }}</span>
-                            </h5>
-                            <div class="d-flex align-items-center gap-2">
-                                <label class="text-muted small">FCP :</label>
-                                <select class="select-custom" id="calendarFcpSelector" style="min-width: 220px;">
-                                    {% for fcp_name in fcp_list %}
-                                    <option value="{{ fcp_name }}" {% if fcp_name == selected_fcp %}selected{% endif %}>{{ fcp_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-calendar3 me-2" style="color: var(--primary-color);"></i>
+                            Calendrier de Performance - <span id="calendarFcpTitle" style="color: var(--primary-color);">{{ selected_fcp }}</span>
+                        </h5>
                     </div>
                 </div>
             </div>
@@ -1518,7 +1760,7 @@
                         <h5 class="card-title mb-0">
                             <i class="bi bi-grid-3x3-gap me-2"></i>Heatmap des Performances Mensuelles
                         </h5>
-                        <small class="text-muted">Performance mensuelle par année (style GitHub contributions)</small>
+                        <small class="text-muted">Performance mensuelle par année</small>
                     </div>
                     <div class="card-body">
                         <div id="monthlyHeatmapContainer" style="overflow-x: auto;">
@@ -1625,6 +1867,581 @@
                     </div>
                 </div>
             </div>
+                        </div>
+                    </div>
+                    <!-- End Calendrier Sub-tab -->
+                </div>
+                <!-- End Sub-tabs Content -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Risque Tab -->
+    <div class="tab-pane fade" id="risk" role="tabpanel">
+        <div class="row g-4">
+            <!-- Header -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-shield-exclamation me-2" style="color: var(--primary-color);"></i>
+                                Analyse du Risque - <span id="riskFcpTitle" style="color: var(--primary-color);">{{ selected_fcp }}</span>
+                            </h5>
+                            <div class="d-flex align-items-center gap-3 flex-wrap">
+                                <div class="d-flex align-items-center gap-2">
+                                    <label class="text-muted small">FCP :</label>
+                                    <select class="select-custom" id="riskFcpSelector" style="min-width: 220px;">
+                                        {% for fcp_name in fcp_list %}
+                                        <option value="{{ fcp_name }}" {% if fcp_name == selected_fcp %}selected{% endif %}>{{ fcp_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sub-tabs Navigation -->
+            <div class="col-12">
+                <ul class="nav nav-pills mb-3" id="risqueSubTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="volatilite-subtab" data-bs-toggle="pill" data-bs-target="#volatilite-content" type="button" role="tab" aria-controls="volatilite-content" aria-selected="true">
+                            <i class="bi bi-activity me-2"></i>Volatilité
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="metriques-subtab" data-bs-toggle="pill" data-bs-target="#metriques-content" type="button" role="tab" aria-controls="metriques-content" aria-selected="false">
+                            <i class="bi bi-graph-up-arrow me-2"></i>Métriques glissantes
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="queues-subtab" data-bs-toggle="pill" data-bs-target="#queues-content" type="button" role="tab" aria-controls="queues-content" aria-selected="false">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Analyse des queues
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="profil-risque-subtab" data-bs-toggle="pill" data-bs-target="#profil-risque-content" type="button" role="tab" aria-controls="profil-risque-content" aria-selected="false">
+                            <i class="bi bi-speedometer2 me-2"></i>Profil de risque
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="drawdown-risque-subtab" data-bs-toggle="pill" data-bs-target="#drawdown-risque-content" type="button" role="tab" aria-controls="drawdown-risque-content" aria-selected="false">
+                            <i class="bi bi-water me-2"></i>Drawdown
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Sub-tabs Content -->
+            <div class="col-12">
+                <div class="tab-content" id="risqueSubTabsContent">
+                    <!-- Volatilité Sub-tab -->
+                    <div class="tab-pane fade show active" id="volatilite-content" role="tabpanel" aria-labelledby="volatilite-subtab">
+                        <div class="row g-4">
+            
+            <!-- Fenêtre de volatilité -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body py-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="text-muted small">Fenêtre :</label>
+                            <input type="range" class="form-range" id="volatilityWindow" min="5" max="30" value="20" style="width: 100px;">
+                            <span class="badge bg-primary" id="windowValue">20</span>
+                            <small class="text-muted">jours</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Graphique Volatilité Glissante -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-activity me-2"></i>Volatilité Glissante et Régimes
+                        </h5>
+                        <small class="text-muted">Clustering en 3 régimes : Faible, Intermédiaire, Élevé</small>
+                    </div>
+                    <div class="card-body">
+                        <div id="volatilityChartContainer" style="height: 350px;">
+                            <div class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Chargement...</span>
+                                </div>
+                                <p class="text-muted mt-2">Calcul du clustering de volatilité...</p>
+                            </div>
+                        </div>
+                        <canvas id="volatilityChart" style="display: none;"></canvas>
+                        <!-- Légende régimes -->
+                        <div class="d-flex justify-content-center gap-4 mt-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 16px; height: 16px; background: #28a745; border-radius: 50%;"></div>
+                                <small>Régime Faible</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 16px; height: 16px; background: #ffc107; border-radius: 50%;"></div>
+                                <small>Régime Intermédiaire</small>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width: 16px; height: 16px; background: #dc3545; border-radius: 50%;"></div>
+                                <small>Régime Élevé</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Statistiques des Régimes et Matrice de Transition -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-pie-chart me-2"></i>Statistiques des Régimes
+                        </h5>
+                        <small class="text-muted">Distribution de la volatilité par régime</small>
+                    </div>
+                    <div class="card-body" id="regimeStatsContainer">
+                        <div class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-arrow-left-right me-2"></i>Matrice de Transition
+                        </h5>
+                        <small class="text-muted">Probabilité de passage entre régimes (%)</small>
+                    </div>
+                    <div class="card-body" id="transitionMatrixContainer">
+                        <div class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Régime actuel -->
+            <div class="col-12">
+                <div class="card" id="currentRegimeCard">
+                    <div class="card-body py-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div id="currentRegimeBadge" class="px-4 py-2 rounded-pill text-white fw-bold" style="background: #6c757d;">
+                                    --
+                                </div>
+                                <div>
+                                    <div class="text-muted small">Régime actuel</div>
+                                    <div class="fw-bold" id="currentVolatilityValue">Volatilité: --</div>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="text-muted small">Seuils de classification</div>
+                                <div id="thresholdsInfo">Faible ≤ -- | Intermédiaire ≤ -- | Élevé > --</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Métriques glissantes Sub-tab -->
+                    <div class="tab-pane fade" id="metriques-content" role="tabpanel" aria-labelledby="metriques-subtab">
+                        <div class="row g-4">
+            
+            <!-- Rolling Metrics Section -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-graph-up-arrow me-2"></i>Métriques Glissantes
+                            </h5>
+                            <small class="text-muted">Sharpe Ratio et Beta glissants</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 flex-wrap">
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="text-muted small">Fenêtre :</label>
+                                <input type="range" class="form-range" id="rollingMetricsWindow" min="10" max="60" value="20" style="width: 100px;">
+                                <span class="badge bg-primary" id="rollingWindowValue">20</span>
+                                <small class="text-muted">jours</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <!-- Sharpe Ratio Glissant -->
+                            <div class="col-md-6">
+                                <div class="mb-2 d-flex justify-content-between">
+                                    <span class="fw-bold">Sharpe Ratio Glissant</span>
+                                    <span class="badge bg-primary" id="currentSharpeValue">--</span>
+                                </div>
+                                <div style="height: 200px;">
+                                    <canvas id="rollingSharpeChart"></canvas>
+                                </div>
+                            </div>
+                            <!-- Beta Glissant -->
+                            <div class="col-md-6">
+                                <div class="mb-2 d-flex justify-content-between">
+                                    <span class="fw-bold">Beta Glissant <small class="text-muted">(vs FCP Actions Performances)</small></span>
+                                    <span class="badge bg-secondary" id="currentBetaValue">--</span>
+                                </div>
+                                <div style="height: 200px;">
+                                    <canvas id="rollingBetaChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Analyse des queues Sub-tab -->
+                    <div class="tab-pane fade" id="queues-content" role="tabpanel" aria-labelledby="queues-subtab">
+                        <div class="row g-4">
+            
+            <!-- Tail Risk Analysis Section -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Analyse du Tail Risk
+                        </h5>
+                        <small class="text-muted">Événements extrêmes et fréquence des pertes</small>
+                    </div>
+                    <div class="card-body" id="tailRiskContainer">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Chargement...</span>
+                            </div>
+                            <p class="text-muted mt-2">Analyse des événements extrêmes...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pires et Meilleurs Jours -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header" style="background: rgba(220, 53, 69, 0.1);">
+                        <h5 class="card-title mb-0 text-danger">
+                            <i class="bi bi-arrow-down-circle me-2"></i>Top 10 Pires Jours
+                        </h5>
+                    </div>
+                    <div class="card-body" id="worstDaysContainer">
+                        <div class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-danger" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header" style="background: rgba(40, 167, 69, 0.1);">
+                        <h5 class="card-title mb-0 text-success">
+                            <i class="bi bi-arrow-up-circle me-2"></i>Top 10 Meilleurs Jours
+                        </h5>
+                    </div>
+                    <div class="card-body" id="bestDaysContainer">
+                        <div class="text-center py-4">
+                            <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Note -->
+            <div class="col-12">
+                <div class="alert alert-light border d-flex align-items-center" role="alert">
+                    <i class="bi bi-info-circle me-2" style="color: var(--primary-color);"></i>
+                    <div>
+                        <small>
+                            <strong>Tail Risk :</strong> Analyse des événements extrêmes au-delà de 1, 2 et 3 écarts-types par rapport à la distribution normale attendue.
+                        </small>
+                    </div>
+                </div>
+            </div>
+                        </div>
+                    </div>
+                    <!-- End Analyse des queues Sub-tab -->
+                    
+                    <!-- Profil de risque Sub-tab -->
+                    <div class="tab-pane fade" id="profil-risque-content" role="tabpanel" aria-labelledby="profil-risque-subtab">
+                        <div class="row g-4">
+            <!-- Profil de Risque -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-speedometer2 me-2"></i>Profil de Risque
+                        </h5>
+                        <small class="text-muted">Indicateurs clés de risque du fonds</small>
+                    </div>
+                    <div class="card-body">
+                        <!-- Drawdown Maximum -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">
+                                    <i class="bi bi-graph-down-arrow me-2"></i>Drawdown Maximum
+                                </span>
+                                <span class="fw-bold text-danger fs-5" id="risque-max-drawdown">-{{ analyse_stats.max_drawdown|default:"--" }}%</span>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar bg-danger" role="progressbar" id="risque-drawdown-bar"
+                                     style="width: {{ analyse_stats.max_drawdown|default:0 }}%"></div>
+                            </div>
+                            <small class="text-muted">Perte maximale depuis un pic historique</small>
+                        </div>
+                        
+                        <!-- Ratio de Sharpe -->
+                        <div class="mb-4 p-3 rounded" style="background: var(--bg-secondary);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-trophy me-2" style="color: var(--primary-color);"></i>
+                                    <span class="fw-medium">Ratio de Sharpe</span>
+                                    <br><small class="text-muted">Rendement ajusté du risque (rf=3,25%)</small>
+                                </div>
+                                <span class="fs-4 fw-bold" id="risque-sharpe">
+                                    {{ analyse_stats.sharpe|default:"--" }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Ratio de Sortino -->
+                        <div class="mb-4 p-3 rounded" style="background: var(--bg-secondary);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-shield-check me-2" style="color: var(--primary-color);"></i>
+                                    <span class="fw-medium">Ratio de Sortino</span>
+                                    <br><small class="text-muted">Rendement ajusté du risque baissier</small>
+                                </div>
+                                <span class="fs-4 fw-bold" id="risque-sortino">
+                                    {{ analyse_stats.sortino|default:"--" }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Jours Positifs/Négatifs -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted">Distribution des jours</span>
+                                <span class="fw-bold" id="risque-ratio-positif">{{ analyse_stats.ratio_positif|default:"--" }}% positifs</span>
+                            </div>
+                            <div class="progress" style="height: 24px;" id="risque-jours-progress">
+                                <div class="progress-bar bg-success" role="progressbar" id="risque-jours-positifs-bar"
+                                     style="width: {{ analyse_stats.ratio_positif|default:50 }}%"
+                                     title="{{ analyse_stats.jours_positifs }} jours positifs">
+                                    <small><span id="risque-jours-positifs">{{ analyse_stats.jours_positifs|default:"--" }}</span> <i class="bi bi-arrow-up"></i></small>
+                                </div>
+                                <div class="progress-bar bg-danger" role="progressbar" id="risque-jours-negatifs-bar"
+                                     style="width: {% widthratio analyse_stats.jours_negatifs analyse_stats.nb_observations 100 %}%"
+                                     title="{{ analyse_stats.jours_negatifs }} jours négatifs">
+                                    <small><span id="risque-jours-negatifs">{{ analyse_stats.jours_negatifs|default:"--" }}</span> <i class="bi bi-arrow-down"></i></small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tracking Error Table -->
+                        <div class="mt-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-graph-up-arrow me-2" style="color: var(--primary-color);"></i>
+                                <span class="fw-medium">Tracking Error (Volatilité annualisée)</span>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered mb-0" style="font-size: 0.85rem;">
+                                    <thead style="background: var(--bg-secondary);">
+                                        <tr class="text-center">
+                                            <th class="py-2">WTD</th>
+                                            <th class="py-2">MTD</th>
+                                            <th class="py-2">QTD</th>
+                                            <th class="py-2">STD</th>
+                                            <th class="py-2">YTD</th>
+                                            <th class="py-2">Origine</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="text-center">
+                                            <td class="py-2 fw-bold" id="risque-tracking-error-wtd">{{ tracking_error.wtd|default:"--" }}%</td>
+                                            <td class="py-2 fw-bold" id="risque-tracking-error-mtd">{{ tracking_error.mtd|default:"--" }}%</td>
+                                            <td class="py-2 fw-bold" id="risque-tracking-error-qtd">{{ tracking_error.qtd|default:"--" }}%</td>
+                                            <td class="py-2 fw-bold" id="risque-tracking-error-std">{{ tracking_error.std|default:"--" }}%</td>
+                                            <td class="py-2 fw-bold" id="risque-tracking-error-ytd">{{ tracking_error.ytd|default:"--" }}%</td>
+                                            <td class="py-2 fw-bold" id="risque-tracking-error-origine" style="color: var(--primary-color);">{{ tracking_error.origine|default:"--" }}%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- Légende interprétation -->
+                        <div class="alert alert-light border-0 mb-0 mt-4">
+                            <small>
+                                <strong>Interprétation des ratios :</strong><br>
+                                <span class="text-success">● &gt; 1</span> = Excellent |
+                                <span class="text-warning">● 0-1</span> = Acceptable |
+                                <span class="text-danger">● &lt; 0</span> = À éviter
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- VaR et CVaR -->
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Value at Risk (VaR)
+                        </h5>
+                        <small class="text-muted">Mesures de risque extrême - Méthode historique</small>
+                    </div>
+                    <div class="card-body">
+                        <!-- VaR 95% -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <span class="fw-medium">VaR 95%</span>
+                                    <br><small class="text-muted">Perte max dans 95% des cas (1 jour)</small>
+                                </div>
+                                <span class="fs-4 fw-bold text-danger" id="risque-var95">{{ analyse_stats.var_95|default:"--" }}%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 95%;"></div>
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 5%;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- VaR 99% -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <span class="fw-medium">VaR 99%</span>
+                                    <br><small class="text-muted">Perte max dans 99% des cas (1 jour)</small>
+                                </div>
+                                <span class="fs-4 fw-bold text-danger" id="risque-var99">{{ analyse_stats.var_99|default:"--" }}%</span>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 99%;"></div>
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 1%;"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- CVaR / Expected Shortfall -->
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="p-3 rounded text-center" style="background: rgba(220, 53, 69, 0.1); border: 1px solid rgba(220, 53, 69, 0.3);">
+                                    <div class="text-muted small">CVaR 95%</div>
+                                    <div class="fw-bold fs-5 text-danger" id="risque-cvar95">{{ analyse_stats.cvar_95|default:"--" }}%</div>
+                                    <small class="text-muted">Expected Shortfall</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 rounded text-center" style="background: rgba(220, 53, 69, 0.15); border: 1px solid rgba(220, 53, 69, 0.4);">
+                                    <div class="text-muted small">CVaR 99%</div>
+                                    <div class="fw-bold fs-5 text-danger" id="risque-cvar99">{{ analyse_stats.cvar_99|default:"--" }}%</div>
+                                    <small class="text-muted">Expected Shortfall</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-light border-0 mt-3 mb-0 small">
+                            <i class="bi bi-info-circle me-1"></i>
+                            <strong>CVaR</strong> = Perte moyenne quand on dépasse la VaR (plus conservateur).
+                        </div>
+                    </div>
+                </div>
+            </div>
+                        </div>
+                    </div>
+                    <!-- End Profil de risque Sub-tab -->
+                    
+                    <!-- Drawdown Sub-tab -->
+                    <div class="tab-pane fade" id="drawdown-risque-content" role="tabpanel" aria-labelledby="drawdown-risque-subtab">
+                        <div class="row g-4">
+            <!-- Underwater Chart (Drawdowns dans le temps) -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-water me-2"></i>Underwater Chart - Évolution des Drawdowns
+                        </h5>
+                        <small class="text-muted">Visualisation des périodes de perte par rapport aux pics historiques</small>
+                    </div>
+                    <div class="card-body">
+                        <div style="height: 250px;">
+                            <canvas id="underwaterChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Top Drawdowns -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <div>
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-graph-down-arrow me-2"></i>Top 5 des Pires Drawdowns
+                            </h5>
+                            <small class="text-muted">Analyse détaillée des périodes de baisse</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <label class="text-muted small">Seuil minimum :</label>
+                            <select class="select-custom" id="drawdownThreshold" style="width: auto;">
+                                <option value="0">Tous</option>
+                                <option value="1">≥ 1%</option>
+                                <option value="2" selected>≥ 2%</option>
+                                <option value="5">≥ 5%</option>
+                                <option value="10">≥ 10%</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="drawdownsTable">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-3">#</th>
+                                        <th class="px-4 py-3">Début</th>
+                                        <th class="px-4 py-3">Point bas</th>
+                                        <th class="px-4 py-3">Fin</th>
+                                        <th class="px-4 py-3 text-end">Profondeur</th>
+                                        <th class="px-4 py-3 text-center">Durée (jours)</th>
+                                        <th class="px-4 py-3 text-center">Recovery (jours)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="drawdownsTableBody">
+                                    <!-- Rempli par JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Note -->
+            <div class="col-12">
+                <div class="alert alert-light border d-flex align-items-center" role="alert">
+                    <i class="bi bi-info-circle me-2" style="color: var(--primary-color);"></i>
+                    <div>
+                        <small>Analyse basée sur les données du <strong>{{ stats.premiere_date }}</strong> au <strong>{{ stats.derniere_date }}</strong>. 
+                        Taux sans risque utilisé : 3,25% annuel.</small>
+                    </div>
+                </div>
+            </div>
+                        </div>
+                    </div>
+                    <!-- End Drawdown Sub-tab -->
+                </div>
+                <!-- End Sub-tabs Content -->
+            </div>
         </div>
     </div>
 </div>
@@ -1634,6 +2451,7 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Données VL depuis Django (variables modifiables)
@@ -1647,6 +2465,49 @@ document.addEventListener('DOMContentLoaded', function() {
     let drawdownsData = {{ drawdowns_data_json|safe }};
     let rendementsList = {{ rendements_list_json|safe }};
     
+    // Données des FCP pour la fiche signalétique (déplacé en haut pour accessibilité)
+    const fcpDataJson = {{ fcp_data_json|safe }};
+    
+    // Fonction pour initialiser le donut chart de l'overview
+    function initOverviewDonutChart(oblig, brvm) {
+        const svg = document.getElementById('overviewBenchmarkDonut');
+        if (!svg) return;
+        
+        // Remove old segments
+        svg.querySelectorAll('circle:not(:first-child)').forEach(c => c.remove());
+        
+        const circumference = 2 * Math.PI * 15.915;
+        
+        if (oblig > 0) {
+            const segment1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            segment1.setAttribute('cx', '18');
+            segment1.setAttribute('cy', '18');
+            segment1.setAttribute('r', '15.915');
+            segment1.setAttribute('fill', 'none');
+            segment1.setAttribute('stroke', '#004080');
+            segment1.setAttribute('stroke-width', '3.5');
+            segment1.setAttribute('stroke-dasharray', `${oblig * circumference / 100} ${circumference}`);
+            segment1.setAttribute('stroke-dashoffset', '0');
+            svg.appendChild(segment1);
+        }
+        
+        if (brvm > 0) {
+            const segment2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            segment2.setAttribute('cx', '18');
+            segment2.setAttribute('cy', '18');
+            segment2.setAttribute('r', '15.915');
+            segment2.setAttribute('fill', 'none');
+            segment2.setAttribute('stroke', '#28a745');
+            segment2.setAttribute('stroke-width', '3.5');
+            segment2.setAttribute('stroke-dasharray', `${brvm * circumference / 100} ${circumference}`);
+            segment2.setAttribute('stroke-dashoffset', `-${oblig * circumference / 100}`);
+            svg.appendChild(segment2);
+        }
+    }
+    
+    // Initial overview donut chart
+    initOverviewDonutChart({{ selected_fcp_data.benchmark_oblig }}, {{ selected_fcp_data.benchmark_brvmc }});
+
     // Fonction pour filtrer les données par période
     function filterDataByPeriod(data, period) {
         if (!data || data.length === 0) return { labels: [], values: [] };
@@ -1779,6 +2640,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }));
     }
     
+    // Variable pour contrôler l'affichage des labels
+    let showScatterLabels = true;
+    
     // Initialiser le scatter chart
     let scatterDatasets = createScatterDatasets(allFcpStats);
     
@@ -1787,12 +2651,37 @@ document.addEventListener('DOMContentLoaded', function() {
         data: {
             datasets: scatterDatasets
         },
+        plugins: [ChartDataLabels],
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: false
+                },
+                datalabels: {
+                    display: function(context) {
+                        return showScatterLabels;
+                    },
+                    align: 'top',
+                    offset: 8,
+                    color: '#333',
+                    font: {
+                        size: 10,
+                        weight: '500'
+                    },
+                    formatter: function(value, context) {
+                        // Retourner un nom court (premiers mots)
+                        const label = context.dataset.label || '';
+                        const words = label.split(' ');
+                        if (words.length > 3) {
+                            return words.slice(0, 3).join(' ') + '...';
+                        }
+                        return label;
+                    },
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    borderRadius: 4,
+                    padding: { top: 2, bottom: 2, left: 4, right: 4 }
                 },
                 tooltip: {
                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -1851,29 +2740,107 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (elements.length > 0) {
                     const datasetIndex = elements[0].datasetIndex;
                     const fcpData = scatterChart.data.datasets[datasetIndex];
-                    updateScatterInfo(fcpData.label, fcpData.data[0].y, fcpData.data[0].x, fcpData.type_fond);
+                    // Highlight row in table
+                    highlightTableRow(fcpData.label);
                 }
             }
         }
     });
     
-    // Fonction pour mettre à jour les infos du scatter
-    function updateScatterInfo(nom, rendement, volatilite, typeFond) {
-        document.getElementById('scatterSelectedFcp').textContent = nom;
-        const rendementEl = document.getElementById('scatterRendement');
-        rendementEl.textContent = (rendement >= 0 ? '+' : '') + rendement.toFixed(2) + '%';
-        rendementEl.style.color = rendement >= 0 ? 'var(--success-color)' : 'var(--danger-color)';
-        document.getElementById('scatterVolatilite').textContent = volatilite.toFixed(2) + '%';
-        const ratio = volatilite > 0 ? (rendement / volatilite).toFixed(2) : '--';
-        document.getElementById('scatterRatio').textContent = ratio;
-        document.getElementById('scatterTypeFond').innerHTML = '<i class="bi bi-tag-fill me-1"></i>' + typeFond;
+    // Fonction pour peupler le tableau des FCP
+    function populateScatterTable(data) {
+        const tbody = document.getElementById('scatterTableBody');
+        if (!tbody) return;
+        
+        // Trier par rendement décroissant
+        const sortedData = [...data].sort((a, b) => b.rendement - a.rendement);
+        
+        tbody.innerHTML = sortedData.map((fcp, index) => {
+            const ratio = fcp.volatilite > 0 ? (fcp.rendement / fcp.volatilite).toFixed(2) : '--';
+            const rendementClass = fcp.rendement >= 0 ? 'positive' : 'negative';
+            const rendementSign = fcp.rendement >= 0 ? '+' : '';
+            const selectedClass = fcp.selected ? 'selected' : '';
+            const typeColor = typeColors[fcp.type_fond] || '#6c757d';
+            
+            // Récupérer les données supplémentaires depuis fcpDataJson
+            const fcpInfo = fcpDataJson[fcp.nom] || {};
+            const echelleRisque = fcpInfo.echelle_risque || '--';
+            const horizon = fcpInfo.horizon || '--';
+            const benchmarkOblig = fcpInfo.benchmark_oblig || 0;
+            const benchmarkBrvmc = fcpInfo.benchmark_brvmc || 0;
+            
+            return `
+                <tr data-fcp="${fcp.nom}" data-type="${fcp.type_fond}" class="${selectedClass}">
+                    <td class="fcp-name">${fcp.nom}</td>
+                    <td>
+                        <span class="type-badge" style="background: ${typeColor}15; color: ${typeColor};">
+                            <i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i>
+                            ${fcp.type_fond}
+                        </span>
+                    </td>
+                    <td style="text-align: right;" class="${rendementClass}">
+                        <strong>${rendementSign}${fcp.rendement.toFixed(2)}%</strong>
+                    </td>
+                    <td style="text-align: right;">${fcp.volatilite.toFixed(2)}%</td>
+                    <td style="text-align: right;"><strong>${ratio}</strong></td>
+                    <td style="text-align: center;">
+                        <span class="risk-badge risk-level-${echelleRisque}">${echelleRisque}</span>
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="horizon-badge">
+                            <i class="bi bi-clock"></i>
+                            ${horizon} ans
+                        </span>
+                    </td>
+                    <td style="text-align: center;">
+                        <small style="color: var(--text-muted);">
+                            <span style="color: #004080; font-weight: 600;">${benchmarkOblig}%</span> / 
+                            <span style="color: #28a745; font-weight: 600;">${benchmarkBrvmc}%</span>
+                        </small>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        
+        // Ajouter les événements click sur les lignes
+        tbody.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('click', function() {
+                const fcpName = this.dataset.fcp;
+                const fcpInfo = data.find(f => f.nom === fcpName);
+                if (fcpInfo) {
+                    // Mettre à jour la sélection visuelle dans le tableau
+                    tbody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    // Charger les données du FCP
+                    loadFcpData(fcpName);
+                }
+            });
+        });
     }
     
-    // Initialiser les infos avec le FCP sélectionné
-    const selectedFcpData = allFcpStats.find(f => f.selected);
-    if (selectedFcpData) {
-        updateScatterInfo(selectedFcpData.nom, selectedFcpData.rendement, selectedFcpData.volatilite, selectedFcpData.type_fond);
+    // Fonction pour mettre en évidence une ligne du tableau
+    function highlightTableRow(fcpName) {
+        const tbody = document.getElementById('scatterTableBody');
+        if (!tbody) return;
+        
+        tbody.querySelectorAll('tr').forEach(row => {
+            row.classList.remove('selected');
+            if (row.dataset.fcp === fcpName) {
+                row.classList.add('selected');
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
     }
+    
+    // Initialiser le tableau avec les données initiales
+    populateScatterTable(allFcpStats);
+    
+    // Event listener pour le toggle des labels
+    document.getElementById('showScatterLabels')?.addEventListener('change', function() {
+        showScatterLabels = this.checked;
+        scatterChart.update();
+    });
     
     // Scatter Period Filter Click Handler
     document.querySelectorAll('#scatterPeriodFilters .filter-pill').forEach(pill => {
@@ -1896,11 +2863,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     scatterChart.data.datasets = createScatterDatasets(result.data);
                     scatterChart.update();
                     
-                    // Mettre à jour les infos si le FCP sélectionné est dans les résultats
-                    const selectedData = result.data.find(f => f.selected);
-                    if (selectedData) {
-                        updateScatterInfo(selectedData.nom, selectedData.rendement, selectedData.volatilite, selectedData.type_fond);
-                    }
+                    // Mettre à jour le tableau
+                    populateScatterTable(result.data);
                     
                     // Mettre à jour la note avec la date
                     if (result.last_date) {
@@ -1983,6 +2947,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Mettre à jour l'onglet Analyse avec les nouvelles statistiques
                 updateAnalysisTab(data.analyse_stats, data.tracking_error);
                 
+                // Mettre à jour l'onglet Fiche Signalétique
+                updateFicheSignaletique(fcpName);
+                
+                // Mettre à jour le calendrier si l'onglet est actif
+                if (document.getElementById('calendar-content')?.classList.contains('show')) {
+                    loadCalendarData(fcpName);
+                }
+                
                 document.body.style.cursor = 'default';
             })
             .catch(error => {
@@ -1991,9 +2963,68 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
     
+    // Fonction pour mettre à jour l'onglet Fiche Signalétique avec le FCP sélectionné
+    // Fonction pour mettre à jour la fiche signalétique dans l'overview
+    function updateFicheSignaletique(fcpName) {
+        const fcpInfo = fcpDataJson[fcpName];
+        if (!fcpInfo) return;
+        
+        // Mettre à jour l'échelle de risque - Overview
+        document.querySelectorAll('#overviewRiskScale .risk-level').forEach(level => {
+            level.classList.remove('active');
+            level.style.transform = 'scaleY(1)';
+            if (parseInt(level.dataset.level) === fcpInfo.echelle_risque) {
+                level.classList.add('active');
+                setTimeout(() => {
+                    level.style.transform = 'scaleY(1.15)';
+                }, 100);
+            }
+        });
+        
+        // Mettre à jour les valeurs et labels de risque - Overview
+        const overviewRiskValueEl = document.getElementById('overviewRiskValue');
+        const overviewRiskLabelEl = document.getElementById('overviewRiskLabel');
+        if (overviewRiskValueEl) overviewRiskValueEl.textContent = fcpInfo.echelle_risque + '/7';
+        if (overviewRiskLabelEl) overviewRiskLabelEl.textContent = fcpInfo.risk_label;
+        
+        // Mettre à jour les cartes d'info - Overview
+        const overviewTypeIconEl = document.getElementById('overviewTypeIcon');
+        if (overviewTypeIconEl) {
+            overviewTypeIconEl.innerHTML = `<i class="${fcpInfo.type_icon}"></i>`;
+        }
+        const overviewTypeFondEl = document.getElementById('overviewTypeFond');
+        if (overviewTypeFondEl) overviewTypeFondEl.textContent = fcpInfo.type_fond;
+        
+        const overviewHorizonEl = document.getElementById('overviewHorizon');
+        if (overviewHorizonEl) overviewHorizonEl.textContent = fcpInfo.horizon + ' ans';
+        
+        const overviewDeviseEl = document.getElementById('overviewDevise');
+        if (overviewDeviseEl) overviewDeviseEl.textContent = fcpInfo.devise;
+        
+        const overviewGestionnaireEl = document.getElementById('overviewGestionnaire');
+        if (overviewGestionnaireEl) overviewGestionnaireEl.textContent = fcpInfo.gestionnaire;
+        
+        // Mettre à jour l'allocation benchmark - Overview
+        const overviewBenchmarkObligEl = document.getElementById('overviewBenchmarkOblig');
+        const overviewBenchmarkBrvmEl = document.getElementById('overviewBenchmarkBrvm');
+        if (overviewBenchmarkObligEl) overviewBenchmarkObligEl.textContent = fcpInfo.benchmark_oblig + '%';
+        if (overviewBenchmarkBrvmEl) overviewBenchmarkBrvmEl.textContent = fcpInfo.benchmark_brvmc + '%';
+        
+        // Mettre à jour le donut chart - Overview
+        initOverviewDonutChart(fcpInfo.benchmark_oblig, fcpInfo.benchmark_brvmc);
+        
+        // Marquer la ligne correspondante dans le tableau scatter
+        document.querySelectorAll('#scatterDataTable tbody tr').forEach(row => {
+            row.classList.remove('selected');
+            if (row.dataset.fcp === fcpName) {
+                row.classList.add('selected');
+            }
+        });
+    }
+    
     // Fonction pour synchroniser tous les sélecteurs FCP
     function syncAllFcpSelectors(fcpName) {
-        const selectors = ['fcpSelector', 'perfFcpSelector', 'analyseFcpSelector', 'historyFcpSelector', 'riskFcpSelector', 'calendarFcpSelector'];
+        const selectors = ['fcpSelector', 'perfFcpSelector', 'analyseFcpSelector', 'historyFcpSelector', 'riskFcpSelector'];
         selectors.forEach(id => {
             const selector = document.getElementById(id);
             if (selector) {
@@ -2002,7 +3033,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Mettre à jour tous les titres dynamiques
-        const titles = ['analyseFcpTitle', 'historyFcpTitle', 'riskFcpTitle', 'calendarFcpTitle', 'perfFcpTitle'];
+        const titles = ['analyseFcpTitle', 'historyFcpTitle', 'riskFcpTitle', 'calendarFcpTitle', 'perfFcpTitle', 'evolutionVlFcpTitle'];
         titles.forEach(id => {
             const titleEl = document.getElementById(id);
             if (titleEl) {
@@ -2204,6 +3235,78 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('tracking-error-std').textContent = formatValue(trackingError.std, '%');
             document.getElementById('tracking-error-ytd').textContent = formatValue(trackingError.ytd, '%');
             document.getElementById('tracking-error-origine').textContent = formatValue(trackingError.origine, '%');
+        }
+        
+        // === Mise à jour du sous-onglet "Profil de risque" dans l'onglet Risque ===
+        // Max Drawdown
+        const risqueMaxDrawdown = document.getElementById('risque-max-drawdown');
+        if (risqueMaxDrawdown) {
+            risqueMaxDrawdown.textContent = '-' + formatValue(analyseStats.max_drawdown, '%');
+        }
+        const risqueDrawdownBar = document.getElementById('risque-drawdown-bar');
+        if (risqueDrawdownBar) {
+            risqueDrawdownBar.style.width = (analyseStats.max_drawdown || 0) + '%';
+        }
+        
+        // Sharpe et Sortino
+        const risqueSharpe = document.getElementById('risque-sharpe');
+        if (risqueSharpe) {
+            risqueSharpe.textContent = formatValue(analyseStats.sharpe);
+        }
+        const risqueSortino = document.getElementById('risque-sortino');
+        if (risqueSortino) {
+            risqueSortino.textContent = formatValue(analyseStats.sortino);
+        }
+        
+        // Jours Positifs/Négatifs pour Risque
+        const risqueRatioPositif = document.getElementById('risque-ratio-positif');
+        if (risqueRatioPositif) {
+            risqueRatioPositif.textContent = ratioPos + '% positifs';
+        }
+        const risqueJoursPositifs = document.getElementById('risque-jours-positifs');
+        if (risqueJoursPositifs) {
+            risqueJoursPositifs.textContent = joursPos;
+        }
+        const risqueJoursNegatifs = document.getElementById('risque-jours-negatifs');
+        if (risqueJoursNegatifs) {
+            risqueJoursNegatifs.textContent = joursNeg;
+        }
+        const risqueJoursPositifsBar = document.getElementById('risque-jours-positifs-bar');
+        if (risqueJoursPositifsBar) {
+            risqueJoursPositifsBar.style.width = ratioPos + '%';
+        }
+        const risqueJoursNegatifsBar = document.getElementById('risque-jours-negatifs-bar');
+        if (risqueJoursNegatifsBar) {
+            risqueJoursNegatifsBar.style.width = (100 - ratioPos) + '%';
+        }
+        
+        // VaR et CVaR pour Risque
+        const risqueVar95 = document.getElementById('risque-var95');
+        if (risqueVar95) {
+            risqueVar95.textContent = formatValue(analyseStats.var_95, '%');
+        }
+        const risqueVar99 = document.getElementById('risque-var99');
+        if (risqueVar99) {
+            risqueVar99.textContent = formatValue(analyseStats.var_99, '%');
+        }
+        const risqueCvar95 = document.getElementById('risque-cvar95');
+        if (risqueCvar95) {
+            risqueCvar95.textContent = formatValue(analyseStats.cvar_95, '%');
+        }
+        const risqueCvar99 = document.getElementById('risque-cvar99');
+        if (risqueCvar99) {
+            risqueCvar99.textContent = formatValue(analyseStats.cvar_99, '%');
+        }
+        
+        // Tracking Error pour Risque
+        if (trackingError) {
+            const teFields = ['wtd', 'mtd', 'qtd', 'std', 'ytd', 'origine'];
+            teFields.forEach(field => {
+                const el = document.getElementById('risque-tracking-error-' + field);
+                if (el) {
+                    el.textContent = formatValue(trackingError[field], '%');
+                }
+            });
         }
         
         // Re-render les graphiques de l'analyse si les données ont changé
@@ -3138,17 +4241,17 @@ document.addEventListener('DOMContentLoaded', function() {
         loadTailRisk(fcpName);
     });
     
-    // Charger les données quand l'onglet Calendrier est affiché
-    document.querySelector('button[data-bs-target="#calendar"]')?.addEventListener('shown.bs.tab', function() {
-        const fcpName = document.getElementById('calendarFcpSelector').value;
-        loadCalendarData(fcpName);
+    // Re-render les graphiques quand le sous-onglet Drawdown devient visible
+    document.getElementById('drawdown-risque-subtab')?.addEventListener('shown.bs.tab', function() {
+        setTimeout(() => {
+            renderUnderwaterChart();
+            renderDrawdownsTable(parseFloat(document.getElementById('drawdownThreshold')?.value || 2));
+        }, 100);
     });
     
-    // Calendar FCP Selector
-    document.getElementById('calendarFcpSelector')?.addEventListener('change', function() {
-        // Mettre à jour le titre dynamiquement
-        document.getElementById('calendarFcpTitle').textContent = this.value;
-        loadCalendarData(this.value);
+    // Charger les données quand le sous-onglet Calendrier est affiché
+    document.querySelector('button[data-bs-target="#calendar-content"]')?.addEventListener('shown.bs.tab', function() {
+        loadCalendarData(selectedFcp);
     });
     
     // ========== ROLLING METRICS FUNCTIONS ==========
@@ -3784,6 +4887,83 @@ document.addEventListener('DOMContentLoaded', function() {
         html += '</div>';
         
         container.innerHTML = html;
+    }
+    
+    // === Overview FCP Stats ===
+    // Count FCP by type from scatter data table rows
+    let counts = { 'Diversifié': 0, 'Obligataire': 0, 'Actions': 0, 'Monétaire': 0, 'Capital-Risque': 0 };
+    document.querySelectorAll('#scatterDataTable tbody tr').forEach(row => {
+        const type = row.dataset.type;
+        if (counts.hasOwnProperty(type)) {
+            counts[type]++;
+        }
+    });
+    
+    // Initialize overview FCP counts
+    const overviewDiversifiedCountEl = document.getElementById('overviewDiversifiedCount');
+    const overviewObligataireCountEl = document.getElementById('overviewObligataireCount');
+    const overviewActionsCountEl = document.getElementById('overviewActionsCount');
+    if (overviewDiversifiedCountEl) overviewDiversifiedCountEl.textContent = counts['Diversifié'];
+    if (overviewObligataireCountEl) overviewObligataireCountEl.textContent = counts['Obligataire'];
+    if (overviewActionsCountEl) overviewActionsCountEl.textContent = counts['Actions'];
+    
+    // Animate risk scale on load
+    const activeRisk = document.querySelector('.risk-level.active');
+    if (activeRisk) {
+        activeRisk.style.transform = 'scaleY(1)';
+        setTimeout(() => {
+            activeRisk.style.transform = 'scaleY(1.15)';
+        }, 300);
+    }
+    
+    // Scatter data table row click handler
+    document.querySelectorAll('#scatterDataTable tbody tr').forEach(row => {
+        row.addEventListener('click', function() {
+            const fcpName = this.dataset.fcp;
+            
+            // Update selection
+            document.querySelectorAll('#scatterDataTable tbody tr').forEach(r => r.classList.remove('selected'));
+            this.classList.add('selected');
+            
+            // Load FCP data
+            loadFcpData(fcpName);
+        });
+    });
+    
+    // Filter pills for scatter data table
+    document.querySelectorAll('.table-filters .mini-pill').forEach(pill => {
+        pill.addEventListener('click', function() {
+            // Get parent filter group to only affect pills in the same group
+            const filterGroup = this.closest('.table-filters');
+            
+            // Update active state within the same filter group
+            filterGroup.querySelectorAll('.mini-pill').forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            
+            const filterType = this.dataset.filter;
+            const targetTable = this.dataset.table;
+            
+            // Determine which table to filter - use scatterDataTable
+            let tableId = targetTable || 'scatterDataTable';
+            
+            // Filter table rows
+            document.querySelectorAll(`#${tableId} tbody tr`).forEach(row => {
+                if (filterType === 'all' || row.dataset.type === filterType) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    // Animate overview risk scale on load
+    const overviewActiveRisk = document.querySelector('#overviewRiskScale .risk-level.active');
+    if (overviewActiveRisk) {
+        overviewActiveRisk.style.transform = 'scaleY(1)';
+        setTimeout(() => {
+            overviewActiveRisk.style.transform = 'scaleY(1.15)';
+        }, 300);
     }
 });
 </script>

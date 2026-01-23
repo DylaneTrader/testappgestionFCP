@@ -17,6 +17,23 @@ from .data import (
 )
 from .models import FicheSignaletique, FCP_VL_MODELS, get_vl_model
 
+# ============================================================================
+# CONSTANTES FINANCIÈRES
+# ============================================================================
+# Nombre de jours de trading par an (standard pour les marchés financiers)
+# Le marché BRVM est ouvert ~252 jours par an (hors week-ends et jours fériés)
+TRADING_DAYS_PER_YEAR = 365
+
+# Taux sans risque annuel (en %) - Taux de référence BCEAO
+RISK_FREE_RATE_ANNUAL = 3.25
+
+# Taux sans risque journalier
+RISK_FREE_RATE_DAILY = RISK_FREE_RATE_ANNUAL / TRADING_DAYS_PER_YEAR
+
+# Facteur d'annualisation pour la volatilité
+ANNUALIZATION_FACTOR = TRADING_DAYS_PER_YEAR ** 0.5
+# ============================================================================
+
 # Create your views here.
 
 
@@ -137,10 +154,10 @@ def valeurs_liquidatives(request):
                 if len(period_rendements) < 2:
                     return None
                 moyenne = sum(period_rendements) / len(period_rendements)
-                variance = sum((r - moyenne) ** 2 for r in period_rendements) / len(period_rendements)
+                variance = sum((r - moyenne) ** 2 for r in period_rendements) / (len(period_rendements) - 1)  # Variance non biaisée
                 ecart_type = variance ** 0.5
                 # Annualiser la volatilité
-                volatilite_ann = ecart_type * (365 ** 0.5)
+                volatilite_ann = ecart_type * ANNUALIZATION_FACTOR
                 return round(volatilite_ann, 2)
             
             tracking_error = {
@@ -159,9 +176,9 @@ def valeurs_liquidatives(request):
                 
                 # Statistiques descriptives
                 moyenne_rdt = sum(rendements) / len(rendements)
-                variance = sum((r - moyenne_rdt) ** 2 for r in rendements) / len(rendements)
+                variance = sum((r - moyenne_rdt) ** 2 for r in rendements) / (len(rendements) - 1)  # Variance non biaisée
                 ecart_type = variance ** 0.5
-                volatilite_ann = ecart_type * (365 ** 0.5)
+                volatilite_ann = ecart_type * ANNUALIZATION_FACTOR
                 
                 rendements_sorted = sorted(rendements)
                 n = len(rendements_sorted)
@@ -187,16 +204,15 @@ def valeurs_liquidatives(request):
                     if drawdown > max_drawdown:
                         max_drawdown = drawdown
                 
-                # Ratio de Sharpe (avec taux sans risque de 3,25%)
-                rf = 3.25 / 365  # Taux sans risque quotidien
-                sharpe = ((moyenne_rdt - rf) / ecart_type * (365 ** 0.5)) if ecart_type > 0 else 0
+                # Ratio de Sharpe (avec taux sans risque constant)
+                sharpe = ((moyenne_rdt - RISK_FREE_RATE_DAILY) / ecart_type * ANNUALIZATION_FACTOR) if ecart_type > 0 else 0
                 
                 # Ratio de Sortino
                 rendements_negatifs = [r for r in rendements if r < 0]
                 if rendements_negatifs:
-                    downside_var = sum(r ** 2 for r in rendements_negatifs) / len(rendements_negatifs)
+                    downside_var = sum(r ** 2 for r in rendements_negatifs) / (len(rendements_negatifs) - 1) if len(rendements_negatifs) > 1 else sum(r ** 2 for r in rendements_negatifs)
                     downside_std = downside_var ** 0.5
-                    sortino = ((moyenne_rdt - rf) / downside_std * (365 ** 0.5)) if downside_std > 0 else 0
+                    sortino = ((moyenne_rdt - RISK_FREE_RATE_DAILY) / downside_std * ANNUALIZATION_FACTOR) if downside_std > 0 else 0
                 else:
                     sortino = 0
                 
@@ -348,10 +364,10 @@ def valeurs_liquidatives(request):
                 # Calculer volatilité
                 valeurs = list(fcp_vl.values_list('valeur', flat=True))
                 rendements = [(float(valeurs[i]) / float(valeurs[i-1]) - 1) for i in range(1, len(valeurs))]
-                if rendements:
+                if rendements and len(rendements) > 1:
                     moyenne = sum(rendements) / len(rendements)
-                    variance = sum((r - moyenne) ** 2 for r in rendements) / len(rendements)
-                    vol = (variance ** 0.5) * (365 ** 0.5) * 100
+                    variance = sum((r - moyenne) ** 2 for r in rendements) / (len(rendements) - 1)  # Variance non biaisée
+                    vol = (variance ** 0.5) * ANNUALIZATION_FACTOR * 100
                 else:
                     vol = 0
                 
@@ -376,6 +392,26 @@ def valeurs_liquidatives(request):
     drawdowns_data_json = json.dumps(analyse_stats.get('drawdowns_data', []))
     rendements_list_json = json.dumps(analyse_stats.get('rendements_list', []))
     
+    # Données de fiche signalétique pour l'onglet Fiche signalétique
+    selected_fcp_fiche_data = get_fcp_data(selected_fcp)
+    fcp_enriched = {}
+    for name, data in FCP_FICHE_SIGNALETIQUE.items():
+        fcp_enriched[name] = {
+            **data,
+            'risk_label': get_risk_label(data['echelle_risque']),
+            'type_icon': get_type_icon(data['type_fond']),
+            'type_color': get_type_color(data['type_fond']),
+        }
+    
+    selected_fcp_data = None
+    if selected_fcp_fiche_data:
+        selected_fcp_data = {
+            **selected_fcp_fiche_data,
+            'risk_label': get_risk_label(selected_fcp_fiche_data['echelle_risque']),
+            'type_icon': get_type_icon(selected_fcp_fiche_data['type_fond']),
+            'type_color': get_type_color(selected_fcp_fiche_data['type_fond']),
+        }
+    
     context = {
         'page_title': 'Valeurs Liquidatives',
         'page_description': 'Suivi et historique des valeurs liquidatives des FCP',
@@ -392,6 +428,10 @@ def valeurs_liquidatives(request):
         'underwater_data_json': underwater_data_json,
         'drawdowns_data_json': drawdowns_data_json,
         'rendements_list_json': rendements_list_json,
+        # Données fiche signalétique
+        'fcp_data': fcp_enriched,
+        'selected_fcp_data': selected_fcp_data,
+        'fcp_data_json': json.dumps(fcp_enriched),
     }
     return render(request, 'fcp_app/valeurs_liquidatives.html', context)
 
@@ -446,10 +486,10 @@ def api_scatter_data(request):
                     valeurs = list(filtered_vl.values_list('valeur', flat=True))
                     if len(valeurs) > 1:
                         rendements = [(float(valeurs[i]) / float(valeurs[i-1]) - 1) for i in range(1, len(valeurs))]
-                        if rendements:
+                        if rendements and len(rendements) > 1:
                             moyenne = sum(rendements) / len(rendements)
-                            variance = sum((r - moyenne) ** 2 for r in rendements) / len(rendements)
-                            vol = (variance ** 0.5) * (365 ** 0.5) * 100
+                            variance = sum((r - moyenne) ** 2 for r in rendements) / (len(rendements) - 1)  # Variance non biaisée
+                            vol = (variance ** 0.5) * ANNUALIZATION_FACTOR * 100
                         else:
                             vol = 0
                     else:
@@ -634,9 +674,9 @@ def api_fcp_full_data(request):
             if len(period_rendements) < 2:
                 return None
             moyenne = sum(period_rendements) / len(period_rendements)
-            variance = sum((r - moyenne) ** 2 for r in period_rendements) / len(period_rendements)
+            variance = sum((r - moyenne) ** 2 for r in period_rendements) / (len(period_rendements) - 1)  # Variance non biaisée
             ecart_type = variance ** 0.5
-            volatilite_ann = ecart_type * (365 ** 0.5)
+            volatilite_ann = ecart_type * ANNUALIZATION_FACTOR
             return round(volatilite_ann, 2)
         
         tracking_error = {
@@ -654,9 +694,9 @@ def api_fcp_full_data(request):
             rendements = [(valeurs[i] / valeurs[i-1] - 1) * 100 for i in range(1, len(valeurs))]
             
             moyenne_rdt = sum(rendements) / len(rendements)
-            variance = sum((r - moyenne_rdt) ** 2 for r in rendements) / len(rendements)
+            variance = sum((r - moyenne_rdt) ** 2 for r in rendements) / (len(rendements) - 1)  # Variance non biaisée
             ecart_type = variance ** 0.5
-            volatilite_ann = ecart_type * (365 ** 0.5)
+            volatilite_ann = ecart_type * ANNUALIZATION_FACTOR
             
             rendements_sorted = sorted(rendements)
             n = len(rendements_sorted)
@@ -680,14 +720,13 @@ def api_fcp_full_data(request):
                 if drawdown > max_drawdown:
                     max_drawdown = drawdown
             
-            rf = 3.25 / 365
-            sharpe = ((moyenne_rdt - rf) / ecart_type * (365 ** 0.5)) if ecart_type > 0 else 0
+            sharpe = ((moyenne_rdt - RISK_FREE_RATE_DAILY) / ecart_type * ANNUALIZATION_FACTOR) if ecart_type > 0 else 0
             
             rendements_negatifs = [r for r in rendements if r < 0]
             if rendements_negatifs:
-                downside_var = sum(r ** 2 for r in rendements_negatifs) / len(rendements_negatifs)
+                downside_var = sum(r ** 2 for r in rendements_negatifs) / (len(rendements_negatifs) - 1) if len(rendements_negatifs) > 1 else sum(r ** 2 for r in rendements_negatifs)
                 downside_std = downside_var ** 0.5
-                sortino = ((moyenne_rdt - rf) / downside_std * (365 ** 0.5)) if downside_std > 0 else 0
+                sortino = ((moyenne_rdt - RISK_FREE_RATE_DAILY) / downside_std * ANNUALIZATION_FACTOR) if downside_std > 0 else 0
             else:
                 sortino = 0
             
@@ -851,35 +890,8 @@ def composition(request):
     return render(request, 'fcp_app/composition.html', context)
 
 
-def fiche_signaletique(request):
-    """Vue pour la page Fiche Signalétique"""
-    selected_fcp = request.GET.get('fcp', 'FCP PLACEMENT AVANTAGE')
-    fcp_data = get_fcp_data(selected_fcp)
-    
-    # Préparer les données enrichies pour tous les FCP
-    fcp_enriched = {}
-    for name, data in FCP_FICHE_SIGNALETIQUE.items():
-        fcp_enriched[name] = {
-            **data,
-            'risk_label': get_risk_label(data['echelle_risque']),
-            'type_icon': get_type_icon(data['type_fond']),
-            'type_color': get_type_color(data['type_fond']),
-        }
-    
-    context = {
-        'page_title': 'Fiche Signalétique',
-        'page_description': 'Informations générales et caractéristiques des FCP',
-        'fcp_list': get_all_fcp_names(),
-        'fcp_data': fcp_enriched,
-        'selected_fcp': selected_fcp,
-        'selected_fcp_data': {
-            **fcp_data,
-            'risk_label': get_risk_label(fcp_data['echelle_risque']),
-            'type_icon': get_type_icon(fcp_data['type_fond']),
-            'type_color': get_type_color(fcp_data['type_fond']),
-        } if fcp_data else None,
-    }
-    return render(request, 'fcp_app/fiche_signaletique.html', context)
+# NOTE: Fonction fiche_signaletique supprimée - code orphelin (pas de route ni de template)
+# Les données de la fiche signalétique sont intégrées dans la page Valeurs Liquidatives
 
 
 def a_propos(request):
@@ -2083,11 +2095,10 @@ def api_factsheet_preview(request):
             rendements = [(valeurs[i] / valeurs[i-1] - 1) * 100 for i in range(1, len(valeurs))]
             
             moyenne_rdt = sum(rendements) / len(rendements)
-            variance = sum((r - moyenne_rdt) ** 2 for r in rendements) / len(rendements)
-            volatilite = (variance ** 0.5) * (365 ** 0.5)
+            variance = sum((r - moyenne_rdt) ** 2 for r in rendements) / (len(rendements) - 1) if len(rendements) > 1 else sum((r - moyenne_rdt) ** 2 for r in rendements)
+            volatilite = (variance ** 0.5) * ANNUALIZATION_FACTOR
             
-            rf_daily = 3.25 / 365
-            sharpe = ((moyenne_rdt - rf_daily) / (variance ** 0.5) * (365 ** 0.5)) if variance > 0 else 0
+            sharpe = ((moyenne_rdt - RISK_FREE_RATE_DAILY) / (variance ** 0.5) * ANNUALIZATION_FACTOR) if variance > 0 else 0
             
             peak = valeurs[0]
             max_dd = 0
@@ -2348,8 +2359,8 @@ def generate_factsheet_pdf(fcp_name, month, commentaire, disclaimer):
             return {'vol': None, 'max_dd': None, 'var95': None, 'te': None, 'sharpe': None, 'sortino': None}
         
         mean_ret = sum(rets) / len(rets)
-        variance = sum((r - mean_ret) ** 2 for r in rets) / len(rets)
-        vol = (variance ** 0.5) * (252 ** 0.5) if variance > 0 else 0
+        variance = sum((r - mean_ret) ** 2 for r in rets) / (len(rets) - 1) if len(rets) > 1 else sum((r - mean_ret) ** 2 for r in rets)  # Variance non biaisée
+        vol = (variance ** 0.5) * ANNUALIZATION_FACTOR if variance > 0 else 0
         
         # Max Drawdown
         peak = vals[0]
@@ -2369,15 +2380,14 @@ def generate_factsheet_pdf(fcp_name, month, commentaire, disclaimer):
         # Tracking Error (volatilité)
         te = vol
         
-        # Sharpe (rf = 3.25%)
-        rf_daily = 3.25 / 252
-        sharpe = ((mean_ret - rf_daily) / (variance ** 0.5) * (252 ** 0.5)) if variance > 0 else 0
+        # Sharpe (utiliser constantes)
+        sharpe = ((mean_ret - RISK_FREE_RATE_DAILY) / (variance ** 0.5) * ANNUALIZATION_FACTOR) if variance > 0 else 0
         
         # Sortino
         neg_rets = [r for r in rets if r < 0]
         if neg_rets:
-            downside_var = sum(r ** 2 for r in neg_rets) / len(neg_rets)
-            sortino = ((mean_ret - rf_daily) / (downside_var ** 0.5) * (252 ** 0.5)) if downside_var > 0 else 0
+            downside_var = sum(r ** 2 for r in neg_rets) / (len(neg_rets) - 1) if len(neg_rets) > 1 else sum(r ** 2 for r in neg_rets)
+            sortino = ((mean_ret - RISK_FREE_RATE_DAILY) / (downside_var ** 0.5) * ANNUALIZATION_FACTOR) if downside_var > 0 else 0
         else:
             sortino = 0
         
@@ -2886,8 +2896,8 @@ def api_volatility_clustering(request):
     for i in range(window - 1, len(rendements)):
         window_returns = rendements[i - window + 1:i + 1]
         mean_ret = sum(window_returns) / len(window_returns)
-        variance = sum((r - mean_ret) ** 2 for r in window_returns) / len(window_returns)
-        vol = (variance ** 0.5) * (365 ** 0.5)  # Volatilité annualisée
+        variance = sum((r - mean_ret) ** 2 for r in window_returns) / (len(window_returns) - 1) if len(window_returns) > 1 else sum((r - mean_ret) ** 2 for r in window_returns)
+        vol = (variance ** 0.5) * ANNUALIZATION_FACTOR  # Volatilité annualisée
         volatilites.append(vol)
         vol_dates.append(dates[i])
     
@@ -3022,8 +3032,8 @@ def api_rolling_metrics(request):
             ret = (float(bench_vl[i]['valeur']) / float(bench_vl[i-1]['valeur']) - 1) * 100
             benchmark_returns[bench_vl[i]['date']] = ret
     
-    # Taux sans risque journalier (3.25% annuel)
-    rf_daily = 3.25 / 365
+    # Taux sans risque journalier (utiliser la constante)
+    # Note: rf_daily est déjà défini en constante globale RISK_FREE_RATE_DAILY
     
     # Calculer les métriques glissantes
     rolling_sharpe = []
@@ -3036,11 +3046,11 @@ def api_rolling_metrics(request):
         
         # Sharpe Ratio glissant
         mean_ret = sum(window_returns) / len(window_returns)
-        variance = sum((r - mean_ret) ** 2 for r in window_returns) / len(window_returns)
+        variance = sum((r - mean_ret) ** 2 for r in window_returns) / (len(window_returns) - 1) if len(window_returns) > 1 else sum((r - mean_ret) ** 2 for r in window_returns)
         std_ret = variance ** 0.5
         
         if std_ret > 0:
-            sharpe = ((mean_ret - rf_daily) / std_ret) * (365 ** 0.5)
+            sharpe = ((mean_ret - RISK_FREE_RATE_DAILY) / std_ret) * ANNUALIZATION_FACTOR
         else:
             sharpe = 0
         

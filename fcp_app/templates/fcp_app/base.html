@@ -40,12 +40,6 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{% url 'fcp_app:fiche_signaletique' %}" class="nav-link {% if request.resolver_match.url_name == 'fiche_signaletique' %}active{% endif %}">
-                    <i class="bi bi-file-earmark-text-fill"></i>
-                    <span>Fiche Signalétique</span>
-                </a>
-            </li>
-            <li class="nav-item">
                 <a href="{% url 'fcp_app:exportations' %}" class="nav-link {% if request.resolver_match.url_name == 'exportations' %}active{% endif %}">
                     <i class="bi bi-download"></i>
                     <span>Exportations</span>
